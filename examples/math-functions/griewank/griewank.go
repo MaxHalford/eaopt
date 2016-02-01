@@ -23,11 +23,11 @@ func Griewank(X []float64) float64 {
 
 func main() {
 	// Instantiate a genetic algorithm
-	ga := genalg.GA
+	ga := gago.Default
 	// Fitness function
 	function := Griewank
 	// Number of variables the function takes as input
-	variables := 4
+	variables := 2
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement

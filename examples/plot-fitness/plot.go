@@ -11,12 +11,14 @@ import (
 	"github.com/gonum/plot/vg"
 )
 
-func sphere(X []float64) float64 {
+// StyblinskiTang minimum is -39.16599d reached in (-2.903534, ..., -2.903534)
+// Recommended search domain is [-5, 5]
+func StyblinskiTang(X []float64) float64 {
 	sum := 0.0
 	for _, x := range X {
-		sum += m.Pow(x, 2)
+		sum += m.Pow(x, 4) - 16*m.Pow(x, 2) + 5*x
 	}
-	return sum
+	return sum / 2
 }
 
 func graph(best plotter.XYs) {
@@ -45,22 +47,23 @@ func graph(best plotter.XYs) {
 
 func main() {
 	// Instantiate a population
-	ga := genalg.GA
+	ga := gago.Default
 	// Fitness function
-	function := sphere
+	function := StyblinskiTang
 	// Number of variables the function takes as input
 	variables := 2
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Number of generations
-	generations := 20
+	generations := 10
 	// Containers for fitnesses
 	best := make(plotter.XYs, generations)
 	// Enhancement
 	for i := 0; i < generations; i++ {
+		ga.Enhance()
+		// Store the best fitness for plotting
 		best[i].X = float64(i)
 		best[i].Y = ga.Best.Fitness
-		ga.Enhance()
 	}
 	// Graph the fitnesses
 	graph(best)

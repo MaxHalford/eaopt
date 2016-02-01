@@ -7,27 +7,27 @@ import (
 	"github.com/MaxHalford/gago"
 )
 
-// StyblinskiTang minimum is -39.16599d reached in (-2.903534, ..., -2.903534)
-// Recommended search domain is [-5, 5]
-func StyblinskiTang(X []float64) float64 {
-	sum := 0.0
+// Rastrigin minimum is 0 reached in (0, ..., 0)
+// Recommended search domain is [-5.12, 5.12]
+func Rastrigin(X []float64) float64 {
+	sum := 10.0 * float64(len(X))
 	for _, x := range X {
-		sum += m.Pow(x, 4) - 16*m.Pow(x, 2) + 5*x
+		sum += m.Pow(x, 2) - 10*m.Cos(2*m.Pi*x)
 	}
-	return sum / 2
+	return sum
 }
 
 func main() {
 	// Instantiate a population
-	ga := genalg.GA
+	ga := gago.Default
 	// Fitness function
-	function := StyblinskiTang
+	function := Rastrigin
 	// Number of variables the function takes as input
 	variables := 2
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 40; i++ {
 		fmt.Println(ga.Best)
 		ga.Enhance()
 	}
