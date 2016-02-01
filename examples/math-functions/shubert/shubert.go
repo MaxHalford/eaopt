@@ -21,13 +21,11 @@ func Shubert(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := genalg.GA
+	ga := gago.Default
 	// More demes
-	ga.Nbdemes = 4
+	ga.NbDemes = 4
 	// More individual
-	ga.Nbindividuals = 100
-	// Different standard deviation
-	ga.Std = 2
+	ga.NbIndividuals = 100
 	// Fitness function
 	function := Shubert
 	// Number of variables the function takes as input

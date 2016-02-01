@@ -18,7 +18,7 @@ func Sphere(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := genalg.GA
+	ga := gago.Default
 	// Fitness function
 	function := Sphere
 	// Number of variables the function takes as input

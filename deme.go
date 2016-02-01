@@ -1,84 +1,65 @@
-package genalg
+package gago
 
 import "math/rand"
 
 // A Deme contains individuals. Individuals mate within a deme.
 // Individuals can migrate from one deme to another.
 type Deme struct {
-	size        int
-	individuals Individuals
+	// Number of individuals in the deme
+	Size int
+	// Individuals
+	Individuals Individuals
+	// Each deme has a random number generator to bypass the global rand mutex
+	Generator *rand.Rand
 }
 
 // Initialize each individual in a deme.
 func (deme *Deme) initialize(indiSize int, boundary float64) {
-	for i := range deme.individuals {
-		indi := Individual{make([]float64, indiSize), 0.0}
-		indi.initialize(boundary)
-		deme.individuals[i] = indi
+	for i := range deme.Individuals {
+		individual := Individual{make([]float64, indiSize), 0.0}
+		individual.initialize(boundary, deme.Generator)
+		deme.Individuals[i] = individual
 	}
 }
 
 // Evaluate the fitness of each individual in a deme.
 func (deme *Deme) evaluate(fitnessFunction func([]float64) float64) {
-	for i := range deme.individuals {
-		deme.individuals[i].evaluate(fitnessFunction)
+	for i := range deme.Individuals {
+		deme.Individuals[i].evaluate(fitnessFunction)
 	}
 }
 
-// Sort the individuals in a deme
+// Sort the individuals in a deme.
 func (deme *Deme) sort() {
-	deme.individuals.sort()
+	deme.Individuals.sort()
 }
 
 // Mutate each individual in a deme.
-func (deme *Deme) mutate(rate float64, std float64) {
-	for i := range deme.individuals {
-		deme.individuals[i].mutate(rate, std)
+func (deme *Deme) mutate(mutate func(indi *Individual, rate float64, generator *rand.Rand),
+	rate float64) {
+	for _, individual := range deme.Individuals {
+		// Use the pointer to the individual to mutate
+		mutate(&individual, rate, deme.Generator)
 	}
 }
 
-// Choose two parents to mate.
-func (deme *Deme) chooseParents() (Individual, Individual) {
-	motherIndex := rand.Intn(deme.size)
-	fatherIndex := rand.Intn(deme.size)
-	// The two individuals have to be different
-	for motherIndex == fatherIndex {
-		motherIndex = rand.Intn(deme.size)
-		fatherIndex = rand.Intn(deme.size)
-	}
-	mother := deme.individuals[motherIndex]
-	father := deme.individuals[fatherIndex]
-	return mother, father
-}
-
-// Crossover pairs of individuals in a deme.
-func (deme *Deme) crossover(nbCouples int, nbOffsprings int) {
-	for i := 0; i < nbCouples; i++ {
-		mother, father := deme.chooseParents()
-		for j := 0; j < nbOffsprings; j++ {
-			offspring := crossover(&mother, &father)
-			deme.individuals = append(deme.individuals, offspring)
+// Crossover replaces the population with new individuals called offsprings. The
+// takes as arguments a selection method, a crossover method and the size of the
+// crossover. The size of the crossover is the number of individuals whose genes
+// will be mixed to generate an offspring with the crossover function.
+func (deme *Deme) crossover(selection func(Individuals, *rand.Rand) Individual,
+	crossover func(Individuals, *rand.Rand) Individual, csize int) {
+	// Create an empty slice of individuals to store the offsprings
+	offsprings := make(Individuals, deme.Size)
+	for i := 0; i < deme.Size; i++ {
+		// Select individuals to perform crossover
+		selected := make(Individuals, csize)
+		for j := 0; j < csize; j++ {
+			selected[j] = selection(deme.Individuals, deme.Generator)
 		}
+		// Generate an offspring from the selected individuals
+		offsprings[i] = crossover(selected, deme.Generator)
 	}
-}
-
-// Tournament selection to choose remaining individuals
-// in a deme.
-func (deme *Deme) tournament(tournamentSize int) {
-	winners := make(Individuals, deme.size)
-	var index int
-	for i := 0; i < deme.size; i++ {
-		// Randomly sample the population
-		sample := make(Individuals, tournamentSize)
-		for j := 0; j < tournamentSize; j++ {
-			index := rand.Intn(len(deme.individuals))
-			sample[j] = deme.individuals[index]
-		}
-		// The winner is the best individual of the tournament
-		sample.sort()
-		winners[i] = sample[0]
-		// Remove the selected individual from the original list
-		deme.individuals = append(deme.individuals[:index], deme.individuals[index+1:]...)
-	}
-	deme.individuals = winners
+	// Replace the population with the offsprings
+	deme.Individuals = offsprings
 }
