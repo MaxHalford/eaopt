@@ -2,8 +2,8 @@ package gago
 
 import "math/rand"
 
-// A Deme contains individuals. Individuals mate within a deme.
-// Individuals can migrate from one deme to another.
+// A Deme contains individuals. Individuals mate within a deme. Individuals can
+// migrate from one deme to another.
 type Deme struct {
 	// Number of individuals in the deme
 	Size int
@@ -35,11 +35,11 @@ func (deme *Deme) sort() {
 }
 
 // Mutate each individual in a deme.
-func (deme *Deme) mutate(mutate func(indi *Individual, rate float64, generator *rand.Rand),
-	rate float64) {
+func (deme *Deme) mutate(mutMethod func(indi *Individual, mutRate, mutIntensity float64, generator *rand.Rand),
+	mutRate, mutIntensity float64) {
 	for _, individual := range deme.Individuals {
 		// Use the pointer to the individual to mutate
-		mutate(&individual, rate, deme.Generator)
+		mutMethod(&individual, mutRate, mutIntensity, deme.Generator)
 	}
 }
 
@@ -48,17 +48,17 @@ func (deme *Deme) mutate(mutate func(indi *Individual, rate float64, generator *
 // crossover. The size of the crossover is the number of individuals whose genes
 // will be mixed to generate an offspring with the crossover function.
 func (deme *Deme) crossover(selection func(Individuals, *rand.Rand) Individual,
-	crossover func(Individuals, *rand.Rand) Individual, csize int) {
+	crossMethod func(Individuals, *rand.Rand) Individual, crossSize int) {
 	// Create an empty slice of individuals to store the offsprings
 	offsprings := make(Individuals, deme.Size)
 	for i := 0; i < deme.Size; i++ {
 		// Select individuals to perform crossover
-		selected := make(Individuals, csize)
-		for j := 0; j < csize; j++ {
+		selected := make(Individuals, crossSize)
+		for j := 0; j < crossSize; j++ {
 			selected[j] = selection(deme.Individuals, deme.Generator)
 		}
 		// Generate an offspring from the selected individuals
-		offsprings[i] = crossover(selected, deme.Generator)
+		offsprings[i] = crossMethod(selected, deme.Generator)
 	}
 	// Replace the population with the offsprings
 	deme.Individuals = offsprings

@@ -26,13 +26,15 @@ type Population struct {
 	// Selection method
 	Selection func(Individuals, *rand.Rand) Individual
 	// Crossover method
-	Crossover func(Individuals, *rand.Rand) Individual
+	CrossMethod func(Individuals, *rand.Rand) Individual
 	// Crossover size
-	CSize int
+	CrossSize int
 	// Mutation method
-	Mutate func(*Individual, float64, *rand.Rand)
+	MutMethod func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)
 	// Mutation rate
-	MRate float64
+	MutRate float64
+	// Mutation intensity
+	MutIntensity float64
 }
 
 // Initialize each deme in the population and assign an initial fitness to each
@@ -78,8 +80,8 @@ func (pop *Population) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			pop.Demes[j].crossover(pop.Selection, pop.Crossover, pop.CSize)
-			pop.Demes[j].mutate(pop.Mutate, pop.MRate)
+			pop.Demes[j].crossover(pop.Selection, pop.CrossMethod, pop.CrossSize)
+			pop.Demes[j].mutate(pop.MutMethod, pop.MutRate, pop.MutIntensity)
 			pop.Demes[j].evaluate(pop.Ff)
 			pop.Demes[j].sort()
 		}(i)

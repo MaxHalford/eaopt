@@ -1,5 +1,7 @@
 # Genetic algorithm in Go
 
+![License](http://img.shields.io/:license-mit-blue.svg)
+
 ![Logo](logo.png)
 
 In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) runs as follows:
@@ -10,7 +12,7 @@ In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genet
 4. Apply genetic operators (such as [mutation](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) and [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm))).
 5. Repeat from step 2 until satisfied.
 
-Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-population genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html), in that sense it performs better than a traditional genetic algorithm.
+Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-population genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it performs better than a traditional genetic algorithm.
 
 Genetic algorithms are notorious for being [embarrassingly parallel](http://www.wikiwand.com/en/Embarrassingly_parallel). Indeed, most calculations can be run in parallel because they only affect one individual. Luckily Go provides good support for parallelism. As some gophers may know, the `math/rand` module can be problematic because there is a global lock the random number generator, the problem is described in this [stackoverflow post](http://stackoverflow.com/questions/14298523/why-does-adding-concurrency-slow-down-this-golang-code). This can be circumvented by providing each deme with it's own generator.
 
@@ -70,33 +72,46 @@ func main() {
 
 - `gago.Default` is a preset configuration, this way the parameters described in the following don't have to all be set manually.
 - `function` and `variables` have to be predefined. These are only two parameters that change from one problem to another.
-- `ga.Initialize` will populate the demes with individuals.
+- `ga.Initialize` will populate the demes with individuals based on the chosen parameters.
 - The GA will try to **minimize** the fitness function. If instead you want to maximize a function `f(x)`, you can minimize `-f(x)` or `1/f(x)`.
 
 ## Parameters
 
 To modify the behavior off the GA, you can change the `gago.Population` struct before running `ga.Initialize`. You can either instantiate a new `gago.Population` or use a predefined one from the `configuration.go` file.
 
-| Variable in the code | Type                                       | Description                                                      |
-|----------------------|--------------------------------------------|------------------------------------------------------------------|
-| `NbDemes`            | `int`                                      | Number of demes in the population.                               |
-| `NbIndividuals`      | `int`                                      | Number of individuals in each deme.                              |
-| `NbGenes`            | `int`                                      | Number of genes in each individual.                              |
-| `Ff`                 | `func([]float64) float64`                  | Fitness function the GA has to minimize.                         |
-| `Boundary`           |                                            | Boundary when generating initial genes.                          |
-| `Selection`          | `func(Individuals, *rand.Rand) Individual` | Method for selecting one individual from a group of individuals. |
-| `Crossover`          | `func(Individuals, *rand.Rand) Individual` | Method for producing a new individual.                           |
-| `CSize`              | `int`                                      | Number of individuals that are chosen for crossover.             |
-| `Mutate`             | `func(*Individual, float64, *rand.Rand)`   | Method for modifying an individual's genes.                      |
-| `MRate`              | `MRate`                                    | Rate at which genes mutate.                                      |
+| Variable in the code | Type                                                                                  | Description                                                      |
+|----------------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| `NbDemes`            | `int`                                                                                 | Number of demes in the population.                               |
+| `NbIndividuals`      | `int`                                                                                 | Number of individuals in each deme.                              |
+| `NbGenes`            | `int`                                                                                 | Number of genes in each individual.                              |
+| `Ff`                 | `func([]float64) float64`                                                             | Fitness function the GA has to minimize.                         |
+| `Boundary`           | `float64`                                                                             | Boundary when generating initial genes.                          |
+| `Selection`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
+| `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual.                           |
+| `CrossSize`          | `int`                                                                                 | Number of individuals that are chosen for crossover.             |
+| `MutMethod           | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
+| `MutRate`            | `float64`                                                                             | Rate at which genes mutate.                                      |
+| `MutMethod`          | `float64`                                                                             | Intensity at which genes mutate.                                 |
 
 `gago` is very flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it.
+
+## Documentation
+
+- [godoc](https://godoc.org/github.com/MaxHalford/gago)
+- Each operator (selection, crossover, mutation, migration) is described in it's comments.
+- [An introduction to genetic algorithms](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
+- [The Multipopulation Genetic Algorithm: Local Selection and Migration](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
 
 ## Examples
 
 - Check out the [examples/minimization/](examples/minimization/) folder for basic examples. Test functions were found [here](http://www.sfu.ca/~ssurjano/optimization.html).
 - [examples/plot-fitness/](examples/plot-fitness/) is an example of plotting the fitness per generation with [gonum/plot](https://github.com/gonum/plot).
-- [examples/curve-fitting](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
+- [examples/curve-fitting/](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
+
+## Display
+
+- The `String()` methods of each structure have been redefined. For example you can do `fmt.Println(individual)` and the result will be prettily displayed. These display methods are available in the `display.go` script.
+- Later on the goal will be to allow exporting information via CSV files etc.
 
 ## Roadmap
 
@@ -105,3 +120,16 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 - Testing.
 - Benchmarking.
 - Comparison with other algorithms/libraries.
+- Implement more genetic operators.
+
+## Comments
+
+- Please post suggestions/issues in GitHub's issues section.
+- You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) for comments/enquiries.
+- I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
+- Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
+
+## Change log
+
+- **01/02/2016**: first commit.
+- **02/02/2016**: based on the apparent popularity of `gago` I made some decisions to make it more flexible and readable. Essentially some names have changed and display functions are available.
