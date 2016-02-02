@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	m "math"
-	"runtime"
 
 	"github.com/MaxHalford/gago"
 )
@@ -32,7 +31,6 @@ func leastSquares(X []float64) float64 {
 }
 
 func main() {
-	runtime.GOMAXPROCS(-1)
 	// Instantiate a population
 	ga := gago.Default
 	// Number of demes

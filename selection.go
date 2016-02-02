@@ -5,7 +5,7 @@ import "math/rand"
 // Tournament selection to choose an individual for crossover. The tournament
 // is composed of randomly chosen individuals. The winner of the tournament is
 // the individual with the lowest fitness.
-func tournament(indis Individuals, generator *rand.Rand) Individual {
+func Tournament(indis Individuals, generator *rand.Rand) Individual {
 	// 3 has been proven empirically to be the optimal number of contestants
 	nbContestants := 3
 	// Randomly sample the population
@@ -15,7 +15,7 @@ func tournament(indis Individuals, generator *rand.Rand) Individual {
 		sample[j] = indis[index]
 	}
 	// The winner is the best individual participating in the tournament
-	sample.sort()
+	sample.Sort()
 	winner := sample[0]
 	return winner
 }

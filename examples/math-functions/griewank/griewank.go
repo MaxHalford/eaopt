@@ -32,7 +32,7 @@ func main() {
 	ga.Initialize(function, variables)
 	// Enhancement
 	for i := 0; i < 50; i++ {
-		fmt.Println(i, "-", ga.Best.Fitness)
+		fmt.Println(ga.Best)
 		ga.Enhance()
 	}
 }

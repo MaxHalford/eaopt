@@ -1,10 +1,11 @@
-# Genetic algorithm in Go
+# Genetic algorithm in Go (gago)
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
+[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 ![Logo](logo.png)
 
-In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) runs as follows:
+In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
 1. Generate random solutions.
 2. Evaluate the solutions.
@@ -25,10 +26,11 @@ The terms surrounding genetic algorithms (GAs) are roughly analogous to those fo
 - Each individual has ***genes*** to which a ***fitness*** is assigned.
 - The number of genes is simply the number of variables defined by the problem.
 - Individuals are sorted based on their fitness towards a problem.
-***crossover***.
+- ***Offsprings*** are born by applying ***crossover*** on selected individuals.
+- The ***selection*** method is crucial and determines most of the behavior of the algorithm.
 - Genes can be randomly modified through ***mutation***.
 - Classically, individuals are contained in a structure called a ***population***.
-- Parallel GAs add another layer in-between called ***demes***.
+- Multi-population GAs add another layer in-between called ***demes***,
 
 ## Usage
 
@@ -87,13 +89,19 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | `Ff`                 | `func([]float64) float64`                                                             | Fitness function the GA has to minimize.                         |
 | `Boundary`           | `float64`                                                                             | Boundary when generating initial genes.                          |
 | `Selection`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
-| `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual.                           |
+| `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual (called the offspring).    |
 | `CrossSize`          | `int`                                                                                 | Number of individuals that are chosen for crossover.             |
 | `MutMethod`          | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
 | `MutRate`            | `float64`                                                                             | Rate at which genes mutate.                                      |
 | `MutMethod`          | `float64`                                                                             | Intensity at which genes mutate.                                 |
+| `MigMethod`		   | `func(demes []Deme) []Deme`														   | Protocol for exchanging individuals between the demes.			  |
 
 `gago` is very flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it.
+
+## Display
+
+- The `String()` methods of each structure have been redefined. For example you can do `fmt.Println(individual)` and the result will be prettily displayed. These display methods are available in the `display.go` script.
+- Later on the goal will be to allow exporting information via CSV files etc.
 
 ## Documentation
 
@@ -107,11 +115,6 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 - Check out the [examples/minimization/](examples/minimization/) folder for basic examples. Test functions were found [here](http://www.sfu.ca/~ssurjano/optimization.html).
 - [examples/plot-fitness/](examples/plot-fitness/) is an example of plotting the fitness per generation with [gonum/plot](https://github.com/gonum/plot).
 - [examples/curve-fitting/](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
-
-## Display
-
-- The `String()` methods of each structure have been redefined. For example you can do `fmt.Println(individual)` and the result will be prettily displayed. These display methods are available in the `display.go` script.
-- Later on the goal will be to allow exporting information via CSV files etc.
 
 ## Roadmap
 
@@ -128,8 +131,12 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 - You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) for comments/enquiries.
 - I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
 - Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
+- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.
 
 ## Change log
 
-- **01/02/2016**: first commit.
-- **02/02/2016**: based on the apparent popularity of `gago` I made some decisions to make it more flexible and readable. Essentially some names have changed and display functions are available.
+| Date       | Description                                                                                                                                                                                         |
+|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 01/02/2016 | First commit.                                                                                                                                                                                       |
+| 02/02/2016 | Based on the apparent popularity of  `gago`, I made some decisions to make it more flexible and readable. Essentially some names have changed and display functions have started to be implemented. |
+| 03/02/2016 | The first migration method has been implemented, the documentation has been updated accordingly. Most methods have been capitalized for `godoc` purposes.                                           |
