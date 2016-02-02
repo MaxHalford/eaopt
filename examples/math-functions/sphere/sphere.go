@@ -27,7 +27,7 @@ func main() {
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 1000; i++ {
 		fmt.Println(ga.Best)
 		ga.Enhance()
 	}

@@ -15,7 +15,7 @@ type Individual struct {
 }
 
 // Initialize an individual.
-func (indi *Individual) initialize(boundary float64, generator *rand.Rand) {
+func (indi *Individual) Initialize(boundary float64, generator *rand.Rand) {
 	for i := range indi.Dna {
 		// Decide if positive or negative
 		var sign float64
@@ -24,13 +24,13 @@ func (indi *Individual) initialize(boundary float64, generator *rand.Rand) {
 		} else {
 			sign = -1.0
 		}
-		gene := generator.Float64() * sign * boundary
+		var gene = generator.Float64() * sign * boundary
 		indi.Dna[i] = gene
 	}
 }
 
 // Evaluate the Fitness of an individual.
-func (indi *Individual) evaluate(FitnessFunction func([]float64) float64) {
+func (indi *Individual) Evaluate(FitnessFunction func([]float64) float64) {
 	indi.Fitness = FitnessFunction(indi.Dna)
 }
 
@@ -40,7 +40,7 @@ type Individuals []Individual
 // Sort the individuals of a deme in ascending order based on their fitness. The
 // convention is that we always want to minimize a function. A function f(x) can
 // be function maximized by minimizing -f(x) or 1/f(x).
-func (indis Individuals) sort() {
+func (indis Individuals) Sort() {
 	sort.Sort(indis)
 }
 
