@@ -5,11 +5,10 @@ import (
 	"sort"
 )
 
-// An Individual represents a potential solution to a problem.
-// The individual's DNA is it's genotype, which is a slice
-// containing genes. Every gene is a floating point numbers.
-// The Fitness is the individual's phenotype and is represented
-// by a floating point number.
+// An Individual represents a potential solution to a problem. The individual's
+// DNA is it's genotype, which is a slice containing genes. Every gene is a
+// floating point numbers. The fitness is the individual's phenotype and is
+// represented by a floating point number.
 type Individual struct {
 	Dna     []float64
 	Fitness float64
@@ -35,26 +34,24 @@ func (indi *Individual) evaluate(FitnessFunction func([]float64) float64) {
 	indi.Fitness = FitnessFunction(indi.Dna)
 }
 
-// Individuals type is necessary
-// for sorting and selection purposes.
+// Individuals type is necessary for sorting and selection purposes.
 type Individuals []Individual
 
-// Sort the individuals of a deme in ascending order based
-// on their Fitness. The convention is that we always want
-// to minimize a function. If the function has to be maximized
-// then we can minimize 1/func(X) or -func(X).
-func (individuals Individuals) sort() {
-	sort.Sort(individuals)
+// Sort the individuals of a deme in ascending order based on their fitness. The
+// convention is that we always want to minimize a function. A function f(x) can
+// be function maximized by minimizing -f(x) or 1/f(x).
+func (indis Individuals) sort() {
+	sort.Sort(indis)
 }
 
-func (individuals Individuals) Len() int {
-	return len(individuals)
+func (indis Individuals) Len() int {
+	return len(indis)
 }
 
-func (individuals Individuals) Less(i, j int) bool {
-	return individuals[i].Fitness < individuals[j].Fitness
+func (indis Individuals) Less(i, j int) bool {
+	return indis[i].Fitness < indis[j].Fitness
 }
 
-func (individuals Individuals) Swap(i, j int) {
-	individuals[i], individuals[j] = individuals[j], individuals[i]
+func (indis Individuals) Swap(i, j int) {
+	indis[i], indis[j] = indis[j], indis[i]
 }

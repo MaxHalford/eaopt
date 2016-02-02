@@ -7,7 +7,8 @@ import (
 	"github.com/MaxHalford/gago"
 )
 
-// Sphere function minimum is 0
+// Sphere function minimum is 0 reached in (0, ..., 0).
+// Any search domain is fine.
 func Sphere(X []float64) float64 {
 	sum := 0.0
 	for _, x := range X {

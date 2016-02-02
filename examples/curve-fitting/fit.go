@@ -42,7 +42,7 @@ func main() {
 	// Initial random boundaries
 	ga.Boundary = 10.0
 	// Mutation rate
-	ga.MRate = 0.2
+	ga.MutRate = 0.2
 	// Fitness function
 	function := leastSquares
 	// Number of variables the function takes as input
@@ -50,7 +50,7 @@ func main() {
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 20; i++ {
 		ga.Enhance()
 	}
 	fmt.Println(ga.Best)
