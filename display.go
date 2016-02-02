@@ -1,6 +1,9 @@
 package gago
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 // floatToString converts a float into a string.
 func floatToString(float float64) string {
@@ -8,13 +11,13 @@ func floatToString(float float64) string {
 }
 
 // floatSliceToString converts a slice of floats into a string by using the
-// floatToString method.
+// previously defined floatToString method.
 func floatSliceToString(slice []float64) string {
-	var str string
-	for _, float := range slice {
-		str += floatToString(float) + ", "
+	var str = make([]string, len(slice))
+	for i, float := range slice {
+		str[i] = floatToString(float)
 	}
-	return str
+	return strings.Join(str, ", ")
 }
 
 // Display an individual.
