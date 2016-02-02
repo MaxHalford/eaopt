@@ -89,7 +89,7 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | `Selection`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
 | `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual.                           |
 | `CrossSize`          | `int`                                                                                 | Number of individuals that are chosen for crossover.             |
-| `MutMethod           | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
+| `MutMethod`          | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
 | `MutRate`            | `float64`                                                                             | Rate at which genes mutate.                                      |
 | `MutMethod`          | `float64`                                                                             | Intensity at which genes mutate.                                 |
 
