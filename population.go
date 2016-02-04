@@ -82,7 +82,8 @@ func (pop *Population) FindBest() {
 }
 
 // Enhance each deme in the population. The deme level operations are done in
-// parallel with a wait group.
+// parallel with a wait group. After all the deme operations have been run, the
+// population level operations are run.
 func (pop *Population) Enhance() {
 	var wg sync.WaitGroup
 	for i := range pop.Demes {

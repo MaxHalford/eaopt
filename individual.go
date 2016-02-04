@@ -14,12 +14,13 @@ type Individual struct {
 	Fitness float64
 }
 
-// Initialize an individual.
+// Initialize an individual. The initial gene values are randomly generated
+// based on the boundary parameter.
 func (indi *Individual) Initialize(boundary float64, generator *rand.Rand) {
 	for i := range indi.Dna {
 		// Decide if positive or negative
 		var sign float64
-		if generator.Float64() > 0.5 {
+		if generator.Float64() < 0.5 {
 			sign = 1.0
 		} else {
 			sign = -1.0
@@ -29,7 +30,7 @@ func (indi *Individual) Initialize(boundary float64, generator *rand.Rand) {
 	}
 }
 
-// Evaluate the Fitness of an individual.
+// Evaluate the fitness of an individual.
 func (indi *Individual) Evaluate(FitnessFunction func([]float64) float64) {
 	indi.Fitness = FitnessFunction(indi.Dna)
 }
