@@ -2,6 +2,7 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
+[![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
 
 ![Logo](logo.png)
 
@@ -88,7 +89,7 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | `NbGenes`            | `int`                                                                                 | Number of genes in each individual.                              |
 | `Ff`                 | `func([]float64) float64`                                                             | Fitness function the GA has to minimize.                         |
 | `Boundary`           | `float64`                                                                             | Boundary when generating initial genes.                          |
-| `Selection`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
+| `SelMethod`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
 | `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual (called the offspring).    |
 | `CrossSize`          | `int`                                                                                 | Number of individuals that are chosen for crossover.             |
 | `MutMethod`          | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
