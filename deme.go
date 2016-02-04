@@ -23,9 +23,9 @@ func (deme *Deme) Initialize(indiSize int, boundary float64) {
 }
 
 // Evaluate the fitness of each individual in a deme.
-func (deme *Deme) Evaluate(fitnessFunction func([]float64) float64) {
+func (deme *Deme) Evaluate(ff func([]float64) float64) {
 	for i := range deme.Individuals {
-		deme.Individuals[i].Evaluate(fitnessFunction)
+		deme.Individuals[i].Evaluate(ff)
 	}
 }
 
