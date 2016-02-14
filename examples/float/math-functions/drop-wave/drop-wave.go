@@ -17,7 +17,7 @@ func DropWave(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// Fitness function
 	function := DropWave
 	// Number of variables the function takes as input

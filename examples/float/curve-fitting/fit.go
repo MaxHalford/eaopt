@@ -32,7 +32,7 @@ func leastSquares(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// Number of demes
 	ga.NbDemes = 4
 	// Number of individuals in each deme

@@ -14,10 +14,10 @@ type Deme struct {
 }
 
 // Initialize each individual in a deme.
-func (deme *Deme) Initialize(indiSize int, boundary float64) {
+func (deme *Deme) Initialize(NbGenes int, init Initializer) {
 	for i := range deme.Individuals {
-		var individual = Individual{make([]float64, indiSize), 0.0}
-		individual.Initialize(boundary, deme.Generator)
+		var individual = Individual{make([]float64, NbGenes), 0.0}
+		init.Apply(&individual, deme.Generator)
 		deme.Individuals[i] = individual
 	}
 }
@@ -36,11 +36,10 @@ func (deme *Deme) Sort() {
 }
 
 // Mutate each individual in a deme.
-func (deme *Deme) Mutate(mutMethod func(indi *Individual, mutRate, mutIntensity float64, generator *rand.Rand),
-	mutRate, mutIntensity float64) {
+func (deme *Deme) Mutate(m Mutator) {
 	for _, individual := range deme.Individuals {
 		// Use the pointer to the individual to perform mutation
-		mutMethod(&individual, mutRate, mutIntensity, deme.Generator)
+		m.Apply(&individual, deme.Generator)
 	}
 }
 
@@ -48,18 +47,12 @@ func (deme *Deme) Mutate(mutMethod func(indi *Individual, mutRate, mutIntensity 
 // takes as arguments a selection method, a crossover method and the size of the
 // crossover. The size of the crossover is the number of individuals whose genes
 // will be mixed to generate an offspring with the crossover function.
-func (deme *Deme) Crossover(selMethod func(Individuals, *rand.Rand) Individual,
-	crossMethod func(Individuals, *rand.Rand) Individual, crossSize int) {
+func (deme *Deme) Crossover(selector Selector, c Crossover) {
 	// Create an empty slice of individuals to store the offsprings
 	var offsprings = make(Individuals, deme.Size)
 	for i := 0; i < deme.Size; i++ {
-		// Select individuals to perform crossover
-		var selected = make(Individuals, crossSize)
-		for j := 0; j < crossSize; j++ {
-			selected[j] = selMethod(deme.Individuals, deme.Generator)
-		}
 		// Generate an offspring from the selected individuals
-		offsprings[i] = crossMethod(selected, deme.Generator)
+		offsprings[i] = c.Apply(selector, deme.Individuals, deme.Generator)
 	}
 	// Replace the population with the offsprings
 	deme.Individuals = offsprings

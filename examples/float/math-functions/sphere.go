@@ -19,7 +19,7 @@ func Sphere(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// Fitness function
 	function := Sphere
 	// Number of variables the function takes as input
@@ -27,7 +27,7 @@ func main() {
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		fmt.Println(ga.Best)
 		ga.Enhance()
 	}

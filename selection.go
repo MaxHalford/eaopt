@@ -2,15 +2,24 @@ package gago
 
 import "math/rand"
 
-// Tournament selection to choose an individual for crossover. The tournament
-// is composed of randomly chosen individuals. The winner of the tournament is
-// the individual with the lowest fitness.
-func Tournament(indis Individuals, generator *rand.Rand) Individual {
-	// 3 has been proven empirically to be the optimal number of contestants
-	nbContestants := 3
+// Selector chooses an individual from a group of individuals.
+type Selector interface {
+	// Apply select one individual
+	Apply(individuals Individuals, generator *rand.Rand) Individual
+}
+
+// Tournament selection chooses an individual through tournament selection. The
+// tournament is composed of randomly chosen individuals. The winner of the
+// tournament is the individual with the lowest fitness.
+type Tournament struct {
+	NbParticipants int
+}
+
+// Apply tournament selection.
+func (ts Tournament) Apply(indis Individuals, generator *rand.Rand) Individual {
 	// Randomly sample the population
-	sample := make(Individuals, nbContestants)
-	for j := 0; j < nbContestants; j++ {
+	sample := make(Individuals, ts.NbParticipants)
+	for j := 0; j < ts.NbParticipants; j++ {
 		index := generator.Intn(len(indis))
 		sample[j] = indis[index]
 	}

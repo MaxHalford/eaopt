@@ -21,7 +21,7 @@ func Shubert(X []float64) float64 {
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// More demes
 	ga.NbDemes = 4
 	// More individual
