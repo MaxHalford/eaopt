@@ -47,7 +47,7 @@ func graph(best plotter.XYs) {
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// Fitness function
 	function := StyblinskiTang
 	// Number of variables the function takes as input

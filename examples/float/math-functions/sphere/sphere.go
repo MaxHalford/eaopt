@@ -7,27 +7,27 @@ import (
 	"github.com/MaxHalford/gago"
 )
 
-// Rastrigin minimum is 0 reached in (0, ..., 0)
-// Recommended search domain is [-5.12, 5.12]
-func Rastrigin(X []float64) float64 {
-	sum := 10.0 * float64(len(X))
+// Sphere function minimum is 0 reached in (0, ..., 0).
+// Any search domain is fine.
+func Sphere(X []float64) float64 {
+	sum := 0.0
 	for _, x := range X {
-		sum += m.Pow(x, 2) - 10*m.Cos(2*m.Pi*x)
+		sum += m.Pow(x, 2)
 	}
 	return sum
 }
 
 func main() {
 	// Instantiate a population
-	ga := gago.Default
+	ga := gago.Float
 	// Fitness function
-	function := Rastrigin
+	function := Sphere
 	// Number of variables the function takes as input
 	variables := 2
 	// Initialize the genetic algorithm
 	ga.Initialize(function, variables)
 	// Enhancement
-	for i := 0; i < 40; i++ {
+	for i := 0; i < 10; i++ {
 		fmt.Println(ga.Best)
 		ga.Enhance()
 	}

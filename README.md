@@ -1,9 +1,9 @@
-# Genetic algorithm in Go (gago)
+![Logo](logo.png)
+
+# gago is a genetic algorithm written in Golang
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-
-![Logo](logo.png)
 
 In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
@@ -81,22 +81,21 @@ func main() {
 
 To modify the behavior off the GA, you can change the `gago.Population` struct before running `ga.Initialize`. You can either instantiate a new `gago.Population` or use a predefined one from the `configuration.go` file.
 
-| Variable in the code | Type                                                                                  | Description                                                      |
-|----------------------|---------------------------------------------------------------------------------------|------------------------------------------------------------------|
-| `NbDemes`            | `int`                                                                                 | Number of demes in the population.                               |
-| `NbIndividuals`      | `int`                                                                                 | Number of individuals in each deme.                              |
-| `NbGenes`            | `int`                                                                                 | Number of genes in each individual.                              |
-| `Ff`                 | `func([]float64) float64`                                                             | Fitness function the GA has to minimize.                         |
-| `Boundary`           | `float64`                                                                             | Boundary when generating initial genes.                          |
-| `SelMethod`          | `func(Individuals, *rand.Rand) Individual`                                            | Method for selecting one individual from a group of individuals. |
-| `CrossMethod`        | `func(Individuals, *rand.Rand) Individual`                                            | Method for producing a new individual (called the offspring).    |
-| `CrossSize`          | `int`                                                                                 | Number of individuals that are chosen for crossover.             |
-| `MutMethod`          | `func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)`       | Method for modifying an individual's genes.                      |
-| `MutRate`            | `float64`                                                                             | Rate at which genes mutate.                                      |
-| `MutMethod`          | `float64`                                                                             | Intensity at which genes mutate.                                 |
-| `MigMethod`		   | `func(demes []Deme) []Deme`														   | Protocol for exchanging individuals between the demes.			  |
+| Variable in the code   | Type                      | Description                                                      |
+|------------------------|---------------------------|------------------------------------------------------------------|
+| `NbDemes`              | `int`                     | Number of demes in the population.                               |
+| `NbIndividuals`        | `int`                     | Number of individuals in each deme.                              |
+| `NbGenes`              | `int`                     | Number of genes in each individual.                              |
+| `Ff`                   | `func([]float64) float64` | Fitness function the GA has to minimize.                         |
+| `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual.                        |
+| `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals. |
+| `Crossover` (struct)   | `Crossover` (interface)   | Method for producing a new individual (called the offspring).    |
+| `Mutator` (struct)     | `Mutator` (interface)     | Method for modifying an individual's genes.                      |
+| `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the demes.             |
 
-`gago` is very flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it.
+The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
+
+`gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
 
 ## Display
 
@@ -140,3 +139,4 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | 01/02/2016 | First commit.                                                                                                                                                                                       |
 | 02/02/2016 | Based on the apparent popularity of  `gago`, I made some decisions to make it more flexible and readable. Essentially some names have changed and display functions have started to be implemented. |
 | 03/02/2016 | The first migration method has been implemented, the documentation has been updated accordingly. Most methods have been capitalized for `godoc` purposes.                                           |
+| 13/02/2016 | The genetic operator API got an overhaul. Each operator now implements an interface, this makes things more readable and more flexible.                                                             |

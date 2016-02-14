@@ -22,21 +22,15 @@ type Population struct {
 	// Overall best individual (dummy initialization at the begining)
 	Best Individual
 	// Initial random boundaries
-	Boundary float64
+	Initializer Initializer
 	// Selection method
-	SelMethod func(Individuals, *rand.Rand) Individual
+	Selector Selector
 	// Crossover method
-	CrossMethod func(Individuals, *rand.Rand) Individual
-	// Crossover size
-	CrossSize int
+	Crossover Crossover
 	// Mutation method
-	MutMethod func(indi *Individual, rate float64, intensity float64, generator *rand.Rand)
-	// Mutation rate
-	MutRate float64
-	// Mutation intensity
-	MutIntensity float64
+	Mutator Mutator
 	// Migration method
-	MigMethod func(demes []Deme) []Deme
+	Migrator Migrator
 }
 
 // Initialize each deme in the population and assign an initial fitness to each
@@ -57,19 +51,20 @@ func (pop *Population) Initialize(ff func([]float64) float64, variables int) {
 		// Create the deme
 		var deme = Deme{pop.NbIndividuals, make([]Individual, pop.NbIndividuals), generator}
 		// Initialize the deme
-		deme.Initialize(pop.NbGenes, pop.Boundary)
+		deme.Initialize(pop.NbGenes, pop.Initializer)
 		// Add it to the population
 		pop.Demes[i] = deme
 		// Initial evaluation
 		pop.Demes[i].Evaluate(pop.Ff)
 	}
+	pop.FindBest()
 }
 
 // Migrate allows demes to exchange individuals through the migration protocol
 // defined in pop.MigMethod. This is a convenience method for calling purposes.
 func (pop *Population) Migrate() {
 	// Use the pointer to the demes to perform migration
-	pop.Demes = pop.MigMethod(pop.Demes)
+	pop.Demes = pop.Migrator.Apply(pop.Demes)
 }
 
 // FindBest stores the best individual over all demes.
@@ -90,8 +85,8 @@ func (pop *Population) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			pop.Demes[j].Crossover(pop.SelMethod, pop.CrossMethod, pop.CrossSize)
-			pop.Demes[j].Mutate(pop.MutMethod, pop.MutRate, pop.MutIntensity)
+			pop.Demes[j].Crossover(pop.Selector, pop.Crossover)
+			pop.Demes[j].Mutate(pop.Mutator)
 			pop.Demes[j].Evaluate(pop.Ff)
 			pop.Demes[j].Sort()
 		}(i)
