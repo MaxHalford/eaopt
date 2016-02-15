@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	m "math"
 
 	"github.com/MaxHalford/gago"
@@ -9,7 +8,7 @@ import (
 
 // Sphere function minimum is 0 reached in (0, ..., 0).
 // Any search domain is fine.
-func Sphere(X []float64) float64 {
+func sphere(X []float64) float64 {
 	sum := 0.0
 	for _, x := range X {
 		sum += m.Pow(x, 2)
@@ -20,15 +19,13 @@ func Sphere(X []float64) float64 {
 func main() {
 	// Instantiate a population
 	ga := gago.Float
-	// Fitness function
-	function := Sphere
-	// Number of variables the function takes as input
-	variables := 2
-	// Initialize the genetic algorithm
-	ga.Initialize(function, variables)
+	// Wrap the function
+	ga.Ff = gago.FloatFunction{sphere}
+	// Initialize the genetic algorithm with two variables per individual
+	ga.Initialize(2)
 	// Enhancement
-	for i := 0; i < 10; i++ {
-		fmt.Println(ga.Best)
+	for i := 0; i < 100; i++ {
+		ga.Best.Display()
 		ga.Enhance()
 	}
 }

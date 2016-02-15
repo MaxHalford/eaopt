@@ -6,24 +6,36 @@ import "math/rand"
 // deme. It applies to an individual level and instantiates it's genome gene by
 // gene.
 type Initializer interface {
-	Apply(individual *Individual, generator *rand.Rand)
+	apply(individual *Individual, generator *rand.Rand)
 }
 
 // UniformFloat generates random floating point values between given boundaries.
 type UniformFloat struct {
-	Lower, Upper float64
+	lower, upper float64
 }
 
 // Apply the uniform floating point initializer.
-func (uf UniformFloat) Apply(indi *Individual, generator *rand.Rand) {
+func (uf UniformFloat) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Decide if positive or negative
 		var gene float64
 		if generator.Float64() < 0.5 {
-			gene = generator.Float64() * uf.Lower
+			gene = generator.Float64() * uf.lower
 		} else {
-			gene = generator.Float64() * uf.Upper
+			gene = generator.Float64() * uf.upper
 		}
 		indi.Genome[i] = gene
+	}
+}
+
+// UniformString generates random string values from a given corpus.
+type UniformString struct {
+	corpus []string
+}
+
+// Apply the uniform floating point initializer.
+func (us UniformString) apply(indi *Individual, generator *rand.Rand) {
+	for i := range indi.Genome {
+		indi.Genome[i] = us.corpus[generator.Intn(len(us.corpus))]
 	}
 }
