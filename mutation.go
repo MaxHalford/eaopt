@@ -14,18 +14,18 @@ type Mutator interface {
 // with the intensity parameter as it's standard deviation.
 type Normal struct {
 	// Mutation rate
-	rate float64
+	Rate float64
 	// Standard deviation
-	std float64
+	Std float64
 }
 
 // Apply normal mutation.
 func (norm Normal) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Flip a coin and decide to mutate or not
-		if generator.Float64() <= norm.rate {
+		if generator.Float64() <= norm.Rate {
 			// Sample from a normal distribution
-			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * norm.std
+			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * norm.Std
 		}
 	}
 }
@@ -34,17 +34,17 @@ func (norm Normal) apply(indi *Individual, generator *rand.Rand) {
 // a defined corpus.
 type Corpus struct {
 	// Mutation rate
-	rate float64
+	Rate float64
 	// Slice of strings
-	corpus []string
+	Corpus []string
 }
 
 func (crp Corpus) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Flip a coin and decide to mutate or not
-		if generator.Float64() <= crp.rate {
+		if generator.Float64() <= crp.Rate {
 			// Sample from the corpus
-			indi.Genome[i] = crp.corpus[generator.Intn(len(crp.corpus))]
+			indi.Genome[i] = crp.Corpus[generator.Intn(len(crp.Corpus))]
 		}
 	}
 }
