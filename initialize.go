@@ -30,12 +30,12 @@ func (uf UniformFloat) apply(indi *Individual, generator *rand.Rand) {
 
 // UniformString generates random string values from a given corpus.
 type UniformString struct {
-	corpus []string
+	Corpus []string
 }
 
 // Apply the uniform floating point initializer.
 func (us UniformString) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
-		indi.Genome[i] = us.corpus[generator.Intn(len(us.corpus))]
+		indi.Genome[i] = us.Corpus[generator.Intn(len(us.Corpus))]
 	}
 }

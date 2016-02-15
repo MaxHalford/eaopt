@@ -13,15 +13,15 @@ var Float = Population{
 	Migrator:      Shuffle{},
 }
 
-var latin = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
+var latinAlphabet = strings.Split("abcdefghijklmnopqrstuvwxyz ", "")
 
 // String problem configuration.
 var String = Population{
 	NbDemes:       2,
 	NbIndividuals: 30,
-	Initializer:   UniformString{latin},
+	Initializer:   UniformString{latinAlphabet},
 	Selector:      Tournament{3},
 	Breeder:       Crossover{},
-	Mutator:       Corpus{0.1, latin},
+	Mutator:       Corpus{0.1, latinAlphabet},
 	Migrator:      Shuffle{},
 }
