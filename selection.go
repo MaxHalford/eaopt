@@ -5,7 +5,7 @@ import "math/rand"
 // Selector chooses an individual from a group of individuals.
 type Selector interface {
 	// Apply select one individual
-	Apply(individuals Individuals, generator *rand.Rand) Individual
+	apply(individuals Individuals, generator *rand.Rand) Individual
 }
 
 // Tournament selection chooses an individual through tournament selection. The
@@ -16,7 +16,7 @@ type Tournament struct {
 }
 
 // Apply tournament selection.
-func (ts Tournament) Apply(indis Individuals, generator *rand.Rand) Individual {
+func (ts Tournament) apply(indis Individuals, generator *rand.Rand) Individual {
 	// Randomly sample the population
 	sample := make(Individuals, ts.NbParticipants)
 	for j := 0; j < ts.NbParticipants; j++ {
