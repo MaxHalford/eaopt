@@ -1,31 +1,34 @@
 package main
 
 import (
-	"fmt"
 	m "math"
 
 	"github.com/MaxHalford/gago"
 )
 
-func simulate(start, end int) []float64 {
+// Target function the GA has to approach
+func f(x int, B []float64) float64 {
+	return B[0] * m.Pow(float64(x), B[1])
+}
+
+// Simulate random data based on the target function
+func simulate(start, end int, B []float64) []float64 {
 	data := []float64{}
 	for x := start; x <= end; x++ {
-		value := 1 * m.Pow(float64(x), 2)
-		data = append(data, value)
+		data = append(data, f(x, B))
 	}
 	return data
 }
 
-var (
-	data = simulate(1, 20)
-)
+var data = simulate(1, 20, []float64{1.0, 2.0})
 
-func leastSquares(X []float64) float64 {
+// Least squares function to evaluate the difference between the GA individuals
+// and the originally simulated data.
+func leastSquares(B []float64) float64 {
 	error := 0.0
-	for i, target := range data {
+	for i, y := range data {
 		x := i + 1
-		difference := target - (X[0] * m.Pow(float64(x), 2))
-		error += m.Pow(difference, 2)
+		error += m.Pow(y-f(x, B), 2)
 	}
 	return error
 }
@@ -33,23 +36,17 @@ func leastSquares(X []float64) float64 {
 func main() {
 	// Instantiate a population
 	ga := gago.Float
+	// Wrap the function
+	ga.Ff = gago.FloatFunction{leastSquares}
 	// Number of demes
 	ga.NbDemes = 4
 	// Number of individuals in each deme
-	ga.NbIndividuals = 30
-	// Initial random boundaries
-	ga.Boundary = 10.0
-	// Mutation rate
-	ga.MutRate = 0.2
-	// Fitness function
-	function := leastSquares
-	// Number of variables the function takes as input
-	variables := 1
+	ga.NbIndividuals = 100
 	// Initialize the genetic algorithm
-	ga.Initialize(function, variables)
+	ga.Initialize(2)
 	// Enhancement
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 10000; i++ {
 		ga.Enhance()
 	}
-	fmt.Println(ga.Best)
+	ga.Best.Display()
 }

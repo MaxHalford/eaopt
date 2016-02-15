@@ -13,7 +13,7 @@ import (
 
 // StyblinskiTang minimum is -39.16599d reached in (-2.903534, ..., -2.903534)
 // Recommended search domain is [-5, 5]
-func StyblinskiTang(X []float64) float64 {
+func styblinskiTang(X []float64) float64 {
 	sum := 0.0
 	for _, x := range X {
 		sum += m.Pow(x, 4) - 16*m.Pow(x, 2) + 5*x
@@ -48,12 +48,10 @@ func graph(best plotter.XYs) {
 func main() {
 	// Instantiate a population
 	ga := gago.Float
-	// Fitness function
-	function := StyblinskiTang
-	// Number of variables the function takes as input
-	variables := 2
-	// Initialize the genetic algorithm
-	ga.Initialize(function, variables)
+	// Wrap the function
+	ga.Ff = gago.FloatFunction{styblinskiTang}
+	// Initialize the genetic algorithm with two variables per individual
+	ga.Initialize(2)
 	// Number of generations
 	generations := 10
 	// Containers for fitnesses

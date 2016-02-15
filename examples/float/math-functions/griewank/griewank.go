@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	m "math"
 
 	"github.com/MaxHalford/gago"
@@ -9,7 +8,7 @@ import (
 
 // Griewank minimum is 0 reached in (0, ..., 0)
 // Recommended search domain is [-600, 600]
-func Griewank(X []float64) float64 {
+func griewank(X []float64) float64 {
 	sum := 0.0
 	prod := 1.0
 	for _, x := range X {
@@ -22,17 +21,15 @@ func Griewank(X []float64) float64 {
 }
 
 func main() {
-	// Instantiate a genetic algorithm
+	// Instantiate a population
 	ga := gago.Float
-	// Fitness function
-	function := Griewank
-	// Number of variables the function takes as input
-	variables := 2
-	// Initialize the genetic algorithm
-	ga.Initialize(function, variables)
+	// Wrap the function
+	ga.Ff = gago.FloatFunction{griewank}
+	// Initialize the genetic algorithm with two variables per individual
+	ga.Initialize(2)
 	// Enhancement
 	for i := 0; i < 50; i++ {
-		fmt.Println(ga.Best)
+		ga.Best.Display()
 		ga.Enhance()
 	}
 }
