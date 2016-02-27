@@ -4,7 +4,7 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-![Build](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
+![Build Status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
 
 In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
@@ -129,4 +129,4 @@ It works, documentation is coming.
 - You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) or my [email address](mailto:maxhalford25@gmail.com) for comments/enquiries.
 - I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
 - Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
-- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.                               |
+- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.
