@@ -25,6 +25,6 @@ func (ts Tournament) apply(indis Individuals, generator *rand.Rand) Individual {
 	}
 	// The winner is the best individual participating in the tournament
 	sample.Sort()
-	winner := sample[0]
+	var winner = sample[0]
 	return winner
 }

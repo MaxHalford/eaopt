@@ -7,7 +7,7 @@ import (
 )
 
 // Target string the GA has to guess
-var target = strings.Split("hello world", "")
+var target = strings.Split("hello", "")
 
 func hamming(guess []string) float64 {
 	var score = 0
