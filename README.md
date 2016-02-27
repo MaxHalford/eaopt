@@ -127,14 +127,4 @@ It works, documentation is coming.
 - You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) or my [email address](mailto:maxhalford25@gmail.com) for comments/enquiries.
 - I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
 - Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
-- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.
-
-## Change log
-
-| Date       | Description                                                                                                                                                                                         |
-|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 01/02/2016 | First commit.                                                                                                                                                                                       |
-| 02/02/2016 | Based on the apparent popularity of  `gago`, I made some decisions to make it more flexible and readable. Essentially some names have changed and display functions have started to be implemented. |
-| 03/02/2016 | The first migration method has been implemented, the documentation has been updated accordingly. Most methods have been capitalized for `godoc` purposes.                                           |
-| 13/02/2016 | The genetic operator API got an overhaul. Each operator now implements an interface, this makes things more readable and more flexible.                                                             |
-| 14/02/2016 | Any type of fitness function is now accepted as long as the correct interfaces are implemented. Most of the methods have become private to minimize the API.                                        |
+- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.                               |
