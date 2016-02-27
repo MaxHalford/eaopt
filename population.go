@@ -40,8 +40,6 @@ func (pop *Population) Initialize(variables int) {
 	pop.NbGenes = variables
 	// Create the demes
 	pop.Demes = make([]Deme, pop.NbDemes)
-	// Best individual (dummy instantiation)
-	pop.Best = Individual{make([]interface{}, pop.NbGenes), math.Inf(1)}
 	var wg sync.WaitGroup
 	for i := range pop.Demes {
 		wg.Add(1)
@@ -63,18 +61,27 @@ func (pop *Population) Initialize(variables int) {
 		}(i)
 	}
 	wg.Wait()
+	// Best individual (dummy initialization)
+	pop.Best = Individual{make([]interface{}, pop.NbGenes), math.Inf(1)}
 	// Find the best individual
 	pop.findBest()
 }
 
-// Find the best individual in a deme and check if it's better than the current
-// best individual. The deme's best individual is the first one if the deme has
-// been sorted.
+// Find the best individual in each deme and then compare the best overall
+// individual to the current best individual.
 func (pop *Population) findBest() {
-	for _, deme := range pop.Demes {
-		if deme.Individuals[0].Fitness < pop.Best.Fitness {
-			pop.Best = deme.Individuals[0]
-		}
+	// Get each deme's best individual
+	var best = make(Individuals, pop.NbDemes)
+	for i, deme := range pop.Demes {
+		best[i] = deme.Individuals[0]
+	}
+	// Sort the best individuals
+	best.Sort()
+	// Get the overall best individual
+	var overallBest = best[0]
+	// Compare it to the current best individual
+	if overallBest.Fitness < pop.Best.Fitness {
+		pop.Best = overallBest
 	}
 }
 
