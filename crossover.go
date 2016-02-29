@@ -2,50 +2,25 @@ package gago
 
 import "math/rand"
 
-// Breeder mixes two or more individuals into a new individual called the
+// Crossover mixes two or more individuals into a new individual called the
 // offspring.
-type Breeder interface {
+type Crossover interface {
 	apply(selector Selector, individuals Individuals, generator *rand.Rand) Individual
 }
 
-// Crossover breeding creates a new genome by splicing the genomes of two
-// selected individuals (the mother and the father) and gluing them back
-// together in a random way.
-type Crossover struct{}
-
-// Apply crossover breeding.
-func (cv Crossover) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
-	// Choose two individuals at random
-	var mother = s.apply(indis, generator)
-	var father = s.apply(indis, generator)
-	// Create an individual with an empty genome
-	var offspring = Individual{make([]interface{}, len(mother.Genome)), 0.0}
-	// Choose where to split the genomes
-	var split = rand.Intn(len(mother.Genome))
-	// Split and glue
-	if generator.Float64() < 0.5 {
-		offspring.Genome = append(mother.Genome[:split], father.Genome[split:]...)
-	} else {
-		offspring.Genome = append(father.Genome[:split], mother.Genome[split:]...)
-	}
-	return offspring
-}
-
-// Parenthood breeding combines two individuals (the parents) into one
+// Parenthood crossover combines two individuals (the parents) into one
 // (the offspring). Each parent's contribution to the Genome is determined by
 // the toss of a coin. The offspring can inherit from it's mother's genes
 // (coin <= 0.33), from it's father's genes (0.33 < coin <= 0.66) or from a
-// random mix of both (0.66 < coin <= 1). A coin is thrown for each gene. With
-// this method only the two first selected individuals are considered, hence the
-// CrossSize parameter should be set to 2.
+// random mix of both (0.66 < coin <= 1). A coin is thrown for each gene.
 type Parenthood struct{}
 
-// Apply parenthood breeding.
+// Apply parenthood crossover.
 func (ph Parenthood) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
 	// Choose two individuals at random
 	var mother = s.apply(indis, generator)
 	var father = s.apply(indis, generator)
-	// Create an individual with an empty genome
+	// Create an offspring
 	var offspring = Individual{make([]interface{}, len(mother.Genome)), 0.0}
 	// For every gene in the parent's genome
 	for i := range offspring.Genome {
@@ -69,11 +44,11 @@ func (ph Parenthood) apply(s Selector, indis Individuals, generator *rand.Rand) 
 	return offspring
 }
 
-// FitnessProportionate breeding combines any number of individuals. Each of the
+// FitnessProportionate crossover combines any number of individuals. Each of the
 // offspring's genes is a random combination of the selected individuals genes.
 // Each individual is assigned a weight such that the sum of the weights is
 // equal to 1, this is done by normalizing each weight by the sum of the
-// generated weights. With this breeding method the CrossSize can be set to any
+// generated weights. With this crossover method the CrossSize can be set to any
 // positive integer, in other words any number of individuals can be combined to
 // generate an offspring.
 type FitnessProportionate struct {
@@ -81,33 +56,56 @@ type FitnessProportionate struct {
 	NbIndividuals int
 }
 
-// Apply fitness proportional breeding.
+// Apply fitness proportional crossover.
 func (fpc FitnessProportionate) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
 	// Choose individuals at random
 	var selected = make(Individuals, fpc.NbIndividuals)
 	for i := range selected {
 		selected[i] = s.apply(indis, generator)
 	}
-	// Create an individual with an empty genome
+	// Create an offspring
 	var offspring = Individual{make([]interface{}, len(indis[0].Genome)), 0.0}
 	// For every gene in the parent's genome
 	for i := range offspring.Genome {
-		// Weight of each individual in the breeding
-		var weights = make([]float64, len(indis))
-		// Sum of the weights
-		var total float64
-		// Assign a weight to each individual
-		for j := range indis {
-			weights[j] = rand.Float64()
-			total += weights[j]
-		}
+		// Weight of each individual in the crossover
+		var weights = generateWeights(len(indis))
 		// Create the new gene as the product of the individuals' genes
 		var gene float64
 		for j := range indis {
-			gene += indis[j].Genome[i].(float64) * weights[j] / total
+			gene += indis[j].Genome[i].(float64) * weights[j]
 		}
 		// Assign the new gene to the offspring
 		offspring.Genome[i] = gene
+	}
+	return offspring
+}
+
+// PartiallyMappedCrossover randomly picks a crossover point. The offspring is
+// built by copying one of the parents and then copying the other parent's
+// values up to the crossover point. Each gene that is replaced is permuted with
+// the gene that is copied in the first parent's genome. Two offsprings are
+// generated in such a way (because there are two parents). This crossover
+// method ensures the offspring's genomes are composed of unique genes, which
+// is particularly useful for permutation problems such as the Travelling
+// Salesman Problem (TSP).
+type PartiallyMappedCrossover struct{}
+
+// Apply PartiallyMappedCrossover.
+func (pmx PartiallyMappedCrossover) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
+	// Choose two individuals at random
+	var mother = s.apply(indis, generator)
+	var father = s.apply(indis, generator)
+	// Create an offspring with the mother's genome
+	var offspring = Individual{mother.Genome, 0.0}
+	// Choose a random crossover point
+	var point = generator.Intn(len(mother.Genome))
+	// Paste the father's genome up to the crossover point
+	for i := 0; i < point; i++ {
+		// Find where the element is in the offspring's genome
+		var position = findPosition(offspring.Genome, father.Genome[i])
+		// Swap the genes
+		offspring.Genome[position] = offspring.Genome[i]
+		offspring.Genome[i] = father.Genome[i]
 	}
 	return offspring
 }

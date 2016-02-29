@@ -41,11 +41,12 @@ func (deme *Deme) mutate(m Mutator) {
 	}
 }
 
-// Breed replaces the population with new individuals called offsprings. The
-// method takes as arguments a selection method, a breeding method and the size
-// of the breeding. The size of the breeding is the number of individuals whose
-// genes will be mixed to generate an offspring with the breeding function.
-func (deme *Deme) breed(selector Selector, c Breeder) {
+// Crossover replaces the population with new individuals called offsprings. The
+// method takes as arguments a selection method, a crossover method and the size
+// of the crossover. The size of the crossover is the number of individuals
+// whose genes will be mixed to generate an offspring with the crossover
+// function.
+func (deme *Deme) crossover(selector Selector, c Crossover) {
 	// Create an empty slice of individuals to store the offsprings
 	var offsprings = make(Individuals, len(deme.Individuals))
 	for i := range offsprings {

@@ -25,8 +25,8 @@ type Population struct {
 	Initializer Initializer
 	// Selection method
 	Selector Selector
-	// Breeding method
-	Breeder Breeder
+	// crossover method
+	Crossover Crossover
 	// Mutation method
 	Mutator Mutator
 	// Migration method
@@ -106,9 +106,9 @@ func (pop *Population) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// 1. Breed
-			if pop.Breeder != nil {
-				pop.Demes[j].breed(pop.Selector, pop.Breeder)
+			// 1. Crossover
+			if pop.Crossover != nil {
+				pop.Demes[j].crossover(pop.Selector, pop.Crossover)
 			}
 			// 2. Mutate
 			if pop.Mutator != nil {
