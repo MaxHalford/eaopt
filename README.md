@@ -12,7 +12,7 @@ In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genet
 1. Generate random solutions.
 2. Evaluate the solutions.
 3. Sort the solutions by increasing (or decreasing) order.
-4. Apply genetic operators (such as [mutation](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) and [breeding](http://www.wikiwand.com/en/Breeder_(genetic_algorithm))).
+4. Apply genetic operators (such as [mutation](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) and [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm))).
 5. Repeat from step 2 until satisfied.
 
 Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-population genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it performs better than a traditional genetic algorithm.
@@ -28,7 +28,7 @@ The terms surrounding genetic algorithms (GAs) are roughly analogous to those fo
 - Each individual has ***genes*** to which a ***fitness*** is assigned.
 - The number of genes is simply the number of variables defined by the problem.
 - Individuals are sorted based on their fitness towards a problem.
-- ***Offsprings*** are born by applying ***breeding*** on selected individuals.
+- ***Offsprings*** are born by applying ***crossover*** on selected individuals.
 - The ***selection*** method is crucial and determines most of the behavior of the algorithm.
 - Genes can be randomly modified through ***mutation***.
 - Classically, individuals are contained in a structure called a ***population***.
@@ -86,15 +86,15 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | `NbGenes`              | `int`                     | Number of genes in each individual.                              |
 | `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual.                        |
 | `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals. |
-| `Breeder` (struct)     | `Breeder` (interface)     | Method for producing a new individual (called the offspring).    |
+| `Crossover` (struct)     | `Crossover` (interface)     | Method for producing a new individual (called the offspring).    |
 | `Mutator` (struct)     | `Mutator` (interface)     | Method for modifying an individual's genes.                      |
 | `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the demes.             |
 
 The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
 
-`gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, breeding, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
+`gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
 
-If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Breeder`, the `Mutator` and the `Migrator`.
+If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator`.
 
 
 ## Using different types
@@ -105,7 +105,7 @@ It works, documentation is coming.
 ## Documentation
 
 - [godoc](https://godoc.org/github.com/MaxHalford/gago)
-- Each operator (selection, breeding, mutation, migration) is described in it's comments.
+- Each operator (selection, crossover, mutation, migration) is described in it's comments.
 - [**An introduction to genetic algorithms**](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
 - [**The Multipopulation Genetic Algorithm: Local Selection and Migration**](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
 
@@ -118,10 +118,11 @@ It works, documentation is coming.
 ## Roadmap
 
 - Error handling.
-- Testing.
+- More tests.
 - Benchmarking.
 - Comparison with other algorithms/libraries.
 - Implement more genetic operators.
+- Possibility to apply multiple genetic operators of the same kind.
 
 ## Comments
 

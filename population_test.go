@@ -8,12 +8,12 @@ var (
 
 func init() {
 	// Instantiate a population
-	ga = Population{
+	var ga = Population{
 		NbDemes:       4,
 		NbIndividuals: 30,
 		Initializer:   UniformFloat{-10, 10},
 		Selector:      Tournament{3},
-		Breeder:       Parenthood{},
+		Crossover:     Parenthood{},
 		Mutator:       Normal{0.1, 1},
 		Migrator:      Shuffle{},
 	}
