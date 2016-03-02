@@ -9,33 +9,50 @@ type Initializer interface {
 	apply(individual *Individual, generator *rand.Rand)
 }
 
-// UniformFloat generates random floating point values between given boundaries.
-type UniformFloat struct {
+// FloatUniform generates random floating point values between given boundaries.
+type FloatUniform struct {
 	lower, upper float64
 }
 
-// Apply the uniform floating point initializer.
-func (uf UniformFloat) apply(indi *Individual, generator *rand.Rand) {
+// Apply the FloatUniform initializer.
+func (fu FloatUniform) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Decide if positive or negative
 		var gene float64
 		if generator.Float64() < 0.5 {
-			gene = generator.Float64() * uf.lower
+			gene = generator.Float64() * fu.lower
 		} else {
-			gene = generator.Float64() * uf.upper
+			gene = generator.Float64() * fu.upper
 		}
 		indi.Genome[i] = gene
 	}
 }
 
-// UniformString generates random string values from a given corpus.
-type UniformString struct {
+// StringUniform generates random string slices based on a given corpus.
+type StringUniform struct {
 	Corpus []string
 }
 
-// Apply the uniform floating point initializer.
-func (us UniformString) apply(indi *Individual, generator *rand.Rand) {
+// Apply the StringUniform initializer.
+func (su StringUniform) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
-		indi.Genome[i] = us.Corpus[generator.Intn(len(us.Corpus))]
+		indi.Genome[i] = su.Corpus[generator.Intn(len(su.Corpus))]
+	}
+}
+
+// StringUnique generates random string slices based on a given corpus, each
+// element from the corpus is only represented once in each slice. The method
+// starts by shuffling, it then assigns the elements of the corpus in increasing
+// index order to an individual. Usually the length of the individual's genome
+// should match the length of the corpus.
+type StringUnique struct {
+	Corpus []string
+}
+
+// Apply the StringUnique initializer.
+func (su StringUnique) apply(indi *Individual, generator *rand.Rand) {
+	var strings = shuffleStrings(su.Corpus, generator)
+	for i := range indi.Genome {
+		indi.Genome[i] = strings[i]
 	}
 }

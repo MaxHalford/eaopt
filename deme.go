@@ -27,8 +27,7 @@ func (deme *Deme) evaluate(ff FitnessFunction) {
 	}
 }
 
-// Sort the individuals in a deme. This method is merely a convenience for
-// calling the Individuals.Sort method within the deme from the population.
+// Sort the individuals in a deme. This method is merely and ergonomic layer.
 func (deme *Deme) sort() {
 	deme.Individuals.Sort()
 }
@@ -36,7 +35,6 @@ func (deme *Deme) sort() {
 // Mutate each individual in a deme.
 func (deme *Deme) mutate(m Mutator) {
 	for _, individual := range deme.Individuals {
-		// Use the pointer to the individual to perform mutation
 		m.apply(&individual, deme.generator)
 	}
 }

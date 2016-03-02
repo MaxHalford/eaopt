@@ -1,17 +1,20 @@
 package gago
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // Find where an element is in a slice.
-func findPosition(array []interface{}, element interface{}) int {
-	var index = 0
-	for array[index] != element {
-		if index >= len(array)-1 {
-			return -1
+func getIndex(element interface{}, array []interface{}) int {
+	for i, v := range array {
+		if v == element {
+			return i
 		}
-		index++
 	}
-	return index
+	fmt.Println(element, array)
+	// Element not in array
+	return -1
 }
 
 // Generate random weights that sum up to 1?
@@ -29,4 +32,29 @@ func generateWeights(size int) []float64 {
 		weights[i] /= total
 	}
 	return weights
+}
+
+// Shuffle a slice of strings.
+func shuffleStrings(strings []string, generator *rand.Rand) []string {
+	var shuffled = make([]string, len(strings))
+	for i, v := range generator.Perm(len(strings)) {
+		shuffled[v] = strings[i]
+	}
+	return shuffled
+}
+
+// Shuffle a slice of individuals.
+func shuffleIndividuals(indis Individuals, generator *rand.Rand) Individuals {
+	var shuffled = make(Individuals, len(indis))
+	for i, v := range generator.Perm(len(indis)) {
+		shuffled[v] = indis[i]
+	}
+	return shuffled
+}
+
+// Sample n unique individuals from a slice of individuals
+func sampleIndividuals(n int, indis Individuals, generator *rand.Rand) Individuals {
+	var shuffled = shuffleIndividuals(indis, generator)
+	var sample = shuffled[:n]
+	return sample
 }
