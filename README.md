@@ -4,8 +4,10 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
+![Dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
 ![Build Status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/274ec5aa024b4d84910c0301e9eda884/badge.svg)](https://www.quantifiedcode.com/app/project/274ec5aa024b4d84910c0301e9eda884)
 
 In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
@@ -94,13 +96,11 @@ The `gago.Population` struct also contains a `Best` variable which is of type `I
 
 `gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
 
-If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator`.
-
+If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator` (the other ones are part of minimum requirements).
 
 ## Using different types
 
-It works, documentation is coming.
-
+Some genetic operators target a specific type, these ones are prefixed with the name of the type (`Float`, `String`). The ones that don't have prefixes work with any types, which is down to the way they are implemented. Default configurations are available in `configuration.go`
 
 ## Documentation
 
@@ -111,18 +111,21 @@ It works, documentation is coming.
 
 ## Examples
 
-- Check out the [examples/minimization/](examples/minimization/) folder for basic examples. Test functions were found [here](http://www.sfu.ca/~ssurjano/optimization.html).
+- Check out the [examples/minimization/](examples/math-functions/) folder for basic examples. Test functions were found [here](http://www.sfu.ca/~ssurjano/optimization.html).
 - [examples/plot-fitness/](examples/plot-fitness/) is an example of plotting the fitness per generation with [gonum/plot](https://github.com/gonum/plot).
 - [examples/curve-fitting/](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
+- [examples/tsp/](examples/tsp/) is an example of solving the Traveling Salesman Problem.
 
 ## Roadmap
 
 - Error handling.
 - More tests.
+- Statistics.
 - Benchmarking.
-- Comparison with other algorithms/libraries.
-- Implement more genetic operators.
-- Possibility to apply multiple genetic operators of the same kind.
+- Compare with other algorithms/libraries.
+- Implement/generalize genetic operators.
+- Add possibility to apply multiple genetic operators of the same kind.
+- More exaples.
 
 ## Comments
 
@@ -130,4 +133,5 @@ It works, documentation is coming.
 - You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) or my [email address](mailto:maxhalford25@gmail.com) for comments/enquiries.
 - I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
 - Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
+- Although I believe the code structure is quite simple and well structured, I've split the logic into separate functions for testing purposes. Don't worry if you see functions call other ones, it's sane.
 - As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.

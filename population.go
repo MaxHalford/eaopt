@@ -13,13 +13,13 @@ type Population struct {
 	NbDemes int
 	// Number of individuals in each deme
 	NbIndividuals int
-	// Number of genes in each individual (defined by the user)
+	// Number of genes in each individual (imposed by the problem)
 	NbGenes int
 	// Demes
 	Demes []Deme
 	// Overall best individual (dummy initialization at the begining)
 	Best Individual
-	// Fitness function to evaluate individuals (defined by the user)
+	// Fitness function to evaluate individuals (imposed by the problem)
 	Ff FitnessFunction
 	// Initial random boundaries
 	Initializer Initializer

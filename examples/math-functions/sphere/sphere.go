@@ -24,7 +24,7 @@ func main() {
 	// Initialize the genetic algorithm with two variables per individual
 	ga.Initialize(2)
 	// Enhancement
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 25; i++ {
 		ga.Best.Display()
 		ga.Enhance()
 	}
