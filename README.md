@@ -7,7 +7,6 @@
 ![Dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
 ![Build Status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/274ec5aa024b4d84910c0301e9eda884/badge.svg)](https://www.quantifiedcode.com/app/project/274ec5aa024b4d84910c0301e9eda884)
 
 In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
@@ -100,14 +99,18 @@ If you wish to not use certain genetic operators, you can set them to `nil`. Thi
 
 ## Using different types
 
-Some genetic operators target a specific type, these ones are prefixed with the name of the type (`Float`, `String`). The ones that don't have prefixes work with any types, which is down to the way they are implemented. Default configurations are available in `configuration.go`
+Some genetic operators target a specific type, these ones are prefixed with the name of the type (`Float`, `String`). The ones that don't have prefixes work with any types, which is down to the way they are implemented. Default configurations are available in `configuration.go`.
+
+You should think of `gago` as a framework for implementing your problems, and not as an all in one solution. It's quite easy to implement your own for exotic problems, for example the [TSP solver](examples/tsp/).
+
+The only requirement for solving a problem is that the problem can be modeled as a function that returns a floating point value, that's it. Because Go is statically typed, you have to provide a [wrapper for the function](fitness.go) and make sure that the genetic operators make sense for your problem.
 
 ## Documentation
 
 - [godoc](https://godoc.org/github.com/MaxHalford/gago)
 - Each operator (selection, crossover, mutation, migration) is described in it's comments.
-- [**An introduction to genetic algorithms**](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
-- [**The Multipopulation Genetic Algorithm: Local Selection and Migration**](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
+- [*An introduction to genetic algorithms*](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
+- [*The Multipopulation Genetic Algorithm: Local Selection and Migration*](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
 
 ## Examples
 
@@ -125,7 +128,7 @@ Some genetic operators target a specific type, these ones are prefixed with the 
 - Compare with other algorithms/libraries.
 - Implement/generalize genetic operators.
 - Add possibility to apply multiple genetic operators of the same kind.
-- More exaples.
+- More examples.
 
 ## Comments
 
