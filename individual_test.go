@@ -27,7 +27,7 @@ func TestIndividualFloat(t *testing.T) {
 	}}
 	var lower = -5.0
 	var upper = 5.0
-	var init = UniformFloat{lower, upper}
+	var init = FloatUniform{lower, upper}
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
@@ -72,7 +72,7 @@ func TestIndividualString(t *testing.T) {
 		return sum
 	}}
 	var alphabet = []string{"A", "B", "C", "D"}
-	var init = UniformString{alphabet}
+	var init = StringUniform{alphabet}
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)

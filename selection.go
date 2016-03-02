@@ -17,12 +17,8 @@ type Tournament struct {
 
 // Apply tournament selection.
 func (ts Tournament) apply(indis Individuals, generator *rand.Rand) Individual {
-	// Randomly sample the population
-	sample := make(Individuals, ts.NbParticipants)
-	for j := 0; j < ts.NbParticipants; j++ {
-		index := generator.Intn(len(indis))
-		sample[j] = indis[index]
-	}
+	// Sample the population
+	var sample = sampleIndividuals(ts.NbParticipants, indis, generator)
 	// The winner is the best individual participating in the tournament
 	sample.Sort()
 	var winner = sample[0]
