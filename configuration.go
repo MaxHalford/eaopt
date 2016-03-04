@@ -7,6 +7,6 @@ var Float = Population{
 	Initializer:   FloatUniform{-10, 10},
 	Selector:      Tournament{3},
 	Crossover:     FloatParenthood{},
-	Mutator:       FloatNormal{0.1, 1},
+	Mutators:      []Mutator{FloatNormal{0.1, 1}},
 	Migrator:      Shuffle{},
 }

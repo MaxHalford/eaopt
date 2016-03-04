@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"math"
+	"os"
 	"strconv"
 
 	"github.com/MaxHalford/gago"
@@ -17,17 +20,26 @@ func euclidian(a, b point) float64 {
 }
 
 var (
-	size     = 5
+	file     = "capitals.csv"
 	points   = make(map[string]point)
 	distance = euclidian
 )
 
 func init() {
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			var name = strconv.Itoa(i) + "-" + strconv.Itoa(j)
-			points[name] = point{float64(i), float64(j)}
+	var f, _ = os.Open(file)
+	defer f.Close()
+	var rows = csv.NewReader(f)
+	// Skip header
+	rows.Read()
+	for {
+		var row, err = rows.Read()
+		if err == io.EOF {
+			return
 		}
+		var name = row[1]
+		var lat, _ = strconv.ParseFloat(row[2], 64)
+		var lon, _ = strconv.ParseFloat(row[3], 64)
+		points[name] = point{lat, lon}
 	}
 }
 
@@ -46,13 +58,16 @@ func main() {
 		names = append(names, name)
 	}
 	var ga = gago.Population{
-		NbDemes:       4,
-		NbIndividuals: 100,
+		NbDemes:       8,
+		NbIndividuals: 30,
 		Initializer:   gago.StringUnique{Corpus: names},
-		Selector:      gago.Tournament{NbParticipants: 3},
+		Selector:      gago.Tournament{NbParticipants: 20},
 		Crossover:     gago.PartiallyMappedCrossover{},
-		Mutator:       gago.Permute{},
-		Migrator:      gago.Shuffle{},
+		Mutators: []gago.Mutator{
+			gago.Permute{Rate: 0.9},
+			gago.Splice{Rate: 0.2},
+		},
+		Migrator: gago.Shuffle{},
 	}
 	ga.Ff = gago.StringFunction{totalDistance}
 	ga.Initialize(len(names))

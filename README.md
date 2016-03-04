@@ -89,7 +89,7 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 | `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual.                        |
 | `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals. |
 | `Crossover` (struct)     | `Crossover` (interface)     | Method for producing a new individual (called the offspring).    |
-| `Mutator` (struct)     | `Mutator` (interface)     | Method for modifying an individual's genes.                      |
+| `Mutators` (struct)     | `[]Mutator` (slice of interface)     | Method for modifying an individual's genes.                      |
 | `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the demes.             |
 
 The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
@@ -102,7 +102,7 @@ If you wish to not use certain genetic operators, you can set them to `nil`. Thi
 
 Some genetic operators target a specific type, these ones are prefixed with the name of the type (`Float`, `String`). The ones that don't have prefixes work with any types, which is down to the way they are implemented. Default configurations are available in `configuration.go`.
 
-You should think of `gago` as a framework for implementing your problems, and not as an all in one solution. It's quite easy to implement your own for exotic problems, for example the [TSP solver](examples/tsp/).
+You should think of `gago` as a framework for implementing your problems, and not as an all in one solution. It's quite easy to implement your own for exotic problems, for example the [TSP problem](examples/tsp/).
 
 The only requirement for solving a problem is that the problem can be modeled as a function that returns a floating point value, that's it. Because Go is statically typed, you have to provide a [wrapper for the function](fitness.go) and make sure that the genetic operators make sense for your problem.
 
@@ -118,7 +118,7 @@ The only requirement for solving a problem is that the problem can be modeled as
 - Check out the [examples/minimization/](examples/math-functions/) folder for basic examples. Test functions were found [here](http://www.sfu.ca/~ssurjano/optimization.html).
 - [examples/plot-fitness/](examples/plot-fitness/) is an example of plotting the fitness per generation with [gonum/plot](https://github.com/gonum/plot).
 - [examples/curve-fitting/](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
-- [examples/tsp/](examples/tsp/) is an example of solving the Traveling Salesman Problem.
+- [examples/tsp/](examples/tsp/) contain examples of solving the Traveling Salesman Problem.
 
 ## Roadmap
 
