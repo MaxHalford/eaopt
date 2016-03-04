@@ -33,9 +33,11 @@ func (deme *Deme) sort() {
 }
 
 // Mutate each individual in a deme.
-func (deme *Deme) mutate(m Mutator) {
+func (deme *Deme) mutate(M []Mutator) {
 	for _, individual := range deme.Individuals {
-		m.apply(&individual, deme.generator)
+		for _, m := range M {
+			m.apply(&individual, deme.generator)
+		}
 	}
 }
 
