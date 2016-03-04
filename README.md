@@ -127,14 +127,16 @@ The only requirement for solving a problem is that the problem can be modeled as
 - Benchmarking.
 - Compare with other algorithms/libraries.
 - Implement/generalize genetic operators.
-- Add possibility to apply multiple genetic operators of the same kind.
 - More examples.
 
-## Comments
+## Why use gago?
+
+- It's generic, your only constraint is to model your problem and `gago` will do all the hard work for you.
+- You can easily add your own genetic operators.
+- `gago` implements parallel populations (called "demes") who exchange individuals for better performance.
+- `gago` will be well maintained.
+
+## Suggestions
 
 - Please post suggestions/issues in GitHub's issues section.
 - You can use the [reddit thread](https://www.reddit.com/r/golang/comments/43oi5j/gago_a_parallel_genetic_algorithm_with_go/) or my [email address](mailto:maxhalford25@gmail.com) for comments/enquiries.
-- I'm quite happy with the syntax and the naming in general, however things are not set in stone and some stuff may change to incorporate more functionalities.
-- Genetic algorithms are a deep academic interest of mine, I am very motivated to maintain `gago` and implement state-of-the-art methods.
-- Although I believe the code structure is quite simple and well structured, I've split the logic into separate functions for testing purposes. Don't worry if you see functions call other ones, it's sane.
-- As far as I know the `GOMAXPROCS` from the `runtime` library defaults to the number of available thread, hence we haven't set it in the source code.
