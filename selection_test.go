@@ -17,13 +17,17 @@ func TestTournament(t *testing.T) {
 	}
 	var copy = indis
 	var selector = Tournament{3}
-	var indi = selector.apply(indis, generator)
+	var sample = selector.apply(size, indis, generator)
+	// Check the size of the sample
+	if len(sample) != size {
+		t.Error("Wrong sample size")
+	}
 	// Check the original population hasn't changed
 	if reflect.DeepEqual(indis, copy) == false {
 		t.Error("Population has been modified")
 	}
 	// Check the individual is from the initial population
-	if reflect.DeepEqual(indi, indis[0]) == false {
+	if reflect.DeepEqual(sample[0], indis[0]) == false {
 		t.Error("Problem with tournament selection")
 	}
 }

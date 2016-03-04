@@ -1,9 +1,6 @@
 package gago
 
-import (
-	"fmt"
-	"math/rand"
-)
+import "math/rand"
 
 // Find where an element is in a slice.
 func getIndex(element interface{}, array []interface{}) int {
@@ -12,7 +9,6 @@ func getIndex(element interface{}, array []interface{}) int {
 			return i
 		}
 	}
-	fmt.Println(element, array)
 	// Element not in array
 	return -1
 }
