@@ -4,7 +4,6 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-![Dependencies](https://img.shields.io/gemnasium/mathiasbynens/he.svg)
 ![Build Status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
