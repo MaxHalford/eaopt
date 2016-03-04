@@ -32,28 +32,38 @@ func (fnorm FloatNormal) apply(indi *Individual, generator *rand.Rand) {
 }
 
 // Splice a genome and glue it back in another order.
-type Splice struct{}
+type Splice struct {
+	// Mutation rate
+	Rate float64
+}
 
 // Apply splice mutation.
 func (spl Splice) apply(indi *Individual, generator *rand.Rand) {
-	// Choose where to split the genome
-	var split = rand.Intn(len(indi.Genome))
-	// Splice and glue
-	indi.Genome = append(indi.Genome[split:], indi.Genome[:split]...)
+	if generator.Float64() < spl.Rate {
+		// Choose where to split the genome
+		var split = rand.Intn(len(indi.Genome))
+		// Splice and glue
+		indi.Genome = append(indi.Genome[split:], indi.Genome[:split]...)
+	}
 }
 
 // Permute two genes.
-type Permute struct{}
+type Permute struct {
+	// Mutation rate
+	Rate float64
+}
 
 // Apply permute mutation.
 func (perm Permute) apply(indi *Individual, generator *rand.Rand) {
-	// Choose two points on the genome
-	var i = generator.Intn(len(indi.Genome))
-	var j = generator.Intn(len(indi.Genome))
-	// Make sure both points are different
-	for i == j {
-		j = generator.Intn(len(indi.Genome))
+	if generator.Float64() < perm.Rate {
+		// Choose two points on the genome
+		var i = generator.Intn(len(indi.Genome))
+		var j = generator.Intn(len(indi.Genome))
+		// Make sure both points are different
+		for i == j {
+			j = generator.Intn(len(indi.Genome))
+		}
+		// Permute the genes
+		indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
 	}
-	// Permute the genes
-	indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
 }

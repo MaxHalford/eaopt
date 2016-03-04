@@ -19,8 +19,9 @@ type FloatParenthood struct{}
 // Apply parenthood crossover.
 func (fp FloatParenthood) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
 	// Choose two individuals at random
-	var mother = s.apply(indis, generator)
-	var father = s.apply(indis, generator)
+	var parents = s.apply(2, indis, generator)
+	var mother = parents[0]
+	var father = parents[1]
 	// Create an offspring
 	var offspring = Individual{make([]interface{}, len(mother.Genome)), 0.0}
 	// For every gene in the parent's genome
@@ -60,10 +61,7 @@ type FloatFitnessProportionate struct {
 // Apply fitness proportional crossover.
 func (ffp FloatFitnessProportionate) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
 	// Choose individuals at random
-	var selected = make(Individuals, ffp.NbIndividuals)
-	for i := range selected {
-		selected[i] = s.apply(indis, generator)
-	}
+	var parents = s.apply(ffp.NbIndividuals, indis, generator)
 	// Create an offspring
 	var offspring = Individual{make([]interface{}, len(indis[0].Genome)), 0.0}
 	// For every gene in the parent's genome
@@ -72,8 +70,8 @@ func (ffp FloatFitnessProportionate) apply(s Selector, indis Individuals, genera
 		var weights = generateWeights(len(indis))
 		// Create the new gene as the product of the individuals' genes
 		var gene float64
-		for j := range indis {
-			gene += indis[j].Genome[i].(float64) * weights[j]
+		for j := range parents {
+			gene += parents[j].Genome[i].(float64) * weights[j]
 		}
 		// Assign the new gene to the offspring
 		offspring.Genome[i] = gene
@@ -94,8 +92,9 @@ type PartiallyMappedCrossover struct{}
 // Apply PartiallyMappedCrossover.
 func (pmx PartiallyMappedCrossover) apply(s Selector, indis Individuals, generator *rand.Rand) Individual {
 	// Choose two individuals at random
-	var mother = s.apply(indis, generator)
-	var father = s.apply(indis, generator)
+	var parents = s.apply(2, indis, generator)
+	var mother = parents[0]
+	var father = parents[1]
 	// Create an offspring with the mother's genome
 	var offspring = Individual{make([]interface{}, len(mother.Genome)), 0.0}
 	copy(offspring.Genome, mother.Genome)

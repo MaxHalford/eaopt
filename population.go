@@ -25,10 +25,10 @@ type Population struct {
 	Initializer Initializer
 	// Selection method
 	Selector Selector
-	// crossover method
+	// Crossover method
 	Crossover Crossover
 	// Mutation method
-	Mutator Mutator
+	Mutators []Mutator
 	// Migration method
 	Migrator Migrator
 }
@@ -111,8 +111,8 @@ func (pop *Population) Enhance() {
 				pop.Demes[j].crossover(pop.Selector, pop.Crossover)
 			}
 			// 2. Mutate
-			if pop.Mutator != nil {
-				pop.Demes[j].mutate(pop.Mutator)
+			if pop.Mutators != nil {
+				pop.Demes[j].mutate(pop.Mutators)
 			}
 			// 3. Evaluate
 			pop.Demes[j].evaluate(pop.Ff)
