@@ -4,8 +4,9 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-![Build Status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
-[![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
+![Build status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
+[![Coverage status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
+[![Report card](https://img.shields.io/badge/go_report-A+-brightgreen.svg)](https://goreportcard.com/report/github.com/MaxHalford/gago)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
