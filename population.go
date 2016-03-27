@@ -17,7 +17,7 @@ type Population struct {
 	NbGenes int
 	// Demes
 	Demes []Deme
-	// Overall best individual (dummy initialization at the begining)
+	// Overall best individual (dummy initialization at the beginning)
 	Best Individual
 	// Fitness function to evaluate individuals (imposed by the problem)
 	Ff FitnessFunction
