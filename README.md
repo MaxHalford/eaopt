@@ -8,7 +8,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
-In it's most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
+In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
 1. Generate random solutions.
 2. Evaluate the solutions.
@@ -108,7 +108,7 @@ The only requirement for solving a problem is that the problem can be modeled as
 ## Documentation
 
 - [godoc](https://godoc.org/github.com/MaxHalford/gago)
-- Each operator (selection, crossover, mutation, migration) is described in it's comments.
+- Each operator (selection, crossover, mutation, migration) is described in its comments.
 - [*An introduction to genetic algorithms*](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
 - [*The Multipopulation Genetic Algorithm: Local Selection and Migration*](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
 
