@@ -12,7 +12,7 @@ type Mutator interface {
 // mutation rate. It does so for each gene. The new gene value is a random value
 // sampled from a normal distribution centered on the gene's current value and
 // with the intensity parameter as it's standard deviation. Only works for
-// floating point values
+// floating point values.
 type FloatNormal struct {
 	// Mutation rate
 	Rate float64
@@ -24,7 +24,7 @@ type FloatNormal struct {
 func (fnorm FloatNormal) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Flip a coin and decide to mutate or not
-		if generator.Float64() <= fnorm.Rate {
+		if generator.Float64() < fnorm.Rate {
 			// Sample from a normal distribution
 			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * fnorm.Std
 		}
