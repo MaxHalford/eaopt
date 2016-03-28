@@ -25,9 +25,7 @@ func TestIndividualFloat(t *testing.T) {
 		}
 		return sum
 	}}
-	var lower = -5.0
-	var upper = 5.0
-	var init = FloatUniform{lower, upper}
+	var init = FloatUniform{-5.0, 5.0}
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
