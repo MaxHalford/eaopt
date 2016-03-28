@@ -15,7 +15,8 @@ func TestTournament(t *testing.T) {
 	for i := 0; i < size; i++ {
 		indis[i] = Individual{make([]interface{}, 2), float64(i)}
 	}
-	var copy = indis
+	var original = make([]Individual, len(indis))
+	copy(original, indis)
 	var selector = Tournament{3}
 	var sample = selector.apply(size, indis, generator)
 	// Check the size of the sample
@@ -23,11 +24,13 @@ func TestTournament(t *testing.T) {
 		t.Error("Wrong sample size")
 	}
 	// Check the original population hasn't changed
-	if reflect.DeepEqual(indis, copy) == false {
-		t.Error("Population has been modified")
+	for i := range indis {
+		if reflect.DeepEqual(indis[i], original[i]) == false {
+			t.Error("Population has been modified")
+		}
 	}
 	// Check the individual is from the initial population
-	if reflect.DeepEqual(sample[0], indis[0]) == false {
+	if reflect.DeepEqual(indis[0], sample[0]) == false {
 		t.Error("Problem with tournament selection")
 	}
 }

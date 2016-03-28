@@ -27,7 +27,7 @@ type Population struct {
 	Selector Selector
 	// Crossover method
 	Crossover Crossover
-	// Mutation method
+	// Mutation methods
 	Mutators []Mutator
 	// Migration method
 	Migrator Migrator
