@@ -10,10 +10,10 @@ type Crossover interface {
 
 // FloatParenthood crossover combines two individuals (the parents) into one
 // (the offspring). Each parent's contribution to the Genome is determined by
-// the toss of a coin. The offspring can inherit from it's mother's genes
-// (coin <= 0.33), from it's father's genes (0.33 < coin <= 0.66) or from a
-// random mix of both (0.66 < coin <= 1). A coin is thrown for each gene. Only
-// works for floating point values
+// the value of a probability p. The offspring can inherit from it's mother's
+// genes (p <= 0.33), from it's father's genes (0.33 < p <= 0.66) or from a
+// random mix of both (0.66 < p <= 1). A coin is thrown for each gene. Only
+// works for floating point values.
 type FloatParenthood struct{}
 
 // Apply parenthood crossover.
@@ -26,14 +26,14 @@ func (fp FloatParenthood) apply(s Selector, indis Individuals, generator *rand.R
 	var offspring = Individual{make([]interface{}, len(mother.Genome)), 0.0}
 	// For every gene in the parent's genome
 	for i := range offspring.Genome {
-		// Flip a coin and decide what to do
-		var coin = rand.Float64()
+		// Pick a random number and decide what to do
+		var p = rand.Float64()
 		switch {
 		// The offspring receives the mother's gene
-		case coin <= 0.33:
+		case p <= 0.33:
 			offspring.Genome[i] = mother.Genome[i]
-		// The offspring receives the father's gene
-		case coin <= 0.66:
+			// The offspring receives the father's gene
+		case p <= 0.66:
 			offspring.Genome[i] = father.Genome[i]
 		// The offspring receives a mixture of his parent's genes
 		default:
