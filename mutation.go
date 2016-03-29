@@ -58,7 +58,7 @@ func (perm Permute) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < perm.Rate {
 		// Choose two points on the genome
 		var i = generator.Intn(len(indi.Genome))
-		var j = generator.Intn(len(indi.Genome))
+		var j = i
 		// Make sure both points are different
 		for i == j {
 			j = generator.Intn(len(indi.Genome))
