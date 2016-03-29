@@ -123,7 +123,6 @@ The only requirement for solving a problem is that the problem can be modeled as
 ## Roadmap
 
 - Error handling.
-- 100% test coverage.
 - Statistics.
 - Benchmarking.
 - Compare with other algorithms/libraries.
