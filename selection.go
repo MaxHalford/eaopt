@@ -33,5 +33,5 @@ type Elitism struct{}
 
 // Apply elitism selection.
 func (eli Elitism) apply(size int, indis Individuals, generator *rand.Rand) Individuals {
-	return indis[size:]
+	return indis[:size]
 }

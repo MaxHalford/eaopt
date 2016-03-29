@@ -8,24 +8,26 @@ import (
 )
 
 func TestIndividualFloat(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var nbGenes = 4
-	var indis = Individuals{
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-	}
-	var ff = FloatFunction{func(X []float64) float64 {
-		sum := 0.0
-		for _, x := range X {
-			sum += math.Abs(x)
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 4
+		indis     = Individuals{
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
 		}
-		return sum
-	}}
-	var init = FloatUniform{-5.0, 5.0}
+		ff = FloatFunction{func(X []float64) float64 {
+			sum := 0.0
+			for _, x := range X {
+				sum += math.Abs(x)
+			}
+			return sum
+		}}
+		init = FloatUniform{-5.0, 5.0}
+	)
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
@@ -49,28 +51,31 @@ func TestIndividualFloat(t *testing.T) {
 }
 
 func TestIndividualString(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var nbGenes = 4
-	var indis = Individuals{
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-		Individual{make([]interface{}, nbGenes), 0.0},
-	}
-	var target = []string{"T", "E", "S", "T"}
-	var ff = StringFunction{func(S []string) float64 {
-		sum := 0.0
-		for i := range S {
-			if target[i] != S[i] {
-				sum++
-			}
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 4
+		indis     = Individuals{
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
+			Individual{make([]interface{}, nbGenes), 0.0},
 		}
-		return sum
-	}}
-	var alphabet = []string{"A", "B", "C", "D"}
-	var init = StringUniform{alphabet}
+		target   = []string{"T", "E", "S", "T"}
+		sum      = 0.0
+		alphabet = []string{"A", "B", "C", "D"}
+		init     = StringUniform{alphabet}
+		ff       = StringFunction{func(S []string) float64 {
+			for i := range S {
+				if target[i] != S[i] {
+					sum++
+				}
+			}
+			return sum
+		}}
+	)
+
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
@@ -90,5 +95,20 @@ func TestIndividualString(t *testing.T) {
 				t.Error("Individuals are not sorted")
 			}
 		}
+	}
+}
+
+func TestIndividualDisplay(t *testing.T) {
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		indi      = Individual{make([]interface{}, 4), 0.0}
+		alphabet  = []string{"A", "B", "C", "D"}
+		init      = StringUniform{alphabet}
+	)
+	init.apply(&indi, generator)
+	var err = indi.Display()
+	if err != nil {
+		t.Error("Display didn't work")
 	}
 }
