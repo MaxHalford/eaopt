@@ -9,7 +9,7 @@ type Initializer interface {
 	apply(individual *Individual, generator *rand.Rand)
 }
 
-// FloatUniform generates random floating point values between given boundaries.
+// FloatUniform generates random floating points x such that lower < x < upper.
 type FloatUniform struct {
 	lower, upper float64
 }
@@ -25,6 +25,19 @@ func (fu FloatUniform) apply(indi *Individual, generator *rand.Rand) {
 			gene = generator.Float64() * fu.upper
 		}
 		indi.Genome[i] = gene
+	}
+}
+
+// FloatGaussian generates random floating point values sampled from a normal
+// distribution.
+type FloatGaussian struct {
+	mean, std float64
+}
+
+// Apply the FloatGaussian initializer.
+func (fg FloatGaussian) apply(indi *Individual, generator *rand.Rand) {
+	for i := range indi.Genome {
+		indi.Genome[i] = generator.NormFloat64()*fg.std + fg.mean
 	}
 }
 
