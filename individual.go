@@ -20,8 +20,9 @@ func (indi *Individual) Evaluate(ff FitnessFunction) {
 }
 
 // Display the genome and fitness of an individual.
-func (indi *Individual) Display() {
+func (indi *Individual) Display() error {
 	fmt.Println("Fitness:", indi.Fitness, "| Genome:", indi.Genome)
+	return nil
 }
 
 // Individuals type is necessary for sorting and selection purposes.
