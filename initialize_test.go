@@ -15,6 +15,27 @@ func TestFloatUniform(t *testing.T) {
 	var upper = 5.0
 	var init = FloatUniform{lower, upper}
 	init.apply(&indi, generator)
+	for _, gene := range indi.Genome {
+		var _, err = gene.(float64)
+		// Check if gene has changed
+		if err == false || gene == 0.0 {
+			t.Error("Problem with FloatUniform")
+		}
+		// Check if gene is between boundaries
+		if gene.(float64) < lower || upper < gene.(float64) {
+			t.Error("Problem with FloatUniform")
+		}
+	}
+}
+
+func TestFloatGaussian(t *testing.T) {
+	var source = rand.NewSource(time.Now().UnixNano())
+	var generator = rand.New(source)
+	var indi = Individual{make([]interface{}, 4), 0.0}
+	var mean = 0.0
+	var std = 1.0
+	var init = FloatGaussian{mean, std}
+	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
