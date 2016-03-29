@@ -7,7 +7,7 @@
 [![Report card](https://img.shields.io/badge/go_report-A+-brightgreen.svg)](https://goreportcard.com/report/github.com/MaxHalford/gago)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
-`gago` is a framework for running genetic algorithms. It is written in Go. 
+`gago` is a framework for running genetic algorithms. It is written in Go.
 
 In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) solves a mathematically posed problem by doing the following:
 
@@ -123,11 +123,11 @@ The only requirement for solving a problem is that the problem can be modeled as
 ## Roadmap
 
 - Error handling.
-- More tests.
+- 100% test coverage.
 - Statistics.
 - Benchmarking.
 - Compare with other algorithms/libraries.
-- Implement/generalize genetic operators.
+- Implement more genetic operators.
 - More examples.
 
 ## Why use gago?
