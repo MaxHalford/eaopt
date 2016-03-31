@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	m "math"
 
 	"github.com/MaxHalford/gago"
@@ -23,7 +24,7 @@ func main() {
 	ga.Initialize(2)
 	// Enhancement
 	for i := 0; i < 30; i++ {
-		ga.Best.Display()
+		fmt.Println(ga.Best.Fitness)
 		ga.Enhance()
 	}
 }
