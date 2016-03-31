@@ -11,7 +11,7 @@ type Initializer interface {
 
 // FloatUniform generates random floating points x such that lower < x < upper.
 type FloatUniform struct {
-	lower, upper float64
+	Lower, Upper float64
 }
 
 // Apply the FloatUniform initializer.
@@ -20,9 +20,9 @@ func (fu FloatUniform) apply(indi *Individual, generator *rand.Rand) {
 		// Decide if positive or negative
 		var gene float64
 		if generator.Float64() < 0.5 {
-			gene = generator.Float64() * fu.lower
+			gene = generator.Float64() * fu.Lower
 		} else {
-			gene = generator.Float64() * fu.upper
+			gene = generator.Float64() * fu.Upper
 		}
 		indi.Genome[i] = gene
 	}
@@ -31,13 +31,13 @@ func (fu FloatUniform) apply(indi *Individual, generator *rand.Rand) {
 // FloatGaussian generates random floating point values sampled from a normal
 // distribution.
 type FloatGaussian struct {
-	mean, std float64
+	Mean, Std float64
 }
 
 // Apply the FloatGaussian initializer.
 func (fg FloatGaussian) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
-		indi.Genome[i] = generator.NormFloat64()*fg.std + fg.mean
+		indi.Genome[i] = generator.NormFloat64()*fg.Std + fg.Mean
 	}
 }
 
