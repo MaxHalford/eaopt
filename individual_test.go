@@ -97,18 +97,3 @@ func TestIndividualString(t *testing.T) {
 		}
 	}
 }
-
-func TestIndividualDisplay(t *testing.T) {
-	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		indi      = Individual{make([]interface{}, 4), 0.0}
-		alphabet  = []string{"A", "B", "C", "D"}
-		init      = StringUniform{alphabet}
-	)
-	init.apply(&indi, generator)
-	var err = indi.Display()
-	if err != nil {
-		t.Error("Display didn't work")
-	}
-}
