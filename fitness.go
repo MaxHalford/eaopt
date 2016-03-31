@@ -3,7 +3,7 @@ package gago
 // FitnessFunction wraps user defined functions in order to generalize other
 // functions.
 type FitnessFunction interface {
-	apply(genome []interface{}) float64
+	apply(genome Genome) float64
 }
 
 // FloatFunction is for functions with floating point slices as input.
@@ -12,14 +12,8 @@ type FloatFunction struct {
 }
 
 // Apply the fitness function in wrapped in FloatFunction.
-func (ff FloatFunction) apply(genome []interface{}) float64 {
-	// Apply type insertion over the genome slice
-	floats := make([]float64, len(genome))
-	for i, gene := range genome {
-		floats[i] = gene.(float64)
-	}
-	// Compute the fitness
-	return ff.Image(floats)
+func (ff FloatFunction) apply(genome Genome) float64 {
+	return ff.Image(genome.CastFloat())
 }
 
 // StringFunction is for function with string slices as input.
@@ -27,13 +21,7 @@ type StringFunction struct {
 	Image func([]string) float64
 }
 
-// Apply the fitness function in wrapped in FloatFunction.
-func (sf StringFunction) apply(genome []interface{}) float64 {
-	// Apply type insertion over the genome slice
-	strings := make([]string, len(genome))
-	for i, gene := range genome {
-		strings[i] = gene.(string)
-	}
-	// Compute the fitness
-	return sf.Image(strings)
+// Apply the fitness function in wrapped in StringFunction.
+func (sf StringFunction) apply(genome Genome) float64 {
+	return sf.Image(genome.CastString())
 }
