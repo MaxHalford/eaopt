@@ -45,6 +45,7 @@ The following code shows a basic usage of `gago`.
 package main
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/MaxHalford/gago"
@@ -70,8 +71,8 @@ func main() {
 	for i := 0; i < 20; i++ {
 		ga.Enhance()
 	}
-	// Display the best individual
-	ga.Best.Display()
+	// Display the best obtained solution
+	fmt.Printf("The best obtained solution is %f", ga.Best.Fitness)
 }
 ```
 
