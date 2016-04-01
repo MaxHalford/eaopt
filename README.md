@@ -2,7 +2,6 @@
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-[![Requirements Status](https://requires.io/github/MaxHalford/gago/requirements.svg?branch=master)](https://requires.io/github/MaxHalford/gago/requirements/?branch=master)
 ![Build status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/MaxHalford/gago)](https://goreportcard.com/report/github.com/MaxHalford/gago)
