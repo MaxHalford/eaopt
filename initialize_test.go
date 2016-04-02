@@ -13,7 +13,7 @@ func TestFloatUniform(t *testing.T) {
 	var indi = Individual{make([]interface{}, 4), 0.0}
 	var lower = -5.0
 	var upper = 5.0
-	var init = FloatUniform{lower, upper}
+	var init = IFUniform{lower, upper}
 	init.apply(&indi, generator)
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
@@ -34,7 +34,7 @@ func TestFloatGaussian(t *testing.T) {
 	var indi = Individual{make([]interface{}, 4), 0.0}
 	var mean = 0.0
 	var std = 1.0
-	var init = FloatGaussian{mean, std}
+	var init = IFGaussian{mean, std}
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
@@ -50,7 +50,7 @@ func TestStringUniform(t *testing.T) {
 	var generator = rand.New(source)
 	var indi = Individual{make([]interface{}, 4), 0.0}
 	var alphabet = []string{"T", "E", "S", "T"}
-	var init = StringUniform{alphabet}
+	var init = ISUniform{alphabet}
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
@@ -66,7 +66,7 @@ func TestStringUnique(t *testing.T) {
 	var generator = rand.New(source)
 	var alphabet = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
 	var indi = Individual{make([]interface{}, len(alphabet)), 0.0}
-	var init = StringUnique{alphabet}
+	var init = ISUnique{alphabet}
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {

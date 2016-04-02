@@ -7,15 +7,15 @@ import (
 )
 
 var potentMutators = []Mutator{
-	FloatNormal{Rate: 1.0, Std: 1},
-	Splice{Rate: 1.0},
-	Permute{Rate: 1.0},
+	MutFNormal{Rate: 1.0, Std: 1},
+	MutSplice{Rate: 1.0},
+	MutPermute{Rate: 1.0},
 }
 
 var impotentMutators = []Mutator{
-	FloatNormal{Rate: 0.0, Std: 1},
-	Splice{Rate: 0.0},
-	Permute{Rate: 0.0},
+	MutFNormal{Rate: 0.0, Std: 1},
+	MutSplice{Rate: 0.0},
+	MutPermute{Rate: 0.0},
 }
 
 func TestPotentMutators(t *testing.T) {
@@ -24,7 +24,7 @@ func TestPotentMutators(t *testing.T) {
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		indi      = Individual{make([]interface{}, nbGenes), 0.0}
-		init      = FloatUniform{-5.0, 5.0}
+		init      = IFUniform{-5.0, 5.0}
 	)
 	init.apply(&indi, generator)
 	var genome = make([]interface{}, len(indi.Genome))
@@ -51,7 +51,7 @@ func TestImpotentMutators(t *testing.T) {
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		indi      = Individual{make([]interface{}, nbGenes), 0.0}
-		init      = FloatUniform{-5.0, 5.0}
+		init      = IFUniform{-5.0, 5.0}
 	)
 	init.apply(&indi, generator)
 	var genome = make([]interface{}, len(indi.Genome))
