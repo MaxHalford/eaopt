@@ -18,7 +18,7 @@ func TestTournament(t *testing.T) {
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
 	// All the individuals participate in the tournament
-	var selector = Tournament{size}
+	var selector = STournament{size}
 	var sample = selector.apply(size, indis, generator)
 	// Check the size of the sample
 	if len(sample) != size {
@@ -46,7 +46,7 @@ func TestElitism(t *testing.T) {
 	}
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
-	var selector = Elitism{}
+	var selector = SElitism{}
 	var sample = selector.apply(size, indis, generator)
 	// Check the size of the sample
 	if len(sample) != size {
@@ -75,8 +75,8 @@ func TestTournamentAndElitism(t *testing.T) {
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
 	// All the individuals participate in the tournament
-	var elitism = Elitism{}
-	var tournament = Tournament{size}
+	var elitism = SElitism{}
+	var tournament = STournament{size}
 	var a = elitism.apply(size, indis, generator)
 	var b = tournament.apply(size, indis, generator)
 	a.Sort()

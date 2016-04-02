@@ -8,11 +8,11 @@ type Migrator interface {
 	apply([]Deme) []Deme
 }
 
-// Shuffle migration exchanges individuals between demes in a random fashion.
-type Shuffle struct{}
+// MigShuffle migration exchanges individuals between demes in a random fashion.
+type MigShuffle struct{}
 
-// Apply shuffle migration
-func (shuffle Shuffle) apply(demes []Deme) []Deme {
+// Apply shuffle migration.
+func (shuffle MigShuffle) apply(demes []Deme) []Deme {
 	for i := 0; i < len(demes); i++ {
 		for j := i + 1; j < len(demes); j++ {
 			// Choose where to split the individuals

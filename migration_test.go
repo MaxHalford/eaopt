@@ -8,7 +8,7 @@ func TestShuffle(t *testing.T) {
 	for _, size := range demeSizes {
 		// Instantiate a population
 		var pop = Float
-		pop.Migrator = Shuffle{}
+		pop.Migrator = MigShuffle{}
 		pop.NbDemes = size
 		// Apply the migration method
 		pop.migrate()
