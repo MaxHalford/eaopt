@@ -69,14 +69,14 @@ func main() {
 	var ga = gago.Population{
 		NbDemes:       4,
 		NbIndividuals: 30,
-		Initializer:   gago.StringUnique{Corpus: names},
-		Selector:      gago.Tournament{NbParticipants: 20},
-		Crossover:     gago.PartiallyMappedCrossover{},
+		Initializer:   gago.ISUnique{Corpus: names},
+		Selector:      gago.STournament{NbParticipants: 20},
+		Crossover:     gago.CPMX{},
 		Mutators: []gago.Mutator{
-			gago.Permute{Rate: 0.9},
-			gago.Splice{Rate: 0.2},
+			gago.MutPermute{Rate: 0.9},
+			gago.MutSplice{Rate: 0.2},
 		},
-		Migrator: gago.Shuffle{},
+		Migrator: gago.MigShuffle{},
 	}
 	ga.Ff = gago.StringFunction{totalDistance}
 	ga.Initialize(len(names))

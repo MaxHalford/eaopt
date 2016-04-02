@@ -38,19 +38,3 @@ func shuffleStrings(strings []string, generator *rand.Rand) []string {
 	}
 	return shuffled
 }
-
-// Shuffle a slice of individuals.
-func shuffleIndividuals(indis Individuals, generator *rand.Rand) Individuals {
-	var shuffled = make(Individuals, len(indis))
-	for i, v := range generator.Perm(len(indis)) {
-		shuffled[v] = indis[i]
-	}
-	return shuffled
-}
-
-// Sample n unique individuals from a slice of individuals
-func sampleIndividuals(n int, indis Individuals, generator *rand.Rand) Individuals {
-	var shuffled = shuffleIndividuals(indis, generator)
-	var sample = shuffled[:n]
-	return sample
-}

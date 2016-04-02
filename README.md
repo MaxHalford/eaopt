@@ -95,6 +95,21 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 
 The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
 
+`gago` has a convention for naming genetic operators. The name begins with the a letter or a short sequence of letters to specify which kind of operator it is:
+
+- `C`: crossover
+- `Mut`: mutator
+- `Mig`: migrator
+- `S`: selector
+
+Then comes the second part of the name which indicates on what kind of genomes the operator works:
+
+- `F`: `float64`
+- `S`: `string`
+- No letter means the operator works on any kind of genome, regardless of the underlying type.
+
+Finally the name of the operator ends with a word to indicate what it does.
+
 `gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
 
 If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator` (the other ones are part of minimum requirements).
@@ -126,6 +141,7 @@ The only requirement for solving a problem is that the problem can be modeled as
 - Error handling.
 - Statistics.
 - Benchmarking.
+- Profiling.
 - Compare with other algorithms/libraries.
 - Implement more genetic operators.
 - More examples.
