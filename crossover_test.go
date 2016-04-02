@@ -10,16 +10,17 @@ var crossovers = []struct {
 	crossover Crossover
 	init      Initializer
 }{
-	{FloatParenthood{}, FloatUniform{-5.0, 5.0}},
-	{FloatFitnessProportionate{2}, FloatUniform{-5.0, 5.0}},
-	{PartiallyMappedCrossover{}, StringUnique{[]string{"A", "B", "C", "D"}}},
+	{CPoint{}, IFUniform{-5.0, 5.0}},
+	{CFUniform{}, IFUniform{-5.0, 5.0}},
+	{CFProportionate{2}, IFUniform{-5.0, 5.0}},
+	{CPMX{}, ISUnique{[]string{"A", "B", "C", "D"}}},
 }
 
 func TestCrossovers(t *testing.T) {
 	var source = rand.NewSource(time.Now().UnixNano())
 	var generator = rand.New(source)
 	var nbGenes = 4
-	var selector = Tournament{2}
+	var selector = STournament{2}
 	for _, c := range crossovers {
 		var indis = Individuals{
 			Individual{make([]interface{}, nbGenes), 0.0},

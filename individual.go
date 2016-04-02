@@ -1,6 +1,9 @@
 package gago
 
-import "sort"
+import (
+	"math/rand"
+	"sort"
+)
 
 // An Individual represents a potential solution to a problem. The individual's
 // is defined by it's genome, which is a slice containing genes. Every gene is a
@@ -36,4 +39,19 @@ func (indis Individuals) Less(i, j int) bool {
 
 func (indis Individuals) Swap(i, j int) {
 	indis[i], indis[j] = indis[j], indis[i]
+}
+
+// Shuffle a slice of individuals.
+func (indis Individuals) shuffle(generator *rand.Rand) Individuals {
+	var shuffled = make(Individuals, len(indis))
+	for i, v := range generator.Perm(len(indis)) {
+		shuffled[v] = indis[i]
+	}
+	return shuffled
+}
+
+// Sample n unique individuals from a slice of individuals
+func (indis Individuals) sample(n int, generator *rand.Rand) Individuals {
+	var sample = indis.shuffle(generator)[:n]
+	return sample
 }
