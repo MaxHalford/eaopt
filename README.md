@@ -1,4 +1,4 @@
-![Logo](logo.png)
+![logo](logo.png)
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
@@ -20,6 +20,10 @@ In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Geneti
 Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-population genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it performs better than a traditional genetic algorithm.
 
 Genetic algorithms are notorious for being [embarrassingly parallel](http://www.wikiwand.com/en/Embarrassingly_parallel). Indeed, most calculations can be run in parallel because they only affect one individual. Luckily Go provides good support for parallelism. As some gophers may know, the `math/rand` module can be problematic because there is a global lock the random number generator, the problem is described in this [stackoverflow post](http://stackoverflow.com/questions/14298523/why-does-adding-concurrency-slow-down-this-golang-code). This can be circumvented by providing each deme with it's own generator.
+
+The following flowchart shows the steps the algorithms takes. As can be seen only the search for the best individual and the migration can't be parallelized.
+
+![flowchart](flowchart.png)
 
 ## Terminology
 
@@ -95,24 +99,9 @@ To modify the behavior off the GA, you can change the `gago.Population` struct b
 
 The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
 
-`gago` has a convention for naming genetic operators. The name begins with the a letter or a short sequence of letters to specify which kind of operator it is:
-
-- `C`: crossover
-- `Mut`: mutator
-- `Mig`: migrator
-- `S`: selector
-
-Then comes the second part of the name which indicates on what kind of genomes the operator works:
-
-- `F`: `float64`
-- `S`: `string`
-- No letter means the operator works on any kind of genome, regardless of the underlying type.
-
-Finally the name of the operator ends with a word to indicate what it does.
-
 `gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
 
-If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator` (the other ones are part of minimum requirements).
+If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator` (the other ones are part of minimum requirements). Each operator contains an explanatory description that can be read in the [documentation](https://godoc.org/github.com/MaxHalford/gago). 
 
 ## Using different types
 
