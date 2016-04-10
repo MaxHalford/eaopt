@@ -8,12 +8,16 @@ import (
 )
 
 func TestTournament(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var size = 3
-	var indis = make(Individuals, size)
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		size      = 3
+		nbGenes   = 2
+		indis     = make(Individuals, size)
+	)
 	for i := 0; i < size; i++ {
-		indis[i] = Individual{make([]interface{}, 2), float64(i)}
+		indis[i] = makeIndividual(nbGenes)
+		indis[i].Fitness = float64(i)
 	}
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
@@ -37,12 +41,16 @@ func TestTournament(t *testing.T) {
 }
 
 func TestElitism(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var size = 3
-	var indis = make(Individuals, size)
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 2
+		size      = 3
+		indis     = make(Individuals, size)
+	)
 	for i := 0; i < size; i++ {
-		indis[i] = Individual{make([]interface{}, 2), float64(i)}
+		indis[i] = makeIndividual(nbGenes)
+		indis[i].Fitness = float64(i)
 	}
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
@@ -65,12 +73,16 @@ func TestElitism(t *testing.T) {
 }
 
 func TestTournamentAndElitism(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var size = 3
-	var indis = make(Individuals, size)
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 2
+		size      = 3
+		indis     = make(Individuals, size)
+	)
 	for i := 0; i < size; i++ {
-		indis[i] = Individual{make([]interface{}, 2), float64(i)}
+		indis[i] = makeIndividual(nbGenes)
+		indis[i].Fitness = float64(i)
 	}
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
@@ -79,8 +91,8 @@ func TestTournamentAndElitism(t *testing.T) {
 	var tournament = STournament{size}
 	var a = elitism.apply(size, indis, generator)
 	var b = tournament.apply(size, indis, generator)
-	a.Sort()
-	b.Sort()
+	a.sort()
+	b.sort()
 	// Check the individual is from the initial population
 	if a[0].Fitness != b[0].Fitness {
 		t.Error("Elitism and full tournament selection differed")
