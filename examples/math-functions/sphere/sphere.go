@@ -18,15 +18,13 @@ func sphere(X []float64) float64 {
 }
 
 func main() {
-	// Instantiate a population
-	ga := gago.Float
-	// Wrap the function
-	ga.Ff = gago.FloatFunction{sphere}
-	// Initialize the genetic algorithm with two variables per individual
-	ga.Initialize(2)
+	// Instantiate a GA with 2 variables and the fitness function
+	var ga = gago.GAFloat(2, sphere)
+	ga.Initialize()
 	// Enhancement
-	for i := 0; i < 25; i++ {
-		fmt.Println(ga.Best.Fitness)
+	for i := 0; i < 10; i++ {
 		ga.Enhance()
 	}
+	// Display the best obtained solution
+	fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 }

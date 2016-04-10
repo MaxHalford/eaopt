@@ -35,16 +35,9 @@ func leastSquares(B []float64) float64 {
 }
 
 func main() {
-	// Instantiate a population
-	ga := gago.Float
-	// Wrap the function
-	ga.Ff = gago.FloatFunction{leastSquares}
-	// Number of demes
-	ga.NbDemes = 4
-	// Number of individuals in each deme
-	ga.NbIndividuals = 50
-	// Initialize the genetic algorithm
-	ga.Initialize(3)
+	// Instantiate a GA with 3 variables and the fitness function
+	var ga = gago.GAFloat(3, leastSquares)
+	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 1000; i++ {
 		fmt.Println(ga.Best.Fitness)

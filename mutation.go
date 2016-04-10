@@ -31,7 +31,8 @@ func (mfn MutFNormal) apply(indi *Individual, generator *rand.Rand) {
 	}
 }
 
-// MutSplice a genome and glue it back in another order.
+// MutSplice splices a genome in 3 and glues the parts back together in another
+// order.
 type MutSplice struct {
 	// Mutation rate
 	Rate float64
@@ -40,10 +41,23 @@ type MutSplice struct {
 // Apply splice mutation.
 func (ms MutSplice) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < ms.Rate {
-		// Choose where to split the genome
-		var split = rand.Intn(len(indi.Genome))
-		// Splice and glue
-		indi.Genome = append(indi.Genome[split:], indi.Genome[:split]...)
+		// Choose where to start and end the splice
+		var end = rand.Intn(len(indi.Genome))
+		var start = rand.Intn(len(indi.Genome))
+		if end < start {
+			start, end = end, start
+		}
+		// Split the genome into two
+		var inner = make(Genome, end-start)
+		copy(inner, indi.Genome[start:end])
+		var outer = append(indi.Genome[:start], indi.Genome[end:]...)
+		// Choose where to insert the splice
+		var insert = rand.Intn(len(outer))
+		// Splice and insert
+		indi.Genome = append(
+			outer[:insert],
+			append(inner, outer[insert:]...)...,
+		)
 	}
 }
 
@@ -51,18 +65,25 @@ func (ms MutSplice) apply(indi *Individual, generator *rand.Rand) {
 type MutPermute struct {
 	// Mutation rate
 	Rate float64
+	// Maximum number of permutation
+	Max int
 }
 
 // Apply permutation mutation.
 func (mp MutPermute) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < mp.Rate {
-		// Choose two points on the genome
-		var (
-			r = generator.Perm(len(indi.Genome))[:2]
-			i = r[0]
-			j = r[1]
-		)
-		// Permute the genes
-		indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
+		for i := 0; i < generator.Intn(mp.Max); i++ {
+			// Choose two points on the genome
+			var (
+				i = generator.Intn(len(indi.Genome))
+				j = i
+			)
+			// Make sure both points are different
+			for i == j {
+				j = generator.Intn(len(indi.Genome))
+			}
+			// Permute the genes
+			indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
+		}
 	}
 }

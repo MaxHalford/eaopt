@@ -1,4 +1,4 @@
-![logo](logo.png)
+![logo](img/logo.png)
 
 ![License](http://img.shields.io/:license-mit-blue.svg)
 [![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
@@ -13,17 +13,19 @@ In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Geneti
 
 1. Generate random solutions.
 2. Evaluate the solutions.
-3. Sort the solutions by increasing (or decreasing) order.
-4. Apply genetic operators (such as [mutation](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) and [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm))).
-5. Repeat from step 2 until satisfied.
+3. Sort the solutions according to their evaluation score.
+4. Select parents for breeding.
+5. Apply [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm) to generate new solutions.
+6. [Mutate](https://www.wikiwand.com/en/Mutation_(genetic_algorithm) the newly generated solutions.
+7. Repeat from step 2 until satisfied.
 
-Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-population genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it performs better than a traditional genetic algorithm.
+Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-GA genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it can perform better than a traditional genetic algorithm for certain scenarios.
 
-Genetic algorithms are notorious for being [embarrassingly parallel](http://www.wikiwand.com/en/Embarrassingly_parallel). Indeed, most calculations can be run in parallel because they only affect one individual. Luckily Go provides good support for parallelism. As some gophers may know, the `math/rand` module can be problematic because there is a global lock the random number generator, the problem is described in this [stackoverflow post](http://stackoverflow.com/questions/14298523/why-does-adding-concurrency-slow-down-this-golang-code). This can be circumvented by providing each deme with it's own generator.
+Genetic algorithms are notorious for being [embarrassingly parallel](http://www.wikiwand.com/en/Embarrassingly_parallel). Indeed, most calculations can be run in parallel because they only affect one individual. Luckily Go provides good support for parallelism. As some gophers may know, the `math/rand` module can be problematic because there is a global lock the random number generator, the problem is described in this [stackoverflow post](http://stackoverflow.com/questions/14298523/why-does-adding-concurrency-slow-down-this-golang-code). This can be circumvented by providing each GA with it's own generator.
 
 The following flowchart shows the steps the algorithms takes. As can be seen only the search for the best individual and the migration can't be parallelized.
 
-![flowchart](flowchart.png)
+![flowchart](img/flowchart.png)
 
 ## Terminology
 
@@ -37,9 +39,9 @@ The terms surrounding genetic algorithms (GAs) are roughly analogous to those fo
 - ***Offsprings*** are born by applying ***crossover*** on selected individuals.
 - The ***selection*** method is crucial and determines most of the behavior of the algorithm.
 - Genes can be randomly modified through ***mutation***.
-- Classically, individuals are contained in a structure called a ***population***.
-- Multi-population GAs add another layer in-between called ***demes***.
-- Demes exchange individuals through a process known as ***migration***.
+- Classically, individuals are contained in a structure called a ***GA***.
+- Multi-GA GAs add another layer in-between called ***Populations***.
+- Populations exchange individuals through a process known as ***migration***.
 
 ## Usage
 
@@ -50,33 +52,31 @@ package main
 
 import (
 	"fmt"
-	"math"
+	m "math"
 
 	"github.com/MaxHalford/gago"
 )
 
-// Sphere function minimum is 0
+// Sphere function minimum is 0 reached in (0, ..., 0).
+// Any search domain is fine.
 func sphere(X []float64) float64 {
 	sum := 0.0
 	for _, x := range X {
-		sum += math.Pow(x, 2)
+		sum += m.Pow(x, 2)
 	}
 	return sum
 }
 
 func main() {
-	// Instantiate a population
-	ga := gago.Float
-	// Wrap the function
-	ga.Ff = gago.FloatFunction{sphere}
-	// Initialize the genetic algorithm with two variables per individual
-	ga.Initialize(2)
-	// Enhance the individuals
-	for i := 0; i < 20; i++ {
+	// Instantiate a GA with 2 variables and the fitness function
+	var ga = gago.GAFloat(2, sphere)
+	ga.Initialize()
+	// Enhancement
+	for i := 0; i < 10; i++ {
 		ga.Enhance()
 	}
 	// Display the best obtained solution
-	fmt.Printf("The best obtained solution is %f", ga.Best.Fitness)
+	fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 }
 ```
 
@@ -84,24 +84,23 @@ The user has a function `Sphere` he wishes to minimize. He initiates a predefine
 
 ## Parameters
 
-To modify the behavior off the GA, you can change the `gago.Population` struct before running `ga.Initialize`. You can either instantiate a new `gago.Population` or use a predefined one from the `configuration.go` file.
+To modify the behavior off the GA, you can change the `gago.GA` struct before running `ga.Initialize`. You can either instantiate a new `gago.GA` or use a predefined one from the `configuration.go` file.
 
 | Variable in the code   | Type                      | Description                                                      |
 |------------------------|---------------------------|------------------------------------------------------------------|
-| `NbDemes`              | `int`                     | Number of demes in the population.                               |
-| `NbIndividuals`        | `int`                     | Number of individuals in each deme.                              |
-| `NbGenes`              | `int`                     | Number of genes in each individual.                              |
+| `NbDemes`              | `int`                     | Number of Populations in the GA.                               |
+| `NbIndividuals`        | `int`                     | Number of individuals in each population.                              |
 | `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual.                        |
 | `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals. |
 | `Crossover` (struct)     | `Crossover` (interface)     | Method for producing a new individual (called the offspring).    |
 | `Mutators` (struct)     | `[]Mutator` (slice of interface)     | Method for modifying an individual's genes.                      |
-| `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the demes.             |
+| `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the Populations.             |
 
-The `gago.Population` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall demes for the current generation. Alternatively the `Demes` variable is a slice containing each deme in the population; the demes are sorted at each generation so that the first individual in the deme is the best individual from that deme.
+The `gago.GA` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall. The `Populations` variable is a slice containing each GA in the GA. The populations are sorted at each generation so that the first individual in each GA is the best individual for that specific GA.
 
-`gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment it. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you please. All that matters is that you correctly implement the existing interfaces.
+`gago` is designed to be flexible. You can change every parameter of the algorithm as long as you implement functions that use the correct types as input/output. A good way to start is to look into the source code and see how the methods are implemented, I've made an effort to comment each and every one of them. If you want to add a new generic operator (initializer, selector, crossover, mutator, migrator), then you can simply copy and paste an existing method into your code and change the logic as you see fit. All that matters is that you correctly implement the existing interfaces.
 
-If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Crossover`, the `Mutator` and the `Migrator` (the other ones are part of minimum requirements). Each operator contains an explanatory description that can be read in the [documentation](https://godoc.org/github.com/MaxHalford/gago). 
+If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Mutator` and the `Migrator` (the other ones are part of the minimum requirements). Each operator contains an explanatory description that can be consulted in the [documentation](https://godoc.org/github.com/MaxHalford/gago).
 
 ## Using different types
 
@@ -128,6 +127,7 @@ The only requirement for solving a problem is that the problem can be modeled as
 ## Roadmap
 
 - Error handling.
+- More tests.
 - Statistics.
 - Benchmarking.
 - Profiling.
@@ -139,7 +139,7 @@ The only requirement for solving a problem is that the problem can be modeled as
 
 - It's generic, your only constraint is to model your problem and `gago` will do all the hard work for you.
 - You can easily add your own genetic operators.
-- `gago` implements parallel populations (called "demes") who exchange individuals for better performance.
+- `gago` implements parallel populations (called "Populations") who exchange individuals for better performance.
 - `gago` will be well maintained.
 
 ## Suggestions

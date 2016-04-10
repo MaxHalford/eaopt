@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"math"
 	"math/rand"
 	"sort"
 )
@@ -10,22 +11,52 @@ import (
 // floating point numbers. The fitness is the individual's phenotype and is
 // represented by a floating point number.
 type Individual struct {
-	Genome  Genome
-	Fitness float64
+	Genome    Genome
+	Fitness   float64
+	Evaluated bool
 }
 
 // Evaluate the fitness of an individual.
-func (indi *Individual) Evaluate(ff FitnessFunction) {
-	indi.Fitness = ff.apply(indi.Genome)
+func (indi *Individual) evaluate(ff FitnessFunction) {
+	// Don't evaluate individuals that have already been evaluated
+	if indi.Evaluated == false {
+		indi.Fitness = ff.apply(indi.Genome)
+		indi.Evaluated = true
+	}
+}
+
+// Generate a new individual.
+func makeIndividual(nbGenes int) Individual {
+	return Individual{
+		Genome:    make([]interface{}, nbGenes),
+		Fitness:   math.Inf(1),
+		Evaluated: false,
+	}
 }
 
 // Individuals type is necessary for sorting and selection purposes.
 type Individuals []Individual
 
-// Sort the individuals of a deme in ascending order based on their fitness. The
+// Evaluate each individual
+func (indis Individuals) evaluate(ff FitnessFunction) {
+	for i := range indis {
+		indis[i].evaluate(ff)
+	}
+}
+
+// Generate a slice of new individuals.
+func makeIndividuals(nbIndis, nbGenes int) Individuals {
+	var indis = make(Individuals, nbIndis)
+	for i := range indis {
+		indis[i] = makeIndividual(nbGenes)
+	}
+	return indis
+}
+
+// Sort the individuals of a population in ascending order based on their fitness. The
 // convention is that we always want to minimize a function. A function f(x) can
 // be function maximized by minimizing -f(x) or 1/f(x).
-func (indis Individuals) Sort() {
+func (indis Individuals) sort() {
 	sort.Sort(indis)
 }
 

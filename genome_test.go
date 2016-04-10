@@ -11,7 +11,7 @@ func TestCastFloat(t *testing.T) {
 		nbGenes   = 4
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
-		indi      = Individual{make([]interface{}, nbGenes), 0.0}
+		indi      = makeIndividual(nbGenes)
 		init      = IFUniform{-5.0, 5.0}
 	)
 	init.apply(&indi, generator)
@@ -27,7 +27,7 @@ func TestCastString(t *testing.T) {
 		nbGenes   = 4
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
-		indi      = Individual{make([]interface{}, nbGenes), 0.0}
+		indi      = makeIndividual(nbGenes)
 		init      = ISUniform{[]string{"T", "E", "S", "T"}}
 	)
 	init.apply(&indi, generator)

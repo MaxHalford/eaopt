@@ -14,11 +14,11 @@ func TestIndividualFloat(t *testing.T) {
 		generator = rand.New(source)
 		nbGenes   = 4
 		indis     = Individuals{
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
 		}
 		ff = FloatFunction{func(X []float64) float64 {
 			sum := 0.0
@@ -32,7 +32,7 @@ func TestIndividualFloat(t *testing.T) {
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
-		indis[i].Evaluate(ff)
+		indis[i].evaluate(ff)
 	}
 	// Check if fitnesses have been assigned
 	for _, indi := range indis {
@@ -41,7 +41,7 @@ func TestIndividualFloat(t *testing.T) {
 		}
 	}
 	// Check if the individuals are sorted
-	indis.Sort()
+	indis.sort()
 	for i := 0; i < len(indis); i++ {
 		for j := i + 1; j < len(indis); j++ {
 			if indis[i].Fitness > indis[j].Fitness {
@@ -57,11 +57,11 @@ func TestIndividualString(t *testing.T) {
 		generator = rand.New(source)
 		nbGenes   = 4
 		indis     = Individuals{
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
 		}
 		target   = []string{"T", "E", "S", "T"}
 		sum      = 0.0
@@ -80,7 +80,7 @@ func TestIndividualString(t *testing.T) {
 	// Assign genomes and fitnesses
 	for i, indi := range indis {
 		init.apply(&indi, generator)
-		indis[i].Evaluate(ff)
+		indis[i].evaluate(ff)
 	}
 	// Check if fitnesses have been assigned
 	for _, indi := range indis {
@@ -89,7 +89,7 @@ func TestIndividualString(t *testing.T) {
 		}
 	}
 	// Check if the individuals are sorted
-	indis.Sort()
+	indis.sort()
 	for i := 0; i < len(indis); i++ {
 		for j := i + 1; j < len(indis); j++ {
 			if indis[i].Fitness > indis[j].Fitness {
@@ -99,15 +99,22 @@ func TestIndividualString(t *testing.T) {
 	}
 }
 
+//func TestEvaluateIndividuals(t *testing.T) {
+//
+//}
+
 func TestShuffleIndividuals(t *testing.T) {
 	var (
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		size      = 10
 		indis     = make(Individuals, size)
+		nbGenes   = 1
 	)
 	for i := 0; i < size; i++ {
-		indis[i] = Individual{make([]interface{}, 1), float64(i)}
+		indis[i] = makeIndividual(nbGenes)
+		indis[i].Fitness = float64(i)
+
 	}
 	var shuffled = indis.shuffle(generator)
 	// Check the shuffled slice is different from the original one
@@ -122,11 +129,11 @@ func TestSampleIndividuals(t *testing.T) {
 		generator = rand.New(source)
 		nbGenes   = 4
 		indis     = Individuals{
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
-			Individual{make([]interface{}, nbGenes), 0.0},
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
+			makeIndividual(nbGenes),
 		}
 		size   = 3
 		sample = indis.sample(size, generator)

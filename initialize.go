@@ -3,7 +3,7 @@ package gago
 import "math/rand"
 
 // The Initializer is here to create the first generation of individuals in a
-// deme. It applies to an individual level and instantiates it's genome gene by
+// population. It applies to an individual level and instantiates it's genome gene by
 // gene.
 type Initializer interface {
 	apply(individual *Individual, generator *rand.Rand)

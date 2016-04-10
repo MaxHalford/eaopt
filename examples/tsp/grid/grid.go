@@ -22,11 +22,11 @@ func euclidian(a, b point) float64 {
 }
 
 var (
-	size     = 5
-	points   = make(map[string]point)
-	distance = euclidian
+	size   = 5
+	points = make(map[string]point)
 )
 
+// Create the list of possible points on a grid
 func init() {
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
@@ -36,10 +36,11 @@ func init() {
 	}
 }
 
-func totalDistance(trip []string) float64 {
+// Calculate the distance for a list of consecutive points
+func distance(trip []string) float64 {
 	var total = 0.0
 	for i := 0; i < len(trip)-1; i++ {
-		total += distance(points[trip[i]], points[trip[i+1]])
+		total += euclidian(points[trip[i]], points[trip[i+1]])
 	}
 	return total
 }
@@ -66,29 +67,15 @@ func main() {
 	for name := range points {
 		names = append(names, name)
 	}
-	var ga = gago.Population{
-		NbDemes:       4,
-		NbIndividuals: 30,
-		Initializer:   gago.ISUnique{Corpus: names},
-		Selector:      gago.STournament{NbParticipants: 20},
-		Crossover:     gago.CPMX{},
-		Mutators: []gago.Mutator{
-			gago.MutPermute{Rate: 0.9},
-			gago.MutSplice{Rate: 0.2},
-		},
-		Migrator: gago.MigShuffle{},
-	}
-	ga.Ff = gago.StringFunction{totalDistance}
-	ga.Initialize(len(names))
-
+	// Create the GA
+	var ga = gago.GATSP(names, distance)
+	ga.Initialize()
+	// Enhance
 	for i := 0; i < 1000; i++ {
 		fmt.Println(ga.Best.Fitness)
 		ga.Enhance()
 	}
-
-	var points = make([]string, len(ga.Best.Genome))
-	for i, gene := range ga.Best.Genome {
-		points[i] = gene.(string)
-	}
+	// Extract the genome of the best individual
+	var points = ga.Best.Genome.CastString()
 	graph(points)
 }

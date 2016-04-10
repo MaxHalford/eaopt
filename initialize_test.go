@@ -8,12 +8,14 @@ import (
 )
 
 func TestFloatUniform(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var indi = Individual{make([]interface{}, 4), 0.0}
-	var lower = -5.0
-	var upper = 5.0
-	var init = IFUniform{lower, upper}
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		indi      = makeIndividual(4)
+		lower     = -5.0
+		upper     = 5.0
+		init      = IFUniform{lower, upper}
+	)
 	init.apply(&indi, generator)
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
@@ -29,12 +31,15 @@ func TestFloatUniform(t *testing.T) {
 }
 
 func TestFloatGaussian(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var indi = Individual{make([]interface{}, 4), 0.0}
-	var mean = 0.0
-	var std = 1.0
-	var init = IFGaussian{mean, std}
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 4
+		indi      = makeIndividual(nbGenes)
+		mean      = 0.0
+		std       = 1.0
+		init      = IFGaussian{mean, std}
+	)
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
@@ -46,11 +51,14 @@ func TestFloatGaussian(t *testing.T) {
 }
 
 func TestStringUniform(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var indi = Individual{make([]interface{}, 4), 0.0}
-	var alphabet = []string{"T", "E", "S", "T"}
-	var init = ISUniform{alphabet}
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		nbGenes   = 4
+		indi      = makeIndividual(nbGenes)
+		alphabet  = []string{"T", "E", "S", "T"}
+		init      = ISUniform{alphabet}
+	)
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
@@ -62,11 +70,14 @@ func TestStringUniform(t *testing.T) {
 }
 
 func TestStringUnique(t *testing.T) {
-	var source = rand.NewSource(time.Now().UnixNano())
-	var generator = rand.New(source)
-	var alphabet = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
-	var indi = Individual{make([]interface{}, len(alphabet)), 0.0}
-	var init = ISUnique{alphabet}
+	var (
+		source    = rand.NewSource(time.Now().UnixNano())
+		generator = rand.New(source)
+		alphabet  = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
+		nbGenes   = len(alphabet)
+		indi      = makeIndividual(nbGenes)
+		init      = ISUnique{alphabet}
+	)
 	init.apply(&indi, generator)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
