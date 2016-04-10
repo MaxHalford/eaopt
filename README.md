@@ -102,6 +102,27 @@ The `gago.GA` struct also contains a `Best` variable which is of type `Individua
 
 If you wish to not use certain genetic operators, you can set them to `nil`. This is available for the `Mutator` and the `Migrator` (the other ones are part of the minimum requirements). Each operator contains an explanatory description that can be consulted in the [documentation](https://godoc.org/github.com/MaxHalford/gago).
 
+## Naming convention
+
+Package gago has a convention for naming genetic operators. The name begins
+with a letter or a short sequence of letters to specify which kind of
+operator it is:
+
+- `C`: crossover
+- `Mut`: mutator
+- `Mig`: migrator
+- `S`: selector
+
+Then comes the second part of the name which indicates on what kind of
+genomes the operator works:
+
+- `F`: `float64`
+- `S`: `string`
+- No letter means the operator works on any kind of genome, regardless of the
+underlying type.
+
+Finally the name of the operator ends with a word to indicate what it does.
+
 ## Using different types
 
 Some genetic operators target a specific type, these ones are prefixed with the name of the type (`Float`, `String`). The ones that don't have prefixes work with any types, which is down to the way they are implemented. Default configurations are available in `configuration.go`.

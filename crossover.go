@@ -5,8 +5,10 @@ import (
 	"sort"
 )
 
-// Crossover mixes two or more individuals into a new individual called the
-// offspring.
+// Crossover generates new individuals called "offsprings" are by mixing the
+// genomes of a sample group of individuals. Instead of using the same sample
+// for generating each offspring, each crossover resamples the population in
+// order to preserve diversity.
 type Crossover interface {
 	apply(selector Selector, individuals Individuals, generator *rand.Rand) Individuals
 }
