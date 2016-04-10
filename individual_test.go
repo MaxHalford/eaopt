@@ -12,15 +12,10 @@ func TestIndividualFloat(t *testing.T) {
 	var (
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
+		nbIndis   = 5
 		nbGenes   = 4
-		indis     = Individuals{
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-		}
-		ff = FloatFunction{func(X []float64) float64 {
+		indis     = makeIndividuals(nbIndis, nbGenes)
+		ff        = FloatFunction{func(X []float64) float64 {
 			sum := 0.0
 			for _, x := range X {
 				sum += math.Abs(x)
@@ -55,19 +50,14 @@ func TestIndividualString(t *testing.T) {
 	var (
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
+		nbIndis   = 5
 		nbGenes   = 4
-		indis     = Individuals{
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-		}
-		target   = []string{"T", "E", "S", "T"}
-		sum      = 0.0
-		alphabet = []string{"A", "B", "C", "D"}
-		init     = ISUniform{alphabet}
-		ff       = StringFunction{func(S []string) float64 {
+		indis     = makeIndividuals(nbIndis, nbGenes)
+		target    = []string{"T", "E", "S", "T"}
+		sum       = 0.0
+		alphabet  = []string{"A", "B", "C", "D"}
+		init      = ISUniform{alphabet}
+		ff        = StringFunction{func(S []string) float64 {
 			for i := range S {
 				if target[i] != S[i] {
 					sum++
@@ -127,16 +117,11 @@ func TestSampleIndividuals(t *testing.T) {
 	var (
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
+		nbIndis   = 5
 		nbGenes   = 4
-		indis     = Individuals{
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-			makeIndividual(nbGenes),
-		}
-		size   = 3
-		sample = indis.sample(size, generator)
+		indis     = makeIndividuals(nbIndis, nbGenes)
+		size      = 3
+		sample    = indis.sample(size, generator)
 	)
 	// Check the size of the sample
 	if len(sample) != size {
