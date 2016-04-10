@@ -12,6 +12,7 @@ var crossovers = []struct {
 }{
 	{CPoint{}, IFUniform{-5.0, 5.0}},
 	{CFUniform{}, IFUniform{-5.0, 5.0}},
+	{CFProportionate{NbParents: 2}, IFUniform{-5.0, 5.0}},
 	{CPMX{}, ISUnique{[]string{"A", "B", "C", "D"}}},
 }
 
