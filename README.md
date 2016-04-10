@@ -15,8 +15,8 @@ In its most basic form, a [genetic algorithm](https://www.wikiwand.com/en/Geneti
 2. Evaluate the solutions.
 3. Sort the solutions according to their evaluation score.
 4. Select parents for breeding.
-5. Apply [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm) to generate new solutions.
-6. [Mutate](https://www.wikiwand.com/en/Mutation_(genetic_algorithm) the newly generated solutions.
+5. Apply [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm)) to generate new solutions.
+6. [Mutate](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) the newly generated solutions.
 7. Repeat from step 2 until satisfied.
 
 Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be reusable. What's more, `gago` is a [multi-GA genetic algorithm](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) implementing the *migration model*, in that sense it can perform better than a traditional genetic algorithm for certain scenarios.
