@@ -19,16 +19,16 @@ type STournament struct {
 func (ts STournament) apply(size int, indis Individuals, generator *rand.Rand) Individuals {
 	var winners = make(Individuals, size)
 	for i := range winners {
-		// Sample the population
+		// Sample the GA
 		var sample = indis.sample(ts.NbParticipants, generator)
 		// The winner is the best individual participating in the tournament
-		sample.Sort()
+		sample.sort()
 		winners[i] = sample[0]
 	}
 	return winners
 }
 
-// SElitism selection returns the best individuals in the population.
+// SElitism selection returns the best individuals in the GA.
 type SElitism struct{}
 
 // Apply elitism selection.

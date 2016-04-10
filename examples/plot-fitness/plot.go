@@ -46,16 +46,13 @@ func graph(best plotter.XYs) {
 }
 
 func main() {
-	// Instantiate a population
-	ga := gago.Float
-	// Wrap the function
-	ga.Ff = gago.FloatFunction{styblinskiTang}
-	// Initialize the genetic algorithm with two variables per individual
-	ga.Initialize(2)
+	// Instantiate a GA with 2 variables and the fitness function
+	var ga = gago.GAFloat(2, styblinskiTang)
+	ga.Initialize()
 	// Number of generations
-	generations := 10
+	var generations = 10
 	// Containers for fitnesses
-	best := make(plotter.XYs, generations)
+	var best = make(plotter.XYs, generations)
 	// Enhancement
 	for i := 0; i < generations; i++ {
 		ga.Enhance()

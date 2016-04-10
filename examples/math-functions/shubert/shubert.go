@@ -20,19 +20,13 @@ func shubert(X []float64) float64 {
 }
 
 func main() {
-	// Instantiate a population
-	ga := gago.Float
-	// Wrap the function
-	ga.Ff = gago.FloatFunction{shubert}
-	// More demes
-	ga.NbDemes = 4
-	// More individual
-	ga.NbIndividuals = 100
-	// Initialize the genetic algorithm with two variables per individual
-	ga.Initialize(2)
+	// Instantiate a GA with 2 variables and the fitness function
+	var ga = gago.GAFloat(2, shubert)
+	ga.Initialize()
 	// Enhancement
-	for i := 0; i < 100; i++ {
-		fmt.Println(ga.Best.Fitness)
+	for i := 0; i < 30; i++ {
 		ga.Enhance()
 	}
+	// Display the best obtained solution
+	fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 }
