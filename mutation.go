@@ -2,7 +2,7 @@ package gago
 
 import "math/rand"
 
-// Mutator mutates an individual by modifying part of it's genome.
+// Mutator modifies an individual by replacing it's genes with new values.
 type Mutator interface {
 	// Apply performs the mutation on an individual
 	apply(individual *Individual, generator *rand.Rand)
@@ -42,11 +42,10 @@ type MutSplice struct {
 func (ms MutSplice) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < ms.Rate {
 		// Choose where to start and end the splice
-		var end = rand.Intn(len(indi.Genome))
-		var start = rand.Intn(len(indi.Genome))
-		if end < start {
-			start, end = end, start
-		}
+		var (
+			end   = rand.Intn(len(indi.Genome))
+			start = rand.Intn(end)
+		)
 		// Split the genome into two
 		var inner = make(Genome, end-start)
 		copy(inner, indi.Genome[start:end])
@@ -75,13 +74,10 @@ func (mp MutPermute) apply(indi *Individual, generator *rand.Rand) {
 		for i := 0; i < generator.Intn(mp.Max); i++ {
 			// Choose two points on the genome
 			var (
-				i = generator.Intn(len(indi.Genome))
-				j = i
+				points = generator.Perm(len(indi.Genome))[:2]
+				i      = points[0]
+				j      = points[1]
 			)
-			// Make sure both points are different
-			for i == j {
-				j = generator.Intn(len(indi.Genome))
-			}
 			// Permute the genes
 			indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
 		}
