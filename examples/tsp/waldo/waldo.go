@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"runtime"
 	"strconv"
 
 	"github.com/MaxHalford/gago"
@@ -71,6 +72,7 @@ func graph(P []string) {
 }
 
 func main() {
+	runtime.GOMAXPROCS(4)
 	// Get the names of the points
 	var names []string
 	for name := range points {
@@ -81,9 +83,9 @@ func main() {
 	ga.Initialize()
 	// Enhance
 	for i := 0; i < 3000; i++ {
-		fmt.Println(ga.Best.Fitness)
 		ga.Enhance()
 	}
+	fmt.Println(ga.Best.Fitness)
 	// Extract the genome of the best individual
 	var points = ga.Best.Genome.CastString()
 	graph(points)

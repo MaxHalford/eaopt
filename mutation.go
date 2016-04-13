@@ -42,10 +42,8 @@ type MutSplice struct {
 func (ms MutSplice) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < ms.Rate {
 		// Choose where to start and end the splice
-		var (
-			end   = rand.Intn(len(indi.Genome))
-			start = rand.Intn(end)
-		)
+		var end = rand.Intn(len(indi.Genome))
+		var start = rand.Intn(end + 1)
 		// Split the genome into two
 		var inner = make(Genome, end-start)
 		copy(inner, indi.Genome[start:end])
