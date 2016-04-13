@@ -16,7 +16,7 @@ var potentMutators = []Mutator{
 	},
 	MutPermute{
 		Rate: 1,
-		Max:  1,
+		Max:  3,
 	},
 }
 
