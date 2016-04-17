@@ -139,16 +139,17 @@ func (pmx CPMX) apply(s Selector, indis Individuals, generator *rand.Rand) Indiv
 	copy(offsprings[1].Genome, parents[1].Genome)
 	// Choose a random crossover point
 	var point = generator.Intn(nbGenes)
+	var p int
 	// Paste the father's genome up to the crossover point
 	for i := 0; i < point; i++ {
 		// Find where the second parent's gene is in the first offspring's genome
-		var position = getIndex(parents[1].Genome[i], offsprings[0].Genome)
+		p = getIndex(parents[1].Genome[i], offsprings[0].Genome)
 		// Swap the genes
-		offsprings[0].Genome[position], offsprings[0].Genome[i] = offsprings[0].Genome[i], parents[1].Genome[i]
+		offsprings[0].Genome[p], offsprings[0].Genome[i] = offsprings[0].Genome[i], parents[1].Genome[i]
 		// Find where the first parent's gene is in the second offspring's genome
-		position = getIndex(parents[0].Genome[i], offsprings[1].Genome)
+		p = getIndex(parents[0].Genome[i], offsprings[1].Genome)
 		// Swap the genes
-		offsprings[1].Genome[position], offsprings[1].Genome[i] = offsprings[1].Genome[i], parents[0].Genome[i]
+		offsprings[1].Genome[p], offsprings[1].Genome[i] = offsprings[1].Genome[i], parents[0].Genome[i]
 	}
 	return offsprings
 }
