@@ -84,7 +84,7 @@ func (mp MutPermute) apply(indi *Individual, generator *rand.Rand) {
 	}
 }
 
-// MutSRandom permutes two genes.
+// MutSUniform permutes two genes.
 type MutSUniform struct {
 	// Mutation rate
 	Rate float64
