@@ -42,8 +42,10 @@ type MutSplice struct {
 func (ms MutSplice) apply(indi *Individual, generator *rand.Rand) {
 	if generator.Float64() < ms.Rate {
 		// Choose where to start and end the splice
-		var end = rand.Intn(len(indi.Genome))
-		var start = rand.Intn(end + 1)
+		var (
+			end   = rand.Intn(len(indi.Genome))
+			start = rand.Intn(end + 1)
+		)
 		// Split the genome into two
 		var inner = make(Genome, end-start)
 		copy(inner, indi.Genome[start:end])
@@ -79,5 +81,25 @@ func (mp MutPermute) apply(indi *Individual, generator *rand.Rand) {
 			// Permute the genes
 			indi.Genome[i], indi.Genome[j] = indi.Genome[j], indi.Genome[i]
 		}
+	}
+}
+
+// MutSRandom permutes two genes.
+type MutSUniform struct {
+	// Mutation rate
+	Rate float64
+	// Corpus to replace genes with
+	Corpus []string
+}
+
+// Apply permutation mutation.
+func (msu MutSUniform) apply(indi *Individual, generator *rand.Rand) {
+	if generator.Float64() < msu.Rate {
+		// Choose a random element from the corpus
+		var element = msu.Corpus[generator.Intn(len(msu.Corpus))]
+		// Choose a position on the individual's genome
+		var p = generator.Intn(len(indi.Genome))
+		// Replace the gene at the chosen position with the chosen element
+		indi.Genome[p] = element
 	}
 }

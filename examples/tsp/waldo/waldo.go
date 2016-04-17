@@ -6,7 +6,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"runtime"
 	"strconv"
 
 	"github.com/MaxHalford/gago"
@@ -72,7 +71,6 @@ func graph(P []string) {
 }
 
 func main() {
-	runtime.GOMAXPROCS(4)
 	// Get the names of the points
 	var names []string
 	for name := range points {
