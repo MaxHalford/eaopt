@@ -22,10 +22,12 @@ type CPoint struct {
 
 // Apply n-point crossover.
 func (cp CPoint) apply(s Selector, indis Individuals, generator *rand.Rand) Individuals {
-	// Choose two individuals at random
-	var parents = s.apply(2, indis, generator)
-	// Choose n random points along the genome
-	var points = generator.Perm(len(parents[0].Genome))[:cp.NbPoints]
+	var (
+		// Choose two individuals at random
+		parents = s.apply(2, indis, generator)
+		// Choose n random points along the genome
+		points = generator.Perm(len(parents[0].Genome))[:cp.NbPoints]
+	)
 	// Sort the points
 	sort.Ints(points)
 	// Add the start and end of the genome points
@@ -35,9 +37,7 @@ func (cp CPoint) apply(s Selector, indis Individuals, generator *rand.Rand) Indi
 	var (
 		nbGenes    = len(parents[0].Genome)
 		offsprings = makeIndividuals(len(parents), nbGenes)
-	)
-	// Use switching indexes to know which parent's genome to copy
-	var (
+		// Use switching indexes to know which parent's genome to copy
 		a = 0
 		b = 1
 	)
@@ -105,10 +105,12 @@ func (cfp CFProportionate) apply(s Selector, indis Individuals, generator *rand.
 	)
 	// For every gene in the parent's genome
 	for i := range offspring.Genome {
-		// Weight of each individual in the crossover
-		var weights = generateWeights(len(indis))
-		// Create the new gene as the product of the individuals' genes
-		var gene float64
+		var (
+			// Weight of each individual in the crossover
+			weights = generateWeights(len(indis))
+			// Create the new gene as the product of the individuals' genes
+			gene float64
+		)
 		for j := range parents {
 			gene += parents[j].Genome[i].(float64) * weights[j]
 		}
@@ -138,8 +140,10 @@ func (pmx CPMX) apply(s Selector, indis Individuals, generator *rand.Rand) Indiv
 	copy(offsprings[0].Genome, parents[0].Genome)
 	copy(offsprings[1].Genome, parents[1].Genome)
 	// Choose a random crossover point
-	var point = generator.Intn(nbGenes)
-	var p int
+	var (
+		point = generator.Intn(nbGenes)
+		p     int
+	)
 	// Paste the father's genome up to the crossover point
 	for i := 0; i < point; i++ {
 		// Find where the second parent's gene is in the first offspring's genome

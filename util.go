@@ -33,8 +33,8 @@ func generateWeights(size int) []float64 {
 // Shuffle a slice of strings.
 func shuffleStrings(strings []string, generator *rand.Rand) []string {
 	var shuffled = make([]string, len(strings))
-	for i, v := range generator.Perm(len(strings)) {
-		shuffled[v] = strings[i]
+	for i, j := range generator.Perm(len(strings)) {
+		shuffled[j] = strings[i]
 	}
 	return shuffled
 }
