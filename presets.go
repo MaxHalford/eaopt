@@ -46,11 +46,11 @@ func GATSP(places []string, distance func([]string) float64) GA {
 		Crossover: CPMX{},
 		Mutators: []Mutator{
 			MutPermute{
-				Rate: 0.5,
+				Rate: 1.0,
 				Max:  3,
 			},
 			MutSplice{
-				Rate: 0.5,
+				Rate: 0.3,
 			},
 		},
 		Migrator: MigShuffle{},

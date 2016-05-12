@@ -10,7 +10,8 @@ import (
 const (
 	alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	numerals = "0123456789"
-	ascii    = alphabet + numerals + " ~!@#$%^&*()-_+={}[]\\|<,>.?/\"';:`"
+	symbols  = " ~!@#$%^&*()-_+={}[]\\|<,>.?/\"';:`"
+	ascii    = alphabet + numerals + symbols
 )
 
 var (
