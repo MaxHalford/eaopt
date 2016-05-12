@@ -5,6 +5,7 @@
 ![Build status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
 [![Coverage status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/MaxHalford/gago)](https://goreportcard.com/report/github.com/MaxHalford/gago)
+![Repository size](https://reposs.herokuapp.com/?path=MaxHalford/gago&color=ff69b4)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 `gago` is a framework for running genetic algorithms. It is written in Go.
