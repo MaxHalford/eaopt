@@ -1,10 +1,11 @@
 ![logo](img/logo.png)
 
-![License](http://img.shields.io/:license-mit-blue.svg)
-[![GoDoc](https://godoc.org/github.com/MaxHalford/gago?status.svg)](https://godoc.org/github.com/MaxHalford/gago)
-![Build status](https://api.travis-ci.org/MaxHalford/gago.svg?branch=master)
-[![Coverage status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master)](https://coveralls.io/github/MaxHalford/gago?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/MaxHalford/gago)](https://goreportcard.com/report/github.com/MaxHalford/gago)
+![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/MaxHalford/gago)
+![Build status](https://img.shields.io/travis/MaxHalford/gago.svg?style=flat-square)
+[![Coverage status](https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/MaxHalford/gago?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/MaxHalford/gago?style=flat-square)](https://goreportcard.com/report/github.com/MaxHalford/gago)
+![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square)
 ![Repository size](https://reposs.herokuapp.com/?path=MaxHalford/gago&color=ff69b4)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
