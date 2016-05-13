@@ -1,4 +1,4 @@
-![logo](img/logo.png)
+![logo](http://maxhalford.com/img/projects/gago/logo.png)
 
 ![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/MaxHalford/gago)
@@ -27,7 +27,7 @@ Genetic algorithms are notorious for being [embarrassingly parallel](http://www.
 
 The following flowchart shows the steps the algorithms takes. As can be seen only the search for the best individual and the migration can't be parallelized.
 
-![flowchart](img/flowchart.png)
+![flowchart](http://maxhalford.com/img/projects/gago/flowchart.png)
 
 ## Terminology
 
