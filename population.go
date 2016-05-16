@@ -17,12 +17,15 @@ type Population struct {
 }
 
 // Generate a new population.
-func makePopulation(nbIndis, nbGenes int, init Initializer, generator *rand.Rand) Population {
-	var pop = Population{
-		Individuals: makeIndividuals(nbIndis, nbGenes),
-		Duration:    0,
-		generator:   generator,
-	}
+func makePopulation(nbIndis, nbGenes int, init Initializer) Population {
+	var (
+		source = rand.NewSource(time.Now().UnixNano())
+		pop    = Population{
+			Individuals: makeIndividuals(nbIndis, nbGenes),
+			Duration:    0,
+			generator:   rand.New(source),
+		}
+	)
 	// Randomly initialize each individual's genome
 	for i := range pop.Individuals {
 		init.apply(&pop.Individuals[i], pop.generator)

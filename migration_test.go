@@ -2,26 +2,37 @@ package gago
 
 import "testing"
 
-var PopulationSizes = []int{1, 2, 4}
-
-func generateGA() GA {
-	return GA{
-		NbIndividuals: 10,
+var (
+	migrators = []Migrator{
+		MigShuffle{},
 	}
-}
+	initializer = IFUniform{
+		Lower: -1,
+		Upper: 1,
+	}
+)
 
-func TestShuffle(t *testing.T) {
-	for _, size := range PopulationSizes {
-		// Instantiate a population
-		var ga = generateGA()
-		ga.Migrator = MigShuffle{}
-		ga.NbPopulations = size
-		// Apply the migration method
-		ga.Migrator.Apply(ga.Populations)
-		// Check the Population sizes haven't changed
-		for _, pop := range ga.Populations {
-			if len(pop.Individuals) != ga.NbIndividuals {
-				t.Error("Shuffle migration changed the Population sizes")
+func TestMigSizes(t *testing.T) {
+	var (
+		populationSizes = []int{1, 2, 4}
+		nbIndis         = []int{1, 2, 10}
+	)
+	for _, migrator := range migrators {
+		for _, size := range populationSizes {
+			for _, n := range nbIndis {
+				// Instantiate populations
+				var pops = make([]Population, size)
+				for i := 0; i < size; i++ {
+					pops[i] = makePopulation(n, 2, initializer)
+				}
+				// Apply the migration method
+				migrator.Apply(pops)
+				// Check the Population sizes haven't changed
+				for _, pop := range pops {
+					if len(pop.Individuals) != n {
+						t.Error("Shuffle migration changed the Population sizes")
+					}
+				}
 			}
 		}
 	}
