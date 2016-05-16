@@ -149,18 +149,18 @@ The only requirement for solving a problem is that the problem can be modeled as
 
 ## Roadmap
 
-- Error handling.
-- More tests.
+- Settings verification.
+- Tidy tests.
 - Statistics.
-- Benchmarking.
+- Benchmarking vs other libraries.
 - Profiling.
-- Compare with other algorithms/libraries.
 - Implement more genetic operators.
 - More examples.
+- Possibility to add manual heuristics.
 
 ## Why use gago?
 
-- It's generic, your only constraint is to model your problem and `gago` will do all the hard work for you.
+- It's generic, you only have to model your problem and `gago` will do all the hard work for you.
 - You can easily add your own genetic operators.
 - `gago` implements parallel populations (called *Demes*) who exchange individuals for better performance.
 - `gago` will be well maintained.

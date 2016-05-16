@@ -10,6 +10,7 @@ var (
 	nbIndividuals = 30
 	nbGenes       = 2
 	nbParents     = 6
+	nbGenerations = 10
 	ga            = GA{
 		NbPopulations: nbPopulations,
 		NbIndividuals: nbIndividuals,
@@ -44,7 +45,9 @@ var (
 
 func init() {
 	ga.Initialize()
-	ga.Enhance()
+	for i := 0; i < nbGenerations; i++ {
+		ga.Enhance()
+	}
 }
 
 func TestSizes(t *testing.T) {
@@ -111,7 +114,7 @@ func TestFindBest(t *testing.T) {
 }
 
 func TestGenerations(t *testing.T) {
-	if ga.Generations == 0 {
+	if ga.Generations != nbGenerations {
 		t.Error("Generations counter wasn't incremented")
 	}
 }
