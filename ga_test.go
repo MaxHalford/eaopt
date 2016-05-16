@@ -28,11 +28,23 @@ var (
 				return sum
 			},
 		},
+		Selector: STournament{
+			NbParticipants: 3,
+		},
+		Crossover: CFUniform{},
+		Mutator: MutFNormal{
+			Rate: 0.5,
+			Std:  3,
+		},
+		MutRate:      0.5,
+		Migrator:     MigShuffle{},
+		MigFrequency: 10,
 	}
 )
 
 func init() {
 	ga.Initialize()
+	ga.Enhance()
 }
 
 func TestSizes(t *testing.T) {
@@ -95,5 +107,11 @@ func TestFindBest(t *testing.T) {
 	ga.Best.Fitness = 42
 	if ga.Populations[0].Individuals[0].Fitness == 42 {
 		t.Error("Best individual is linked to an individual")
+	}
+}
+
+func TestGenerations(t *testing.T) {
+	if ga.Generations == 0 {
+		t.Error("Generations counter wasn't incremented")
 	}
 }
