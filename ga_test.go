@@ -1,26 +1,38 @@
 package gago
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 var (
-	ga            GA
 	nbPopulations = 4
 	nbIndividuals = 30
 	nbGenes       = 2
+	nbParents     = 6
+	ga            = GA{
+		NbPopulations: nbPopulations,
+		NbIndividuals: nbIndividuals,
+		NbGenes:       nbGenes,
+		NbParents:     nbParents,
+		Initializer: IFUniform{
+			Lower: -1,
+			Upper: 1,
+		},
+		Ff: FloatFunction{
+			Image: func(X []float64) float64 {
+				var sum float64
+				for _, x := range X {
+					sum += x
+				}
+				return sum
+			},
+		},
+	}
 )
 
 func init() {
-	ga = GAFloat(nbGenes, func(X []float64) float64 {
-		sum := 0.0
-		for _, x := range X {
-			sum += x
-		}
-		return sum
-	})
-	ga.NbPopulations = nbPopulations
-	ga.NbIndividuals = nbIndividuals
 	ga.Initialize()
-	ga.Enhance()
 }
 
 func TestSizes(t *testing.T) {
@@ -74,12 +86,14 @@ func TestBest(t *testing.T) {
 	}
 }
 
-func TestPointers(t *testing.T) {
-	for _, pop := range ga.Populations {
-		for _, indi := range pop.Individuals {
-			if &ga.Best == &indi {
-				t.Error("The current best individual shares a pointer with another individual")
-			}
-		}
+func TestFindBest(t *testing.T) {
+	ga.Populations[0].Individuals[0].Fitness = math.Inf(-1)
+	ga.findBest()
+	if ga.Best.Fitness != math.Inf(-1) {
+		t.Error("findBest didn't work")
+	}
+	ga.Best.Fitness = 42
+	if ga.Populations[0].Individuals[0].Fitness == 42 {
+		t.Error("Best individual is linked to an individual")
 	}
 }

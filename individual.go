@@ -11,26 +11,26 @@ import (
 // floating point numbers. The fitness is the individual's phenotype and is
 // represented by a floating point number.
 type Individual struct {
-	Genome    Genome
-	Fitness   float64
-	Evaluated bool
+	Genome  Genome
+	Fitness float64
+	Age     int
 }
 
 // Evaluate the fitness of an individual.
 func (indi *Individual) evaluate(ff FitnessFunction) {
 	// Don't evaluate individuals that have already been evaluated
-	if indi.Evaluated == false {
+	if indi.Age == 0 {
 		indi.Fitness = ff.apply(indi.Genome)
-		indi.Evaluated = true
 	}
+	indi.Age++
 }
 
 // Generate a new individual.
 func makeIndividual(nbGenes int) Individual {
 	return Individual{
-		Genome:    make([]interface{}, nbGenes),
-		Fitness:   math.Inf(1),
-		Evaluated: false,
+		Genome:  make([]interface{}, nbGenes),
+		Fitness: math.Inf(1),
+		Age:     0,
 	}
 }
 
@@ -72,17 +72,11 @@ func (indis Individuals) Swap(i, j int) {
 	indis[i], indis[j] = indis[j], indis[i]
 }
 
-// Shuffle a slice of individuals.
-func (indis Individuals) shuffle(generator *rand.Rand) Individuals {
-	var shuffled = make(Individuals, len(indis))
-	for i, v := range generator.Perm(len(indis)) {
-		shuffled[v] = indis[i]
-	}
-	return shuffled
-}
-
 // Sample n unique individuals from a slice of individuals
 func (indis Individuals) sample(n int, generator *rand.Rand) Individuals {
-	var sample = indis.shuffle(generator)[:n]
+	var sample = make(Individuals, n)
+	for i, j := range generator.Perm(len(indis))[:n] {
+		sample[i] = indis[j]
+	}
 	return sample
 }
