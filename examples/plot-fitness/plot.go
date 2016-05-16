@@ -3,7 +3,7 @@ package main
 import (
 	m "math"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 
 	"github.com/gonum/plot"
 	"github.com/gonum/plot/plotter"
@@ -47,7 +47,7 @@ func graph(best plotter.XYs) {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = gago.GAFloat(2, styblinskiTang)
+	var ga = presets.Float(2, styblinskiTang)
 	ga.Initialize()
 	// Number of generations
 	var generations = 10

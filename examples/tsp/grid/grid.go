@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 
 	"github.com/gonum/plot"
 	"github.com/gonum/plot/plotter"
@@ -22,7 +22,7 @@ func euclidian(a, b point) float64 {
 }
 
 var (
-	size   = 5
+	size   = 6
 	points = make(map[string]point)
 )
 
@@ -68,13 +68,13 @@ func main() {
 		names = append(names, name)
 	}
 	// Create the GA
-	var ga = gago.GATSP(names, distance)
+	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
 	for i := 0; i < 1000; i++ {
-		fmt.Println(ga.Best.Fitness)
 		ga.Enhance()
 	}
+	fmt.Println(ga.Best.Fitness)
 	// Extract the genome of the best individual
 	var points = ga.Best.Genome.CastString()
 	graph(points)

@@ -1,4 +1,4 @@
-package gago
+package presets
 
 import (
 	"math"
@@ -16,7 +16,7 @@ func TestGAFloat(t *testing.T) {
 			}
 			return sum
 		}
-		ga = GAFloat(nbVariables, ff)
+		ga = Float(nbVariables, ff)
 	)
 	ga.Initialize()
 	// Check the number of variables was respected
@@ -42,7 +42,7 @@ func TestGATSP(t *testing.T) {
 			}
 			return sum
 		}
-		ga = GATSP(alphabet, ff)
+		ga = TSP(alphabet, ff)
 	)
 	ga.Initialize()
 	// Check the number of variables was respected
@@ -68,7 +68,7 @@ func TestGAAlignment(t *testing.T) {
 			}
 			return sum
 		}
-		ga = GAAlignment(len(target), alphabet, ff)
+		ga = Alignment(len(target), alphabet, ff)
 	)
 	ga.Initialize()
 	// Check the number of variables was respected

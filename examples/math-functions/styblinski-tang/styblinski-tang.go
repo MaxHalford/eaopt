@@ -4,7 +4,7 @@ import (
 	"fmt"
 	m "math"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 )
 
 // StyblinskiTang minimum is -39.16599d reached in (-2.903534, ..., -2.903534)
@@ -19,7 +19,7 @@ func styblinskiTang(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = gago.GAFloat(2, styblinskiTang)
+	var ga = presets.Float(2, styblinskiTang)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 50; i++ {
