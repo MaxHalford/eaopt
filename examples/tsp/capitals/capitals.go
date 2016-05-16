@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 	"github.com/gonum/plot"
 	"github.com/gonum/plot/plotter"
 	"github.com/gonum/plot/plotutil"
@@ -77,7 +77,7 @@ func main() {
 		names = append(names, name)
 	}
 	// Create the GA
-	var ga = gago.GATSP(names, distance)
+	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
 	for i := 0; i < 10000; i++ {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 )
 
 const (
@@ -31,7 +31,7 @@ func hamming(str []string) float64 {
 
 func main() {
 	// Create the GA
-	var ga = gago.GAAlignment(len(target), corpus, hamming)
+	var ga = presets.Alignment(len(target), corpus, hamming)
 	ga.Initialize()
 	// Enhance
 	for i := 0; i < 3000; i++ {

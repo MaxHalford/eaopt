@@ -14,6 +14,8 @@ type GA struct {
 	NbIndividuals int
 	// Number of genes in each individual (imposed by the problem)
 	NbGenes int
+	// Number of parents selected for reproduction
+	NbParents int
 	// Populations
 	Populations []Population
 	// Overall best individual (dummy initialization at the beginning)
@@ -26,10 +28,18 @@ type GA struct {
 	Selector Selector
 	// Crossover method
 	Crossover Crossover
-	// Mutation methods
-	Mutators []Mutator
+	// Mutation method
+	Mutator Mutator
+	// Mutation rate
+	MutRate float64
 	// Migration method
 	Migrator Migrator
+	// Migration frequency
+	MigFrequency int
+	// Number of generations
+	Generations int
+	// Elapsed time
+	Duration time.Duration
 }
 
 // Initialize each population in the GA and assign an initial fitness to each
@@ -66,35 +76,23 @@ func (ga *GA) Initialize() {
 // Find the best individual in each population and then compare the best overall
 // individual to the current best individual.
 func (ga *GA) findBest() {
-	// Get each population's best individual
-	var best = make(Individuals, ga.NbPopulations)
-	for i, population := range ga.Populations {
-		best[i] = population.Individuals[0]
+	for _, pop := range ga.Populations {
+		var best = pop.Individuals[0]
+		if best.Fitness < ga.Best.Fitness {
+			ga.Best = best
+		}
 	}
-	// Sort the best individuals
-	best.sort()
-	// Get the overall best individual
-	var overallBest = best[0]
-	// Compare it to the current best individual
-	if overallBest.Fitness < ga.Best.Fitness {
-		ga.Best = overallBest
-	}
-}
-
-// Migrate allows Populations to exchange individuals through the migration protocol
-// defined in ga.MigMethod. This is a convenience method for calling purposes.
-func (ga *GA) migrate() {
-	// Use the pointer to the Populations to perform migration
-	ga.Migrator.apply(ga.Populations)
 }
 
 // Enhance each population in the GA. The population level operations are done in
 // parallel with a wait group. After all the population operations have been run, the
 // GA level operations are run.
 func (ga *GA) Enhance() {
+	var start = time.Now()
+	ga.Generations++
 	// Migrate the individuals between the Populations
-	if ga.Migrator != nil {
-		ga.migrate()
+	if ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+		ga.Migrator.Apply(ga.Populations)
 	}
 	// Use a wait group to run the genetic operators in each population in parallel
 	var wg sync.WaitGroup
@@ -102,21 +100,24 @@ func (ga *GA) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// 1. Crossover
-			if ga.Crossover != nil {
-				ga.Populations[j].crossover(ga.Selector, ga.Crossover)
+			// 1. Select
+			var parents = ga.Selector.Apply(ga.NbParents, ga.Populations[j].Individuals,
+				ga.Populations[j].generator)
+			// 2. Crossover
+			ga.Populations[j].crossover(parents, ga.Crossover)
+			// 3. Mutate
+			if ga.Mutator != nil {
+				ga.Populations[j].mutate(ga.Mutator, ga.MutRate)
 			}
-			// 2. Mutate
-			if ga.Mutators != nil {
-				ga.Populations[j].mutate(ga.Mutators)
-			}
-			// 3. Evaluate
+			// 4. Evaluate
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
-			// 4. Sort
+			// 5. Sort
 			ga.Populations[j].Individuals.sort()
+			ga.Populations[j].Duration += time.Since(start)
 		}(i)
 	}
 	wg.Wait()
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
+	ga.Duration += time.Since(start)
 }
