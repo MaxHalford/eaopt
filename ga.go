@@ -1,7 +1,6 @@
 package gago
 
 import (
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -45,21 +44,15 @@ type GA struct {
 // Initialize each population in the GA and assign an initial fitness to each
 // individual in each population.
 func (ga *GA) Initialize() {
-	// Create the Populations
+	// Create the populations
 	ga.Populations = make([]Population, ga.NbPopulations)
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// Create a new random number generator
-			var (
-				source    = rand.NewSource(time.Now().UnixNano())
-				generator = rand.New(source)
-			)
 			// Generate a population
-			ga.Populations[j] = makePopulation(ga.NbIndividuals, ga.NbGenes,
-				ga.Initializer, generator)
+			ga.Populations[j] = makePopulation(ga.NbIndividuals, ga.NbGenes, ga.Initializer)
 			// Evaluate it's individuals
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
 			// Sort it's individuals
