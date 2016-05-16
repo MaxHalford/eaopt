@@ -63,7 +63,7 @@ type MutPermute struct {
 
 // Apply permutation mutation.
 func (mp MutPermute) Apply(indi *Individual, generator *rand.Rand) {
-	for i := 0; i < generator.Intn(mp.Max); i++ {
+	for i := 0; i <= generator.Intn(mp.Max); i++ {
 		// Choose two points on the genome
 		var (
 			points = generator.Perm(len(indi.Genome))[:2]
