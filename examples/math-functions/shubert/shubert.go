@@ -4,7 +4,7 @@ import (
 	"fmt"
 	m "math"
 
-	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/presets"
 )
 
 // Shubert minimum is -186.7309 reached 18 times
@@ -21,7 +21,7 @@ func shubert(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = gago.GAFloat(2, shubert)
+	var ga = presets.Float(2, shubert)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 30; i++ {

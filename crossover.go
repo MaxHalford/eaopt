@@ -10,7 +10,7 @@ import (
 // for generating each offspring, each crossover resamples the population in
 // order to preserve diversity.
 type Crossover interface {
-	apply(selector Selector, individuals Individuals, generator *rand.Rand) Individuals
+	Apply(individuals Individuals, generator *rand.Rand) Individuals
 }
 
 // CPoint selects identical random points on each parent's genome and exchanges
@@ -21,10 +21,10 @@ type CPoint struct {
 }
 
 // Apply n-point crossover.
-func (cp CPoint) apply(s Selector, indis Individuals, generator *rand.Rand) Individuals {
+func (cp CPoint) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
 		// Choose two individuals at random
-		parents = s.apply(2, indis, generator)
+		parents = indis.sample(2, generator)
 		// Choose n random points along the genome
 		points = generator.Perm(len(parents[0].Genome))[:cp.NbPoints]
 	)
@@ -66,9 +66,9 @@ func (cp CPoint) apply(s Selector, indis Individuals, generator *rand.Rand) Indi
 type CFUniform struct{}
 
 // Apply uniform float crossover.
-func (cfu CFUniform) apply(s Selector, indis Individuals, generator *rand.Rand) Individuals {
+func (cfu CFUniform) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
-		parents    = s.apply(2, indis, generator)
+		parents    = indis.sample(2, generator)
 		mother     = parents[0]
 		father     = parents[1]
 		nbGenes    = len(mother.Genome)
@@ -97,9 +97,9 @@ type CFProportionate struct {
 }
 
 // Apply proportionate float crossover.
-func (cfp CFProportionate) apply(s Selector, indis Individuals, generator *rand.Rand) Individuals {
+func (cfp CFProportionate) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
-		parents   = s.apply(cfp.NbParents, indis, generator)
+		parents   = indis.sample(cfp.NbParents, generator)
 		nbGenes   = len(parents[0].Genome)
 		offspring = makeIndividual(nbGenes)
 	)
@@ -131,9 +131,9 @@ func (cfp CFProportionate) apply(s Selector, indis Individuals, generator *rand.
 type CPMX struct{}
 
 // Apply partially mixed crossover.
-func (pmx CPMX) apply(s Selector, indis Individuals, generator *rand.Rand) Individuals {
+func (pmx CPMX) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
-		parents    = s.apply(2, indis, generator)
+		parents    = indis.sample(2, generator)
 		nbGenes    = len(parents[0].Genome)
 		offsprings = makeIndividuals(len(parents), nbGenes)
 	)
