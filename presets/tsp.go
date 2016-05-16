@@ -12,7 +12,7 @@ var permute = gago.MutPermute{Max: 3}
 var splice = gago.MutSplice{}
 
 func (tspmut tspMutator) Apply(indi *gago.Individual, generator *rand.Rand) {
-	if generator.Float64() < 0.9 {
+	if generator.Float64() < 0.6 {
 		permute.Apply(indi, generator)
 	}
 	if generator.Float64() < 0.3 {
