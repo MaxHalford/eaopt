@@ -157,9 +157,9 @@ To modify the behavior off the GA, you can change the `gago.GA` struct before ru
 | `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals |
 | `Crossover` (struct)     | `Crossover` (interface)     | Method for producing a new individual (called the offspring)    |
 | `Mutator` (struct)     | `Mutator` (interface)     | Method for modifying a single individual's genes                      |
-| `MutRate` (struct)     | `float`     | Mutation rate                      |
+| `MutRate`     | `float`     | Mutation rate                      |
 | `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the populations             |
-| `MigRate` (struct)     | `float`     | Migration rate                      |
+| `MigFrequency`     | `int`     | Migration frequency                      |
 
 The `gago.GA` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall. The `Populations` variable is a slice containing each GA in the GA. The populations are sorted at each generation so that the first individual in each GA is the best individual for that specific GA.
 

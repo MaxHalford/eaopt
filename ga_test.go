@@ -3,6 +3,7 @@ package gago
 import (
 	"math"
 	"testing"
+	"time"
 )
 
 var (
@@ -116,5 +117,18 @@ func TestFindBest(t *testing.T) {
 func TestGenerations(t *testing.T) {
 	if ga.Generations != nbGenerations {
 		t.Error("Generations counter wasn't incremented")
+	}
+}
+
+// TestDuration verifies the sum of the duration of each population is higher
+// the actual duration. This is due to the fact that each population runs on a
+// separate core.
+func TestDuration(t *testing.T) {
+	var totalDuration time.Duration
+	for _, pop := range ga.Populations {
+		totalDuration += pop.Duration
+	}
+	if totalDuration < ga.Duration {
+		t.Error("Inefficient parallelism")
 	}
 }
