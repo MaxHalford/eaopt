@@ -10,10 +10,10 @@ var crossovers = []struct {
 	crossover Crossover
 	init      Initializer
 }{
-	{CPoint{}, IFUniform{-5.0, 5.0}},
-	{CFUniform{}, IFUniform{-5.0, 5.0}},
-	{CFProportionate{NbParents: 2}, IFUniform{-5.0, 5.0}},
-	{CPMX{}, ISUnique{[]string{"A", "B", "C", "D"}}},
+	{CrossPoint{}, InitUniformF{-5.0, 5.0}},
+	{CrossUniformF{}, InitUniformF{-5.0, 5.0}},
+	{CrossProportionateF{NbParents: 2}, InitUniformF{-5.0, 5.0}},
+	{CrossPMX{}, InitUniqueS{[]string{"A", "B", "C", "D"}}},
 }
 
 func TestCrossovers(t *testing.T) {
@@ -23,7 +23,7 @@ func TestCrossovers(t *testing.T) {
 		nbIndis   = 5
 		nbGenes   = 4
 		nbParents = 2
-		selector  = STournament{2}
+		selector  = SelTournament{2}
 	)
 	for _, c := range crossovers {
 		var indis = makeIndividuals(nbIndis, nbGenes)

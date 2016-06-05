@@ -6,7 +6,7 @@ var (
 	migrators = []Migrator{
 		MigShuffle{},
 	}
-	initializer = IFUniform{
+	initializer = InitUniformF{
 		Lower: -1,
 		Upper: 1,
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 var mutators = []Mutator{
-	MutFNormal{
+	MutNormalF{
 		Rate: 1,
 		Std:  1,
 	},
@@ -15,7 +15,7 @@ var mutators = []Mutator{
 	MutPermute{
 		Max: 3,
 	},
-	MutSUniform{
+	MutUniformS{
 		Corpus: []string{"t", "e", "s"},
 	},
 }
@@ -26,7 +26,7 @@ func TestPotentMutators(t *testing.T) {
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		indi      = makeIndividual(nbGenes)
-		init      = IFUniform{-5.0, 5.0}
+		init      = InitUniformF{-5.0, 5.0}
 	)
 	init.apply(&indi, generator)
 	var genome = make([]interface{}, len(indi.Genome))
