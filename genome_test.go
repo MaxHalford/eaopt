@@ -12,7 +12,7 @@ func TestCastFloat(t *testing.T) {
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		indi      = makeIndividual(nbGenes)
-		init      = IFUniform{-5.0, 5.0}
+		init      = InitUniformF{-5.0, 5.0}
 	)
 	init.apply(&indi, generator)
 	// Check the casting doesn't change the length of the genome
@@ -28,7 +28,7 @@ func TestCastString(t *testing.T) {
 		source    = rand.NewSource(time.Now().UnixNano())
 		generator = rand.New(source)
 		indi      = makeIndividual(nbGenes)
-		init      = ISUniform{[]string{"T", "E", "S", "T"}}
+		init      = InitUniformS{[]string{"T", "E", "S", "T"}}
 	)
 	init.apply(&indi, generator)
 	// Check the casting doesn't change the length of the genome

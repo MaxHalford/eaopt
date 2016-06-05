@@ -8,12 +8,12 @@ type Mutator interface {
 	Apply(individual *Individual, generator *rand.Rand)
 }
 
-// MutFNormal mutation modifies a float gene if a coin toss is under a defined
+// MutNormalF mutation modifies a float gene if a coin toss is under a defined
 // mutation rate. It does so for each gene. The new gene value is a random value
 // sampled from a normal distribution centered on the gene's current value and
 // with the intensity parameter as it's standard deviation. Only works for
 // floating point values.
-type MutFNormal struct {
+type MutNormalF struct {
 	// Mutation rate for each gene
 	Rate float64
 	// Standard deviation
@@ -21,12 +21,12 @@ type MutFNormal struct {
 }
 
 // Apply normal mutation.
-func (mfn MutFNormal) Apply(indi *Individual, generator *rand.Rand) {
+func (mnf MutNormalF) Apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Flip a coin and decide to mutate or not
-		if generator.Float64() < mfn.Rate {
+		if generator.Float64() < mnf.Rate {
 			// Sample from a normal distribution
-			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * mfn.Std
+			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * mnf.Std
 		}
 	}
 }
@@ -75,16 +75,16 @@ func (mp MutPermute) Apply(indi *Individual, generator *rand.Rand) {
 	}
 }
 
-// MutSUniform permutes two genes.
-type MutSUniform struct {
+// MutUniformS permutes two genes.
+type MutUniformS struct {
 	// Corpus to replace genes with
 	Corpus []string
 }
 
 // Apply permutation mutation.
-func (msu MutSUniform) Apply(indi *Individual, generator *rand.Rand) {
+func (mus MutUniformS) Apply(indi *Individual, generator *rand.Rand) {
 	// Choose a random element from the corpus
-	var element = msu.Corpus[generator.Intn(len(msu.Corpus))]
+	var element = mus.Corpus[generator.Intn(len(mus.Corpus))]
 	// Choose a position on the individual's genome
 	var p = generator.Intn(len(indi.Genome))
 	// Replace the gene at the chosen position with the chosen element

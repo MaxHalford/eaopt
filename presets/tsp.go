@@ -32,11 +32,11 @@ func TSP(places []string, distance func([]string) float64) gago.GA {
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
-		Initializer: gago.ISUnique{
+		Initializer: gago.InitUniqueS{
 			Corpus: places,
 		},
-		Selector:     gago.SElitism{},
-		Crossover:    gago.CPMX{},
+		Selector:     gago.SelElitism{},
+		Crossover:    gago.CrossPMX{},
 		Mutator:      tspMutator{},
 		MutRate:      1,
 		Migrator:     gago.MigShuffle{},
