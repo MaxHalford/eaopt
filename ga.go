@@ -1,6 +1,8 @@
 package gago
 
 import (
+	"errors"
+	"log"
 	"sync"
 	"time"
 )
@@ -41,9 +43,63 @@ type GA struct {
 	Duration time.Duration
 }
 
+// Validate the parameters of a GA to ensure it will run correctly. Some
+// settings or combination of settings may be incoherent during runtime.
+func (ga *GA) Validate() error {
+	var err error
+	// Check the number of populations
+	if ga.NbPopulations < 1 {
+		return errors.New("'NbPopulations' should be higher or equal to 1")
+	}
+	// Check the number of individuals
+	if ga.NbIndividuals < 2 {
+		return errors.New("'NbIndividuals' should be higher or equal to 2")
+	}
+	// Check the number of genes
+	if ga.NbGenes < 1 {
+		return errors.New("'NbGenes' should be higher or equal to 1")
+	}
+	// Check the number of parents
+	if ga.NbParents < 0 || ga.NbParents > ga.NbIndividuals {
+		return errors.New(`'NbParents' should be higher or equal to 0 and should
+			be lower or equal to 'NbIndividuals'`)
+	}
+	// Check the fitness function
+	if ga.Ff == nil {
+		return errors.New("'Ff' cannot be nil")
+	}
+	// Check the initialization method
+	if ga.Initializer == nil {
+		return errors.New("'Initializer' cannot be nil")
+	}
+	// Check the selection method
+	if ga.Selector == nil {
+		return errors.New("'Selector' cannot be nil")
+	}
+	// Check the crossover method
+	if ga.Crossover == nil {
+		return errors.New("'Crossover' cannot be nil")
+	}
+	// Check the mutation rate
+	if ga.MutRate < 0 || ga.MutRate > 1 {
+		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+	}
+	// Check the migration frequency in the presence of a migrator
+	if ga.Migrator != nil && ga.MigFrequency < 1 {
+		return errors.New("'MigFrequency' should be strictly higher than 0")
+	}
+	// No error
+	return err
+}
+
 // Initialize each population in the GA and assign an initial fitness to each
 // individual in each population.
 func (ga *GA) Initialize() {
+	// Begin by validating the parameters of the GA
+	var err = ga.Validate()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Create the populations
 	ga.Populations = make([]Population, ga.NbPopulations)
 	var wg sync.WaitGroup
