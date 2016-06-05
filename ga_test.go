@@ -16,7 +16,7 @@ var (
 		NbIndividuals: nbIndividuals,
 		NbGenes:       nbGenes,
 		NbParents:     nbParents,
-		Initializer: IFUniform{
+		Initializer: InitUniformF{
 			Lower: -1,
 			Upper: 1,
 		},
@@ -29,11 +29,11 @@ var (
 				return sum
 			},
 		},
-		Selector: STournament{
+		Selector: SelTournament{
 			NbParticipants: 3,
 		},
-		Crossover: CFUniform{},
-		Mutator: MutFNormal{
+		Crossover: CrossUniformF{},
+		Mutator: MutNormalF{
 			Rate: 0.5,
 			Std:  3,
 		},
