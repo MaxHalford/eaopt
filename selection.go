@@ -8,15 +8,15 @@ type Selector interface {
 	Apply(size int, individuals Individuals, generator *rand.Rand) Individuals
 }
 
-// STournament selection chooses an individual through tournament selection. The
-// tournament is composed of randomly chosen individuals. The winner of the
+// SelTournament selection chooses an individual through tournament selection.
+// The tournament is composed of randomly chosen individuals. The winner of the
 // tournament is the individual with the lowest fitness.
-type STournament struct {
+type SelTournament struct {
 	NbParticipants int
 }
 
 // Apply tournament selection.
-func (ts STournament) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
+func (ts SelTournament) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
 	var winners = make(Individuals, size)
 	for i := range winners {
 		// Sample the GA
@@ -28,10 +28,10 @@ func (ts STournament) Apply(size int, indis Individuals, generator *rand.Rand) I
 	return winners
 }
 
-// SElitism selection returns the best individuals in the GA.
-type SElitism struct{}
+// SelElitism selection returns the best individuals in the GA.
+type SelElitism struct{}
 
 // Apply elitism selection.
-func (eli SElitism) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
+func (eli SelElitism) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
 	return indis[:size]
 }
