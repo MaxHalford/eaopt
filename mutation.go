@@ -5,7 +5,7 @@ import "math/rand"
 // Mutator modifies an individual by replacing it's genes with new values.
 type Mutator interface {
 	// Apply performs the mutation on an individual
-	Apply(individual *Individual, generator *rand.Rand)
+	Apply(indi *Individual, generator *rand.Rand)
 }
 
 // MutNormalF mutation modifies a float gene if a coin toss is under a defined
@@ -21,12 +21,12 @@ type MutNormalF struct {
 }
 
 // Apply normal mutation.
-func (mnf MutNormalF) Apply(indi *Individual, generator *rand.Rand) {
+func (mut MutNormalF) Apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
 		// Flip a coin and decide to mutate or not
-		if generator.Float64() < mnf.Rate {
+		if generator.Float64() < mut.Rate {
 			// Sample from a normal distribution
-			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * mnf.Std
+			indi.Genome[i] = indi.Genome[i].(float64) * generator.NormFloat64() * mut.Std
 		}
 	}
 }
@@ -36,7 +36,7 @@ func (mnf MutNormalF) Apply(indi *Individual, generator *rand.Rand) {
 type MutSplice struct{}
 
 // Apply splice mutation.
-func (ms MutSplice) Apply(indi *Individual, generator *rand.Rand) {
+func (mut MutSplice) Apply(indi *Individual, generator *rand.Rand) {
 	// Choose where to start and end the splice
 	var (
 		end   = rand.Intn(len(indi.Genome))
@@ -62,8 +62,8 @@ type MutPermute struct {
 }
 
 // Apply permutation mutation.
-func (mp MutPermute) Apply(indi *Individual, generator *rand.Rand) {
-	for i := 0; i <= generator.Intn(mp.Max); i++ {
+func (mut MutPermute) Apply(indi *Individual, generator *rand.Rand) {
+	for i := 0; i <= generator.Intn(mut.Max); i++ {
 		// Choose two points on the genome
 		var (
 			points = generator.Perm(len(indi.Genome))[:2]
@@ -82,9 +82,9 @@ type MutUniformS struct {
 }
 
 // Apply permutation mutation.
-func (mus MutUniformS) Apply(indi *Individual, generator *rand.Rand) {
+func (mut MutUniformS) Apply(indi *Individual, generator *rand.Rand) {
 	// Choose a random element from the corpus
-	var element = mus.Corpus[generator.Intn(len(mus.Corpus))]
+	var element = mut.Corpus[generator.Intn(len(mut.Corpus))]
 	// Choose a position on the individual's genome
 	var p = generator.Intn(len(indi.Genome))
 	// Replace the gene at the chosen position with the chosen element

@@ -51,6 +51,110 @@ func init() {
 	}
 }
 
+func TestValidationSuccess(t *testing.T) {
+	var err = ga.Validate()
+	if err != nil {
+		t.Error("GA parameters are invalid")
+	}
+}
+
+func TestValidationNbPopulations(t *testing.T) {
+	// Check invalid number of population
+	ga.NbPopulations = 0
+	if ga.Validate() == nil {
+		t.Error("Invalid number of populations didn't return an error")
+	}
+}
+
+func TestValidationNbIndividuals(t *testing.T) {
+	// Check invalid number of individuals
+	ga.NbIndividuals = 1
+	if ga.Validate() == nil {
+		t.Error("Invalid number of individuals didn't return an error")
+	}
+}
+
+func TestValidationNbGenes(t *testing.T) {
+	// Check invalid number of genes
+	ga.NbGenes = 0
+	if ga.Validate() == nil {
+		t.Error("Invalid number of genes didn't return an error")
+	}
+}
+
+func TestValidationNbParents(t *testing.T) {
+	// Check invalid number of parents
+	ga.NbParents = -1
+	if ga.Validate() == nil {
+		t.Error("Invalid number of parents didn't return an error")
+	}
+}
+
+func TestValidationNbParentsNbIndividuals(t *testing.T) {
+	// Check number of parents higher than number of individuals
+	ga.NbIndividuals = 1
+	ga.NbParents = 2
+	if ga.Validate() == nil {
+		t.Error("More parents than individuals didn't return an error")
+	}
+}
+
+func TestValidationFf(t *testing.T) {
+	// Check presence of fitness function
+	ga.Ff = nil
+	if ga.Validate() == nil {
+		t.Error("Nil fitness function didn't return an error")
+	}
+}
+
+func TestValidationInit(t *testing.T) {
+	// Check presence of initializer
+	ga.Initializer = nil
+	if ga.Validate() == nil {
+		t.Error("Nil initializer didn't return an error")
+	}
+}
+
+func TestValidationSel(t *testing.T) {
+	// Check presence of selector
+	ga.Selector = nil
+	if ga.Validate() == nil {
+		t.Error("Nil selector didn't return an error")
+	}
+}
+
+func TestValidationCross(t *testing.T) {
+	// Check presence of crossover
+	ga.Crossover = nil
+	if ga.Validate() == nil {
+		t.Error("Nil crossover didn't return an error")
+	}
+}
+
+func TestValidationMutRateTooLow(t *testing.T) {
+	// Check mutation rate
+	ga.MutRate = -1
+	if ga.Validate() == nil {
+		t.Error("Invalid mutation rate")
+	}
+}
+
+func TestValidationTooHigh(t *testing.T) {
+	// Check mutation rate
+	ga.MutRate = 2
+	if ga.Validate() == nil {
+		t.Error("Invalid mutation rate")
+	}
+}
+
+func TestValidationMigFrequency(t *testing.T) {
+	// Check migration frequency
+	ga.MigFrequency = 0
+	if ga.Validate() == nil {
+		t.Error("Invalid migration frequency")
+	}
+}
+
 func TestSizes(t *testing.T) {
 	// Number of Populations
 	if len(ga.Populations) != nbPopulations {

@@ -40,7 +40,6 @@
 
 <br/>
 
-
 # Introduction
 
 In a nutshell, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorithm) (GA) solves an optimization problem by doing the following:
@@ -189,6 +188,7 @@ For conveniency `gago` includes a set of [presets](presets/). For the while thes
 - Consider the fact that most of the computation is for evaluating the fitness function.
 - Increasing the number of selected parents (`NbParents`) usually increases the convergence rate (which is not necessarily good, but is sometimes desired).
 - Increasing the number of individuals per population (`NbIndividuals`) adds variety to the genetic algorithm, however it is more costly.
+- You can access the GA's `duration` attribute or implement your own stopwatch to enhance the GA for a fixed duration.
 
 
 ## Examples

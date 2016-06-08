@@ -38,3 +38,11 @@ func shuffleStrings(strings []string, generator *rand.Rand) []string {
 	}
 	return shuffled
 }
+
+// Find the strict minimum between two integers
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
