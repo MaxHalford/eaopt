@@ -6,14 +6,14 @@ var (
 	migrators = []Migrator{
 		MigShuffle{},
 	}
-	initializer = InitUniformF{
-		Lower: -1,
-		Upper: 1,
-	}
 )
 
 func TestMigSizes(t *testing.T) {
 	var (
+		initializer = InitUniformF{
+			Lower: -1,
+			Upper: 1,
+		}
 		populationSizes = []int{1, 2, 4}
 		nbIndis         = []int{1, 2, 10}
 	)
