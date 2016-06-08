@@ -12,7 +12,7 @@ type Migrator interface {
 type MigShuffle struct{}
 
 // Apply shuffle migration.
-func (shuffle MigShuffle) Apply(pops []Population) {
+func (mig MigShuffle) Apply(pops []Population) {
 	for i := 0; i < len(pops); i++ {
 		for j := i + 1; j < len(pops); j++ {
 			// Choose where to split the individuals
