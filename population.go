@@ -42,14 +42,14 @@ func (pop *Population) crossover(parents Individuals, c Crossover) {
 	// Create an empty slice of individuals to store the offsprings
 	var offsprings = make(Individuals, len(pop.Individuals))
 	// Generate offsprings through crossover until there are enough offsprings
-	var counter = 0
-	for counter < len(offsprings) {
+	var i = 0
+	for i < len(offsprings) {
 		var children = c.Apply(parents, pop.generator)
 		for _, child := range children {
-			if counter < len(offsprings) {
-				offsprings[counter] = child
+			if i < len(offsprings) {
+				offsprings[i] = child
 			}
-			counter++
+			i++
 		}
 	}
 	// Replace the old population with the new one

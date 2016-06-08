@@ -5,7 +5,7 @@ import "math/rand"
 // Selector chooses a sample of individual from a larger of individuals.
 type Selector interface {
 	// Apply select one individual
-	Apply(size int, individuals Individuals, generator *rand.Rand) Individuals
+	Apply(size int, indis Individuals, generator *rand.Rand) Individuals
 }
 
 // SelTournament selection chooses an individual through tournament selection.
@@ -16,11 +16,11 @@ type SelTournament struct {
 }
 
 // Apply tournament selection.
-func (ts SelTournament) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
+func (sel SelTournament) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
 	var winners = make(Individuals, size)
 	for i := range winners {
 		// Sample the GA
-		var sample = indis.sample(ts.NbParticipants, generator)
+		var sample = indis.sample(sel.NbParticipants, generator)
 		// The winner is the best individual participating in the tournament
 		sample.sort()
 		winners[i] = sample[0]
@@ -32,6 +32,6 @@ func (ts SelTournament) Apply(size int, indis Individuals, generator *rand.Rand)
 type SelElitism struct{}
 
 // Apply elitism selection.
-func (eli SelElitism) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
+func (sel SelElitism) Apply(size int, indis Individuals, generator *rand.Rand) Individuals {
 	return indis[:size]
 }

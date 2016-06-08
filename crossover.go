@@ -10,7 +10,7 @@ import (
 // for generating each offspring, each crossover resamples the population in
 // order to preserve diversity.
 type Crossover interface {
-	Apply(individuals Individuals, generator *rand.Rand) Individuals
+	Apply(indis Individuals, generator *rand.Rand) Individuals
 }
 
 // CrossPoint selects identical random points on each parent's genome and
@@ -21,12 +21,12 @@ type CrossPoint struct {
 }
 
 // Apply n-point crossover.
-func (cp CrossPoint) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossPoint) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
 		// Choose two individuals at random
 		parents = indis.sample(2, generator)
 		// Choose n random points along the genome
-		points = generator.Perm(len(parents[0].Genome))[:cp.NbPoints]
+		points = generator.Perm(len(parents[0].Genome))[:cross.NbPoints]
 	)
 	// Sort the points
 	sort.Ints(points)
@@ -66,7 +66,7 @@ func (cp CrossPoint) Apply(indis Individuals, generator *rand.Rand) Individuals 
 type CrossUniformF struct{}
 
 // Apply uniform float crossover.
-func (cuf CrossUniformF) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossUniformF) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
 		parents    = indis.sample(2, generator)
 		mother     = parents[0]
@@ -97,9 +97,9 @@ type CrossProportionateF struct {
 }
 
 // Apply proportionate float crossover.
-func (cpf CrossProportionateF) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossProportionateF) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
-		parents   = indis.sample(cpf.NbParents, generator)
+		parents   = indis.sample(cross.NbParents, generator)
 		nbGenes   = len(parents[0].Genome)
 		offspring = makeIndividual(nbGenes)
 	)
@@ -131,7 +131,7 @@ func (cpf CrossProportionateF) Apply(indis Individuals, generator *rand.Rand) In
 type CrossPMX struct{}
 
 // Apply partially mixed crossover.
-func (cpmx CrossPMX) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (c CrossPMX) Apply(indis Individuals, generator *rand.Rand) Individuals {
 	var (
 		parents    = indis.sample(2, generator)
 		nbGenes    = len(parents[0].Genome)

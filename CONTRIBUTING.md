@@ -26,6 +26,8 @@ There are many genetic operators yet to be implemented. Feel free to send pull r
 
 ## Naming conventions
 
+### Genetic operators
+
 There is a convention for naming genetic operators. The name begins with an abreviation of the kind of operator being implemented:
 
 - `Cross`: crossover
@@ -33,6 +35,7 @@ There is a convention for naming genetic operators. The name begins with an abre
 - `Mut`: mutator
 - `Mig`: migrator
 - `Sel`: selector
+- `Clu`: clusterer
 
 Then comes the second part of the name which indicates the name of the genetic operator.
 
@@ -45,6 +48,14 @@ underlying type.
 
 For example `MutUniformS` is a *mutator* operator, it applies *uniform* mutation
 on a *string* genome.
+
+### Shortnames
+
+Along with the genetic operators prefixes, other shortnames are used:
+
+- `indi`: individual
+- `pop`: population
+- `ff`: fitness function
 
 ## Running in parallel
 
