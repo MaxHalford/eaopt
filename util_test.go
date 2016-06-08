@@ -56,3 +56,16 @@ func TestShuffleStrings(t *testing.T) {
 		t.Error("Problem with shuffleIndividuals")
 	}
 }
+
+func TestMin(t *testing.T) {
+	var testCases = [][]int{
+		[]int{1, 2},
+		[]int{2, 2},
+		[]int{2, 3},
+	}
+	for _, pair := range testCases {
+		if min(pair[0], pair[1]) != pair[0] {
+			t.Error("min didn't find the smallest integer")
+		}
+	}
+}

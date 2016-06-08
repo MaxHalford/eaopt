@@ -37,6 +37,10 @@ type GA struct {
 	Migrator Migrator
 	// Migration frequency
 	MigFrequency int
+	// Clustering method
+	Clusterer Clusterer
+	// Number of clusters
+	NbClusters int
 	// Number of generations
 	Generations int
 	// Elapsed time
@@ -93,13 +97,17 @@ func (ga *GA) Validate() error {
 }
 
 // Initialize each population in the GA and assign an initial fitness to each
-// individual in each population.
+// individual in each population. Running Initialize after running Enhance will
+// reset the GA entirely.
 func (ga *GA) Initialize() {
 	// Begin by validating the parameters of the GA
 	var err = ga.Validate()
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Reset the number of generations and the elapsed duration
+	ga.Generations = 0
+	ga.Duration = 0
 	// Create the populations
 	ga.Populations = make([]Population, ga.NbPopulations)
 	var wg sync.WaitGroup
@@ -133,17 +141,19 @@ func (ga *GA) findBest() {
 	}
 }
 
-// Enhance each population in the GA. The population level operations are done in
-// parallel with a wait group. After all the population operations have been run, the
-// GA level operations are run.
+// Enhance each population in the GA. The population level operations are done
+// in parallel with a wait group. After all the population operations have been
+// run, the GA level operations are run.
 func (ga *GA) Enhance() {
 	var start = time.Now()
 	ga.Generations++
-	// Migrate the individuals between the Populations
-	if ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+	// Migrate the individuals between the populations if there are enough
+	// populations, there is a migrator and the migration frequency divides the
+	// generation count
+	if ga.NbPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations)
 	}
-	// Use a wait group to run the genetic operators in each population in parallel
+	// Use a wait group to enhance the populations in parallel
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
