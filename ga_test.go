@@ -13,18 +13,11 @@ var (
 	nbGenes       = 2
 	nbParents     = 6
 	nbGenerations = 10
-)
-
-func init() {
-	ga.NbPopulations = nbPopulations
-	ga.NbIndividuals = nbIndividuals
-	ga.NbGenes = nbGenes
-	ga.NbParents = nbParents
-	ga.Initializer = InitUniformF{
+	initializer   = InitUniformF{
 		Lower: -1,
 		Upper: 1,
 	}
-	ga.Ff = FloatFunction{
+	ff = FloatFunction{
 		Image: func(X []float64) float64 {
 			var sum float64
 			for _, x := range X {
@@ -33,17 +26,32 @@ func init() {
 			return sum
 		},
 	}
-	ga.Selector = SelTournament{
+	selector = SelTournament{
 		NbParticipants: 3,
 	}
-	ga.Crossover = CrossUniformF{}
-	ga.Mutator = MutNormalF{
+	crossover = CrossUniformF{}
+	mutator   = MutNormalF{
 		Rate: 0.5,
 		Std:  3,
 	}
-	ga.MutRate = 0.5
-	ga.Migrator = MigShuffle{}
-	ga.MigFrequency = 10
+	mutRate      = 0.5
+	migrator     = MigShuffle{}
+	migFrequency = 10
+)
+
+func init() {
+	ga.NbPopulations = nbPopulations
+	ga.NbIndividuals = nbIndividuals
+	ga.NbGenes = nbGenes
+	ga.NbParents = nbParents
+	ga.Initializer = initializer
+	ga.Ff = ff
+	ga.Selector = selector
+	ga.Crossover = crossover
+	ga.Mutator = mutator
+	ga.MutRate = mutRate
+	ga.Migrator = migrator
+	ga.MigFrequency = migFrequency
 	ga.Initialize()
 	for i := 0; i < nbGenerations; i++ {
 		ga.Enhance()
@@ -63,6 +71,7 @@ func TestValidationNbPopulations(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of populations didn't return an error")
 	}
+	ga.NbPopulations = nbIndividuals
 }
 
 func TestValidationNbIndividuals(t *testing.T) {
@@ -71,6 +80,7 @@ func TestValidationNbIndividuals(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of individuals didn't return an error")
 	}
+	ga.NbIndividuals = nbIndividuals
 }
 
 func TestValidationNbGenes(t *testing.T) {
@@ -79,6 +89,7 @@ func TestValidationNbGenes(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of genes didn't return an error")
 	}
+	ga.NbGenes = nbGenes
 }
 
 func TestValidationNbParents(t *testing.T) {
@@ -87,6 +98,7 @@ func TestValidationNbParents(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of parents didn't return an error")
 	}
+	ga.NbParents = nbParents
 }
 
 func TestValidationNbParentsNbIndividuals(t *testing.T) {
@@ -96,6 +108,8 @@ func TestValidationNbParentsNbIndividuals(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("More parents than individuals didn't return an error")
 	}
+	ga.NbIndividuals = nbIndividuals
+	ga.NbParents = nbParents
 }
 
 func TestValidationFf(t *testing.T) {
@@ -104,6 +118,7 @@ func TestValidationFf(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Nil fitness function didn't return an error")
 	}
+	ga.Ff = ff
 }
 
 func TestValidationInit(t *testing.T) {
@@ -112,6 +127,7 @@ func TestValidationInit(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Nil initializer didn't return an error")
 	}
+	ga.Initializer = initializer
 }
 
 func TestValidationSel(t *testing.T) {
@@ -120,6 +136,7 @@ func TestValidationSel(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Nil selector didn't return an error")
 	}
+	ga.Selector = selector
 }
 
 func TestValidationCross(t *testing.T) {
@@ -128,6 +145,7 @@ func TestValidationCross(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Nil crossover didn't return an error")
 	}
+	ga.Crossover = crossover
 }
 
 func TestValidationMutRateTooLow(t *testing.T) {
@@ -136,6 +154,7 @@ func TestValidationMutRateTooLow(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid mutation rate")
 	}
+	ga.MutRate = mutRate
 }
 
 func TestValidationTooHigh(t *testing.T) {
@@ -144,6 +163,7 @@ func TestValidationTooHigh(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid mutation rate")
 	}
+	ga.MutRate = mutRate
 }
 
 func TestValidationMigFrequency(t *testing.T) {
@@ -152,6 +172,7 @@ func TestValidationMigFrequency(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid migration frequency")
 	}
+	ga.MigFrequency = migFrequency
 }
 
 func TestSizes(t *testing.T) {
