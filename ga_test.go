@@ -7,44 +7,43 @@ import (
 )
 
 var (
+	ga            GA
 	nbPopulations = 4
 	nbIndividuals = 30
 	nbGenes       = 2
 	nbParents     = 6
 	nbGenerations = 10
-	ga            = GA{
-		NbPopulations: nbPopulations,
-		NbIndividuals: nbIndividuals,
-		NbGenes:       nbGenes,
-		NbParents:     nbParents,
-		Initializer: InitUniformF{
-			Lower: -1,
-			Upper: 1,
-		},
-		Ff: FloatFunction{
-			Image: func(X []float64) float64 {
-				var sum float64
-				for _, x := range X {
-					sum += x
-				}
-				return sum
-			},
-		},
-		Selector: SelTournament{
-			NbParticipants: 3,
-		},
-		Crossover: CrossUniformF{},
-		Mutator: MutNormalF{
-			Rate: 0.5,
-			Std:  3,
-		},
-		MutRate:      0.5,
-		Migrator:     MigShuffle{},
-		MigFrequency: 10,
-	}
 )
 
 func init() {
+	ga.NbPopulations = nbPopulations
+	ga.NbIndividuals = nbIndividuals
+	ga.NbGenes = nbGenes
+	ga.NbParents = nbParents
+	ga.Initializer = InitUniformF{
+		Lower: -1,
+		Upper: 1,
+	}
+	ga.Ff = FloatFunction{
+		Image: func(X []float64) float64 {
+			var sum float64
+			for _, x := range X {
+				sum += x
+			}
+			return sum
+		},
+	}
+	ga.Selector = SelTournament{
+		NbParticipants: 3,
+	}
+	ga.Crossover = CrossUniformF{}
+	ga.Mutator = MutNormalF{
+		Rate: 0.5,
+		Std:  3,
+	}
+	ga.MutRate = 0.5
+	ga.Migrator = MigShuffle{}
+	ga.MigFrequency = 10
 	ga.Initialize()
 	for i := 0; i < nbGenerations; i++ {
 		ga.Enhance()
