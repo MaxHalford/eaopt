@@ -28,17 +28,19 @@ func TSP(places []string, distance func([]string) float64) gago.GA {
 		NbPopulations: 2,
 		NbIndividuals: 100,
 		NbGenes:       len(places),
-		NbParents:     4,
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
 		Initializer: gago.InitUniqueS{
 			Corpus: places,
 		},
-		Selector:     gago.SelElitism{},
-		Crossover:    gago.CrossPMX{},
-		Mutator:      tspMutator{},
-		MutRate:      1,
+		Model: gago.ModGenerational{
+			NbParents: 4,
+			Selector:  gago.SelElitism{},
+			Crossover: gago.CrossPMX{},
+			Mutator:   tspMutator{},
+			MutRate:   1,
+		},
 		Migrator:     gago.MigShuffle{},
 		MigFrequency: 10,
 	}
