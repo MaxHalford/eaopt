@@ -80,7 +80,7 @@ func main() {
 	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 2000; i++ {
 		ga.Enhance()
 	}
 	fmt.Println(ga.Best.Fitness)

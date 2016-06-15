@@ -10,23 +10,25 @@ func Alignment(length int, corpus []string, distance func([]string) float64) gag
 		NbPopulations: 2,
 		NbIndividuals: 30,
 		NbGenes:       length,
-		NbParents:     6,
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
 		Initializer: gago.InitUniformS{
 			Corpus: corpus,
 		},
-		Selector: gago.SelTournament{
-			NbParticipants: 3,
+		Model: gago.ModGenerational{
+			NbParents: 6,
+			Selector: gago.SelTournament{
+				NbParticipants: 3,
+			},
+			Crossover: gago.CrossPoint{
+				NbPoints: 2,
+			},
+			Mutator: gago.MutPermute{
+				Max: 3,
+			},
+			MutRate: 0.5,
 		},
-		Crossover: gago.CrossPoint{
-			NbPoints: 2,
-		},
-		Mutator: gago.MutPermute{
-			Max: 3,
-		},
-		MutRate:      0.5,
 		Migrator:     gago.MigShuffle{},
 		MigFrequency: 10,
 	}

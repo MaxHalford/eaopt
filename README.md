@@ -1,16 +1,20 @@
 <div align="center">
   <!-- Logo -->
-   <img src="img/logo.png" alt="logo"/>
+   <img src="doc/img/logo.png" alt="logo"/>
 </div>
 
 <div align="center">
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
-    <img src="http://img.shields.io/:license-mit-blue.svg?style=flat-square" alt="logo"/>
+    <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="logo"/>
   </a>
   <!-- godoc -->
   <a href="https://godoc.org/github.com/MaxHalford/gago">
     <img src="https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square" alt="godoc" />
+  </a>
+  <!-- readthedocs -->
+  <a href="http://gago.readthedocs.io/">
+    <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square" alt="readthedocs" />
   </a>
   <!-- Build status -->
   <a href="https://img.shields.io/travis/MaxHalford/gago">
@@ -47,10 +51,8 @@ In a nutshell, a [genetic algorithm](https://www.wikiwand.com/en/Genetic_algorit
 1. Generate random solutions.
 2. Evaluate the solutions.
 3. Sort the solutions according to their evaluation score.
-4. Select parents for breeding.
-5. Apply [crossover](http://www.wikiwand.com/en/Crossover_(genetic_algorithm)) to generate new solutions.
-6. [Mutate](https://www.wikiwand.com/en/Mutation_(genetic_algorithm)) the newly generated solutions.
-7. Repeat from step 2 until satisfied.
+4. Apply genetic operators following a model.
+5. Repeat from step 2 until satisfied.
 
 Genetic algorithms can be applied to many problems, the only variable being the problem itself. Indeed, the underlying structure does not have to change between problems. With this in mind, `gago` has been built to be applicable to many problems without having to re-write boilerplate code.
 
@@ -58,9 +60,11 @@ The following flowchart shows the steps the algorithms takes. As can be seen onl
 
 <br/>
 <div align="center">
-	<img src="img/flowchart.png" alt="Flowchart"/>
+	<img src="doc/img/flowchart.png" alt="Flowchart"/>
 </div>
 <br/>
+
+This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a *model*, a fact that is often omitted in introductions to genetic algorithms.
 
 
 ## Terminology
@@ -77,9 +81,15 @@ The terms surrounding genetic algorithms (GAs) are roughly analogous to those fo
 - The ***selection*** method is crucial and is very influential on the behavior of the algorithm.
 - Genes can be randomly modified through ***mutation***.
 - Mutation and crossover are part of a larger concept called ***genetic operators***.
+- The precise order and manner in which genetic operators are applied are detailed in a ***model***.
 - [Multi-population GAs](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) split the population into ***sub-populations***.
 - Sub-populations exchange individuals through a process known as ***migration***.
 - Similar individuals can be clustered into ***species*** in order to avoid applying genetic operators to dissimilar individuals.
+
+
+## Philosophy
+
+> TLDR: gago gives you the freedom to tweak every single part of a genetic algorithm.
 
 
 ## Usage
@@ -126,8 +136,9 @@ The nice thing thing is that the GA only requires a function and a number of var
 
 ## Features
 
-- Possibility to run many populations in parallel under the *migration model*.
+- Possibility to run many populations in parallel.
 - Custom genetic operators are easy to implement, as described in the [contribution document](CONTRIBUTING.md).
+- Possibility to apply genetic operators under custom models.
 - A modular approach makes it easy to switch GA parameters.
 - Speciation operators to cluster individuals into similar groups, providing more efficient crossovers.
 
@@ -151,12 +162,8 @@ To modify the behavior off the GA, you can change the `gago.GA` struct before ru
 |------------------------|---------------------------|------------------------------------------------------------------|
 | `NbPopulations`              | `int`                     | Number of Populations in the GA                               |
 | `NbIndividuals`        | `int`                     | Number of individuals in each population                              |
-| `NbParents`        | `int`                     | Number of parents selected for reproduction                              |
 | `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual                        |
-| `Selector` (struct)    | `Selector` (interface)    | Method for selecting one individual from a group of individuals |
-| `Crossover` (struct)     | `Crossover` (interface)     | Method for producing a new individual (called the offspring)    |
-| `Mutator` (struct)     | `Mutator` (interface)     | Method for modifying a single individual's genes                      |
-| `MutRate`     | `float`     | Mutation rate                      |
+| `Model` (struct)    | `Model` (interface)    | Model for applying genetic operators |
 | `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the populations             |
 | `MigFrequency`     | `int`     | Migration frequency                      |
 
@@ -183,10 +190,10 @@ For conveniency `gago` includes a set of [presets](presets/). For the while thes
 
 ## Advice
 
-- Wrap multiple mutators into a single `Mutator` for applying multiple mutators, for example in the [TSP preset](presets/tsp.go).
-- Don't hesitate to add more populations if you have a multi-core machine, the overhead is negligible.
+- Wrap multiple mutators into a single `Mutator` `struct` if you wish to apply multiple mutators, for an example see the [TSP preset](presets/tsp.go).
+- Don't hesitate to add more populations if you have a multi-core machine, the overhead is very small.
 - Consider the fact that most of the computation is for evaluating the fitness function.
-- Increasing the number of selected parents (`NbParents`) usually increases the convergence rate (which is not necessarily good, but is sometimes desired).
+- Increasing the number of selected parents (`NbParents`) during selection usually increases the convergence rate (which is not necessarily good, but is sometimes desired).
 - Increasing the number of individuals per population (`NbIndividuals`) adds variety to the genetic algorithm, however it is more costly.
 - You can access the GA's `duration` attribute or implement your own stopwatch to enhance the GA for a fixed duration.
 

@@ -32,8 +32,8 @@ There is a convention for naming genetic operators. The name begins with an abre
 
 - `Cross`: crossover
 - `Init`: initializer
-- `Mut`: mutator
 - `Mig`: migrator
+- `Mut`: mutator
 - `Sel`: selector
 - `Clu`: clusterer
 
@@ -56,6 +56,11 @@ Along with the genetic operators prefixes, other shortnames are used:
 - `indi`: individual
 - `pop`: population
 - `ff`: fitness function
+
+### Models
+
+Implementations of the `Model` interface begin with a `Mod` prefix.
+
 
 ## Running in parallel
 
