@@ -65,3 +65,10 @@ Implementations of the `Model` interface begin with a `Mod` prefix.
 ## Running in parallel
 
 Genetic algorithms are notorious for being [embarrassingly parallel](http://www.wikiwand.com/en/Embarrassingly_parallel). Indeed, most calculations can be run in parallel because they only affect oneindividual. Luckily Go provides good support for parallelism. As some gophers may know, the `math/rand` module can be problematic because there is a global lock the random number generator, the problem is described in this [stackoverflow post](http://stackoverflow.com/questions/14298523/why-does-adding-concurrency-slow-down-this-golang-code). This can be circumvented by providing each GA with it's own generator.
+
+## Editing the documentation
+
+- The documentation is built with [mkdocs](https://mkdocs.readthedocs.io).
+- You can `mkdocs serve` to enable live editing of the documentation.
+
+
