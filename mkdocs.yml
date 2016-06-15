@@ -1,0 +1,6 @@
+pages:
+- Home: index.md
+- About: about.md
+- Contributing: contributing.md
+site_name: gago
+theme: material

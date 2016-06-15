@@ -1,6 +1,6 @@
 <div align="center">
   <!-- Logo -->
-   <img src="doc/img/logo.png" alt="logo"/>
+   <img src="docs/img/logo.png" alt="logo"/>
 </div>
 
 <div align="center">
@@ -60,7 +60,7 @@ The following flowchart shows the steps the algorithms takes. As can be seen onl
 
 <br/>
 <div align="center">
-	<img src="doc/img/flowchart.png" alt="Flowchart"/>
+	<img src="docs/img/flowchart.png" alt="Flowchart"/>
 </div>
 <br/>
 
@@ -137,7 +137,7 @@ The nice thing thing is that the GA only requires a function and a number of var
 ## Features
 
 - Possibility to run many populations in parallel.
-- Custom genetic operators are easy to implement, as described in the [contribution document](CONTRIBUTING.md).
+- Custom genetic operators are easy to implement, as described in the [contribution document](docs/CONTRIBUTING.md).
 - Possibility to apply genetic operators under custom models.
 - A modular approach makes it easy to switch GA parameters.
 - Speciation operators to cluster individuals into similar groups, providing more efficient crossovers.
