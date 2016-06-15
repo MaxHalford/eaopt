@@ -9,7 +9,6 @@ func Float(n int, function func([]float64) float64) gago.GA {
 		NbPopulations: 2,
 		NbIndividuals: 30,
 		NbGenes:       n,
-		NbParents:     6,
 		Ff: gago.FloatFunction{
 			Image: function,
 		},
@@ -17,15 +16,18 @@ func Float(n int, function func([]float64) float64) gago.GA {
 			Lower: -1,
 			Upper: 1,
 		},
-		Selector: gago.SelTournament{
-			NbParticipants: 3,
+		Model: gago.ModGenerational{
+			NbParents: 6,
+			Selector: gago.SelTournament{
+				NbParticipants: 3,
+			},
+			Crossover: gago.CrossUniformF{},
+			Mutator: gago.MutNormalF{
+				Rate: 0.5,
+				Std:  3,
+			},
+			MutRate: 0.5,
 		},
-		Crossover: gago.CrossUniformF{},
-		Mutator: gago.MutNormalF{
-			Rate: 0.5,
-			Std:  3,
-		},
-		MutRate:      0.5,
 		Migrator:     gago.MigShuffle{},
 		MigFrequency: 10,
 	}

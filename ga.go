@@ -15,8 +15,6 @@ type GA struct {
 	NbIndividuals int
 	// Number of genes in each individual (imposed by the problem)
 	NbGenes int
-	// Number of parents selected for reproduction
-	NbParents int
 	// Populations
 	Populations []Population
 	// Overall best individual (dummy initialization at the beginning)
@@ -25,22 +23,12 @@ type GA struct {
 	Ff FitnessFunction
 	// Initial random boundaries
 	Initializer Initializer
-	// Selection method
-	Selector Selector
-	// Crossover method
-	Crossover Crossover
-	// Mutation method
-	Mutator Mutator
-	// Mutation rate
-	MutRate float64
+	// Evolution model
+	Model Model
 	// Migration method
 	Migrator Migrator
 	// Migration frequency
 	MigFrequency int
-	// Clustering method
-	Clusterer Clusterer
-	// Number of clusters
-	NbClusters int
 	// Number of generations
 	Generations int
 	// Elapsed time
@@ -63,11 +51,6 @@ func (ga *GA) Validate() error {
 	if ga.NbGenes < 1 {
 		return errors.New("'NbGenes' should be higher or equal to 1")
 	}
-	// Check the number of parents
-	if ga.NbParents < 0 || ga.NbParents > ga.NbIndividuals {
-		return errors.New(`'NbParents' should be higher or equal to 0 and should
-			be lower or equal to 'NbIndividuals'`)
-	}
 	// Check the fitness function
 	if ga.Ff == nil {
 		return errors.New("'Ff' cannot be nil")
@@ -75,18 +58,6 @@ func (ga *GA) Validate() error {
 	// Check the initialization method
 	if ga.Initializer == nil {
 		return errors.New("'Initializer' cannot be nil")
-	}
-	// Check the selection method
-	if ga.Selector == nil {
-		return errors.New("'Selector' cannot be nil")
-	}
-	// Check the crossover method
-	if ga.Crossover == nil {
-		return errors.New("'Crossover' cannot be nil")
-	}
-	// Check the mutation rate
-	if ga.MutRate < 0 || ga.MutRate > 1 {
-		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
 	}
 	// Check the migration frequency in the presence of a migrator
 	if ga.Migrator != nil && ga.MigFrequency < 1 {
@@ -159,18 +130,10 @@ func (ga *GA) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// 1. Select
-			var parents = ga.Selector.Apply(ga.NbParents, ga.Populations[j].Individuals,
-				ga.Populations[j].generator)
-			// 2. Crossover
-			ga.Populations[j].crossover(parents, ga.Crossover)
-			// 3. Mutate
-			if ga.Mutator != nil {
-				ga.Populations[j].mutate(ga.Mutator, ga.MutRate)
-			}
-			// 4. Evaluate
+			// Apply the evolution model
+			ga.Model.Apply(ga.Populations[j])
+			// Evaluate and sort
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
-			// 5. Sort
 			ga.Populations[j].Individuals.sort()
 			ga.Populations[j].Duration += time.Since(start)
 		}(i)
