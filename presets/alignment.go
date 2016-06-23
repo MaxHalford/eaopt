@@ -17,7 +17,6 @@ func Alignment(length int, corpus []string, distance func([]string) float64) gag
 			Corpus: corpus,
 		},
 		Model: gago.ModGenerational{
-			NbParents: 6,
 			Selector: gago.SelTournament{
 				NbParticipants: 3,
 			},

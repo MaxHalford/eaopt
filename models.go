@@ -1,36 +1,31 @@
 package gago
 
+import "errors"
+
 // A Model specifies a manner and a order to apply genetic operators to a
 // population at generation n in order for it obtain better individuals at
 // generation n+1.
 type Model interface {
-	Apply(pop Population)
+	Apply(pop *Population)
+	Validate() error
 }
 
 // ModGenerational implements the generational model to a population.
 type ModGenerational struct {
-	// Number of parents selected for reproduction
-	NbParents int
-	// Selection method
-	Selector Selector
-	// Crossover method
+	Selector  Selector
 	Crossover Crossover
-	// Mutation method
-	Mutator Mutator
-	// Mutation rate
-	MutRate float64
+	Mutator   Mutator
+	MutRate   float64 // Mutation rate
 }
 
 // Apply the generational model to a population.
-func (mod ModGenerational) Apply(pop Population) {
-	// 1. Select
-	var parents = mod.Selector.Apply(mod.NbParents, pop.Individuals, pop.generator)
-	// 2. Crossover
-	var offsprings = make(Individuals, len(pop.Individuals))
-	// Generate offsprings through crossover until there are enough
-	var i = 0
+func (mod ModGenerational) Apply(pop *Population) {
+	var (
+		offsprings = make(Individuals, len(pop.Individuals))
+		i          = 0
+	)
 	for i < len(offsprings) {
-		var children = mod.Crossover.Apply(parents, pop.generator)
+		var children = mod.Crossover.Apply(pop.Individuals, mod.Selector, pop.generator)
 		for _, child := range children {
 			if i < len(offsprings) {
 				offsprings[i] = child
@@ -39,15 +34,30 @@ func (mod ModGenerational) Apply(pop Population) {
 		}
 	}
 	// Replace the old population with the new one
-	copy(pop.Individuals, offsprings)
-	// 3. Mutate
-	for _, individual := range pop.Individuals {
-		if pop.generator.Float64() < mod.MutRate {
-			mod.Mutator.Apply(&individual, pop.generator)
+	pop.Individuals = offsprings
+	// Apply mutation
+	if mod.Mutator != nil {
+		for _, individual := range pop.Individuals {
+			if pop.generator.Float64() < mod.MutRate {
+				mod.Mutator.Apply(&individual, pop.generator)
+			}
 		}
 	}
 }
 
-// ModSteadyState implements the steady state model to a population.
-type ModSteadyState struct {
+// Validate the model to verify the parameters are coherent.
+func (mod ModGenerational) Validate() error {
+	// Check the selection method presence
+	if mod.Selector == nil {
+		return errors.New("'Selector' cannot be nil")
+	}
+	// Check the crossover method presence
+	if mod.Crossover == nil {
+		return errors.New("'Crossover' cannot be nil")
+	}
+	// Check the mutation rate in the presence of a mutator
+	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
+		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+	}
+	return nil
 }

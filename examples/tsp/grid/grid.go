@@ -22,7 +22,7 @@ func euclidian(a, b point) float64 {
 }
 
 var (
-	size   = 8
+	size   = 10
 	points = make(map[string]point)
 )
 
@@ -71,11 +71,17 @@ func main() {
 	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
-	for i := 0; i < 30000; i++ {
+	for i := 0; i < 10000; i++ {
 		ga.Enhance()
 	}
-	fmt.Println(ga.Best.Fitness)
+	var optimal = float64((size + 1) * (size - 1))
+	fmt.Printf("Obtained %f\n", ga.Best.Fitness)
+	fmt.Printf("Optimal is %d\n", int(optimal))
+	fmt.Printf("Off by %f percent\n", 100*(ga.Best.Fitness-optimal)/optimal)
 	// Extract the genome of the best individual
-	var points = ga.Best.Genome.CastString()
+	var points = make([]string, len(names))
+	for i, gene := range ga.Best.Genome {
+		points[i] = gene.(string)
+	}
 	graph(points)
 }
