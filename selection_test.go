@@ -23,7 +23,7 @@ func TestTournament(t *testing.T) {
 	copy(original, indis)
 	// All the individuals participate in the tournament
 	var selector = SelTournament{size}
-	var sample = selector.Apply(size, indis, generator)
+	var _, sample = selector.Apply(size, indis, generator)
 	// Check the size of the sample
 	if len(sample) != size {
 		t.Error("Wrong sample size")
@@ -55,7 +55,7 @@ func TestElitism(t *testing.T) {
 	var original = make([]Individual, len(indis))
 	copy(original, indis)
 	var selector = SelElitism{}
-	var sample = selector.Apply(size, indis, generator)
+	var _, sample = selector.Apply(size, indis, generator)
 	// Check the size of the sample
 	if len(sample) != size {
 		t.Error("Wrong sample size")
@@ -89,8 +89,8 @@ func TestTournamentAndElitism(t *testing.T) {
 	// All the individuals participate in the tournament
 	var elitism = SelElitism{}
 	var tournament = SelTournament{size}
-	var a = elitism.Apply(size, indis, generator)
-	var b = tournament.Apply(size, indis, generator)
+	var _, a = elitism.Apply(size, indis, generator)
+	var _, b = tournament.Apply(size, indis, generator)
 	a.sort()
 	b.sort()
 	// Check the individual is from the initial population

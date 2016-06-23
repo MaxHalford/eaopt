@@ -6,22 +6,30 @@ type FitnessFunction interface {
 	apply(genome Genome) float64
 }
 
-// FloatFunction is for functions with floating point slices as input.
-type FloatFunction struct {
+// Float64Function is for functions with floating point slices as input.
+type Float64Function struct {
 	Image func([]float64) float64
 }
 
-// Apply the fitness function in wrapped in FloatFunction.
-func (ff FloatFunction) apply(genome Genome) float64 {
-	return ff.Image(genome.CastFloat())
+// Apply the fitness function wrapped in FloatFunction.
+func (ff Float64Function) apply(genome Genome) float64 {
+	var casted = make([]float64, len(genome))
+	for i := range genome {
+		casted[i] = genome[i].(float64)
+	}
+	return ff.Image(casted)
 }
 
-// StringFunction is for function with string slices as input.
+// StringFunction is for functions with string slices as input.
 type StringFunction struct {
 	Image func([]string) float64
 }
 
-// Apply the fitness function in wrapped in StringFunction.
-func (sf StringFunction) apply(genome Genome) float64 {
-	return sf.Image(genome.CastString())
+// Apply the fitness function wrapped in StringFunction.
+func (ff StringFunction) apply(genome Genome) float64 {
+	var casted = make([]string, len(genome))
+	for i := range genome {
+		casted[i] = genome[i].(string)
+	}
+	return ff.Image(casted)
 }

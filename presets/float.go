@@ -9,7 +9,7 @@ func Float(n int, function func([]float64) float64) gago.GA {
 		NbPopulations: 2,
 		NbIndividuals: 30,
 		NbGenes:       n,
-		Ff: gago.FloatFunction{
+		Ff: gago.Float64Function{
 			Image: function,
 		},
 		Initializer: gago.InitUniformF{
@@ -17,7 +17,6 @@ func Float(n int, function func([]float64) float64) gago.GA {
 			Upper: 1,
 		},
 		Model: gago.ModGenerational{
-			NbParents: 6,
 			Selector: gago.SelTournament{
 				NbParticipants: 3,
 			},

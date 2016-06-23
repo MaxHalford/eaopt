@@ -69,22 +69,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Terminology
 
-The terms surrounding genetic algorithms (GAs) are roughly analogous to those found in biology.
 
-- GAs are intended to optimize a function called the ***fitness function***.
-- Candidate solutions to the optimization problem are called ***individuals***.
-- Each individual has ***genes*** to which a ***fitness*** is assigned.
-- The number of genes is simply the number of variables defined by the problem.
-- Individuals are sorted based on their fitness towards a problem.
-- Individuals are part of a ***population***.
-- ***Offsprings*** are born by applying ***crossover*** on selected individuals.
-- The ***selection*** method is crucial and is very influential on the behavior of the algorithm.
-- Genes can be randomly modified through ***mutation***.
-- Mutation and crossover are part of a larger concept called ***genetic operators***.
-- The precise order and manner in which genetic operators are applied are detailed in a ***model***.
-- [Multi-population GAs](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) split the population into ***sub-populations***.
-- Sub-populations exchange individuals through a process known as ***migration***.
-- Similar individuals can be clustered into ***species*** in order to avoid applying genetic operators to dissimilar individuals.
 
 
 ## Philosophy
@@ -205,10 +190,3 @@ For conveniency `gago` includes a set of [presets](presets/). For the while thes
 - [examples/curve-fitting/](examples/curve-fitting/) is an attempt to fit a set of points with non-linear polynomial function.
 - [examples/tsp/](examples/tsp/) contain examples of solving the Traveling Salesman Problem.
 
-
-## Litterature
-
-- [godoc](https://godoc.org/github.com/MaxHalford/gago)
-- Each operator (selection, crossover, mutation, migration) is described in its comments.
-- [*An introduction to genetic algorithms*](http://www.boente.eti.br/fuzzy/ebook-fuzzy-mitchell.pdf) is quite thorough.
-- [*The Multipopulation Genetic Algorithm: Local Selection and Migration*](http://www.pohlheim.com/Papers/mpga_gal95/gal2_1.html) is an easy read.
