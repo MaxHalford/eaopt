@@ -1,6 +1,25 @@
+extra_javascript:
+  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+  - mathjaxhelper.js
+
+markdown_extensions:
+  - admonition
+  - def_list
+  - extra
+  - fenced_code
+  - tables
+
+maxdepth: 2
+
 pages:
 - Home: index.md
 - About: about.md
+- Evolution models: evolution-models.md
+- Presets: presets.md
+- Extending gago: extending.md
+- Examples: examples.md
 - Contributing: contributing.md
+
 site_name: gago
-theme: material
+
+theme: readthedocs

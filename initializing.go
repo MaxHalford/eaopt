@@ -17,8 +17,8 @@ type InitUniformF struct {
 // Apply the InitUniformF initializer.
 func (init InitUniformF) apply(indi *Individual, generator *rand.Rand) {
 	for i := range indi.Genome {
-		// Decide if positive or negative
 		var gene float64
+		// Decide if positive or negative
 		if generator.Float64() < 0.5 {
 			gene = generator.Float64() * init.Lower
 		} else {

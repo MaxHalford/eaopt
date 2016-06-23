@@ -15,7 +15,7 @@ func TestIndividualsSample(t *testing.T) {
 		nbGenes   = 4
 		indis     = makeIndividuals(nbIndis, nbGenes)
 		size      = 3
-		sample    = indis.sample(size, generator)
+		_, sample = indis.sample(size, generator)
 	)
 	// Check the size of the sample
 	if len(sample) != size {

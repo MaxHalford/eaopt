@@ -9,36 +9,23 @@ import (
 
 // A GA contains population which themselves contain individuals.
 type GA struct {
-	// Number of populations
-	NbPopulations int
-	// Number of individuals in each population
-	NbIndividuals int
-	// Number of genes in each individual (imposed by the problem)
-	NbGenes int
-	// Populations
-	Populations []Population
-	// Overall best individual (dummy initialization at the beginning)
-	Best Individual
-	// Fitness function to evaluate individuals (imposed by the problem)
-	Ff FitnessFunction
-	// Initial random boundaries
-	Initializer Initializer
-	// Evolution model
-	Model Model
-	// Migration method
-	Migrator Migrator
-	// Migration frequency
-	MigFrequency int
-	// Number of generations
-	Generations int
-	// Elapsed time
-	Duration time.Duration
+	NbPopulations int // Number of populations
+	NbIndividuals int // Initial number of individuals in each population
+	NbGenes       int // Number of genes in each individual (imposed by the problem)
+	Populations   []Population
+	Best          Individual      // Overall best individual (dummy initialization at the beginning)
+	Ff            FitnessFunction // Fitness function to evaluate individuals (imposed by the problem)
+	Initializer   Initializer
+	Model         Model
+	Migrator      Migrator
+	MigFrequency  int // Migration frequency
+	Generations   int
+	Duration      time.Duration
 }
 
 // Validate the parameters of a GA to ensure it will run correctly. Some
 // settings or combination of settings may be incoherent during runtime.
 func (ga *GA) Validate() error {
-	var err error
 	// Check the number of populations
 	if ga.NbPopulations < 1 {
 		return errors.New("'NbPopulations' should be higher or equal to 1")
@@ -51,27 +38,36 @@ func (ga *GA) Validate() error {
 	if ga.NbGenes < 1 {
 		return errors.New("'NbGenes' should be higher or equal to 1")
 	}
-	// Check the fitness function
+	// Check the fitness function presence
 	if ga.Ff == nil {
 		return errors.New("'Ff' cannot be nil")
 	}
-	// Check the initialization method
+	// Check the initialization method presence
 	if ga.Initializer == nil {
 		return errors.New("'Initializer' cannot be nil")
+	}
+	// Check the model presence
+	if ga.Model == nil {
+		return errors.New("'Model' cannot be nil")
+	}
+	// Check the model is valid
+	var modelErr = ga.Model.Validate()
+	if modelErr != nil {
+		return modelErr
 	}
 	// Check the migration frequency in the presence of a migrator
 	if ga.Migrator != nil && ga.MigFrequency < 1 {
 		return errors.New("'MigFrequency' should be strictly higher than 0")
 	}
 	// No error
-	return err
+	return nil
 }
 
 // Initialize each population in the GA and assign an initial fitness to each
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
-	// Begin by validating the parameters of the GA
+	// Validate the parameters of the GA
 	var err = ga.Validate()
 	if err != nil {
 		log.Fatal(err)
@@ -131,7 +127,7 @@ func (ga *GA) Enhance() {
 		go func(j int) {
 			defer wg.Done()
 			// Apply the evolution model
-			ga.Model.Apply(ga.Populations[j])
+			ga.Model.Apply(&ga.Populations[j])
 			// Evaluate and sort
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
 			ga.Populations[j].Individuals.sort()

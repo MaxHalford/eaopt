@@ -10,7 +10,7 @@ import (
 // for generating each offspring, each crossover resamples the population in
 // order to preserve diversity.
 type Crossover interface {
-	Apply(indis Individuals, generator *rand.Rand) Individuals
+	Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals
 }
 
 // CrossPoint selects identical random points on each parent's genome and
@@ -21,10 +21,10 @@ type CrossPoint struct {
 }
 
 // Apply n-point crossover.
-func (cross CrossPoint) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossPoint) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
 	var (
 		// Choose two individuals at random
-		parents = indis.sample(2, generator)
+		_, parents = sel.Apply(2, indis, generator)
 		// Choose n random points along the genome
 		points = generator.Perm(len(parents[0].Genome))[:cross.NbPoints]
 	)
@@ -66,9 +66,9 @@ func (cross CrossPoint) Apply(indis Individuals, generator *rand.Rand) Individua
 type CrossUniformF struct{}
 
 // Apply uniform float crossover.
-func (cross CrossUniformF) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossUniformF) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
 	var (
-		parents    = indis.sample(2, generator)
+		_, parents = sel.Apply(2, indis, generator)
 		mother     = parents[0]
 		father     = parents[1]
 		nbGenes    = len(mother.Genome)
@@ -97,11 +97,11 @@ type CrossProportionateF struct {
 }
 
 // Apply proportionate float crossover.
-func (cross CrossProportionateF) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (cross CrossProportionateF) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
 	var (
-		parents   = indis.sample(cross.NbParents, generator)
-		nbGenes   = len(parents[0].Genome)
-		offspring = makeIndividual(nbGenes)
+		_, parents = sel.Apply(cross.NbParents, indis, generator)
+		nbGenes    = len(parents[0].Genome)
+		offspring  = makeIndividual(nbGenes)
 	)
 	// For every gene in the parent's genome
 	for i := range offspring.Genome {
@@ -131,9 +131,9 @@ func (cross CrossProportionateF) Apply(indis Individuals, generator *rand.Rand) 
 type CrossPMX struct{}
 
 // Apply partially mixed crossover.
-func (c CrossPMX) Apply(indis Individuals, generator *rand.Rand) Individuals {
+func (c CrossPMX) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
 	var (
-		parents    = indis.sample(2, generator)
+		_, parents = sel.Apply(2, indis, generator)
 		nbGenes    = len(parents[0].Genome)
 		offsprings = makeIndividuals(len(parents), nbGenes)
 	)

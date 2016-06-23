@@ -16,7 +16,7 @@ func (mig MigShuffle) Apply(pops []Population) {
 	for i := 0; i < len(pops); i++ {
 		for j := i + 1; j < len(pops); j++ {
 			// Choose where to split the individuals
-			var split = rand.Intn(len(pops[i].Individuals))
+			var split = rand.Int() % len(pops[i].Individuals)
 			// Create a temporary slice of individuals in order to switch
 			var tmp = make([]Individual, len(pops[i].Individuals))
 			copy(tmp, pops[i].Individuals)
