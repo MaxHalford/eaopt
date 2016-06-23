@@ -11,13 +11,12 @@ var (
 	nbPopulations = 4
 	nbIndividuals = 30
 	nbGenes       = 2
-	nbParents     = 6
 	nbGenerations = 10
 	initializer   = InitUniformF{
 		Lower: -1,
 		Upper: 1,
 	}
-	ff = FloatFunction{
+	ff = Float64Function{
 		Image: func(X []float64) float64 {
 			var sum float64
 			for _, x := range X {
@@ -26,15 +25,17 @@ var (
 			return sum
 		},
 	}
-	selector = SelTournament{
-		NbParticipants: 3,
+	model = ModGenerational{
+		Selector: SelTournament{
+			NbParticipants: 3,
+		},
+		Crossover: CrossUniformF{},
+		Mutator: MutNormalF{
+			Rate: 0.5,
+			Std:  3,
+		},
+		MutRate: 0.5,
 	}
-	crossover = CrossUniformF{}
-	mutator   = MutNormalF{
-		Rate: 0.5,
-		Std:  3,
-	}
-	mutRate      = 0.5
 	migrator     = MigShuffle{}
 	migFrequency = 10
 )
@@ -43,13 +44,9 @@ func init() {
 	ga.NbPopulations = nbPopulations
 	ga.NbIndividuals = nbIndividuals
 	ga.NbGenes = nbGenes
-	ga.NbParents = nbParents
 	ga.Initializer = initializer
 	ga.Ff = ff
-	ga.Selector = selector
-	ga.Crossover = crossover
-	ga.Mutator = mutator
-	ga.MutRate = mutRate
+	ga.Model = model
 	ga.Migrator = migrator
 	ga.MigFrequency = migFrequency
 	ga.Initialize()
@@ -114,7 +111,7 @@ func TestValidationMigFrequency(t *testing.T) {
 	// Check migration frequency
 	ga.MigFrequency = 0
 	if ga.Validate() == nil {
-		t.Error("Invalid migration frequency")
+		t.Error("Invalid migration frequency didn't return an error")
 	}
 	ga.MigFrequency = migFrequency
 }

@@ -8,12 +8,9 @@ import (
 // A Population contains individuals. Individuals mate within a population. Individuals can
 // migrate from one population to another.
 type Population struct {
-	// Individuals
 	Individuals Individuals
-	// Elapsed time
-	Duration time.Duration
-	// Each population has a random number generator to bypass the global rand mutex
-	generator *rand.Rand
+	Duration    time.Duration
+	generator   *rand.Rand // Each population has a random number generator to bypass the global rand mutex
 }
 
 // Generate a new population.

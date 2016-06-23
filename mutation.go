@@ -4,20 +4,17 @@ import "math/rand"
 
 // Mutator modifies an individual by replacing it's genes with new values.
 type Mutator interface {
-	// Apply performs the mutation on an individual
 	Apply(indi *Individual, generator *rand.Rand)
 }
 
-// MutNormalF mutation modifies a float gene if a coin toss is under a defined
-// mutation rate. It does so for each gene. The new gene value is a random value
-// sampled from a normal distribution centered on the gene's current value and
-// with the intensity parameter as it's standard deviation. Only works for
-// floating point values.
+// MutNormalF modifies a float gene if a coin toss is under a defined mutation
+// ate. It does so for each gene. The new gene value is a random value sampled
+// from a normal distribution centered on the gene's current value and with the
+// intensity parameter as it's standard deviation. Only works for floating point
+// values.
 type MutNormalF struct {
-	// Mutation rate for each gene
-	Rate float64
-	// Standard deviation
-	Std float64
+	Rate float64 // Mutation rate for each gene
+	Std  float64 // Standard deviation
 }
 
 // Apply normal mutation.
@@ -39,15 +36,15 @@ type MutSplice struct{}
 func (mut MutSplice) Apply(indi *Individual, generator *rand.Rand) {
 	// Choose where to start and end the splice
 	var (
-		end   = rand.Intn(len(indi.Genome))
-		start = rand.Intn(end + 1)
+		end   = rand.Int() % len(indi.Genome)
+		start = rand.Int() % end
 	)
 	// Split the genome into two
 	var inner = make(Genome, end-start)
 	copy(inner, indi.Genome[start:end])
 	var outer = append(indi.Genome[:start], indi.Genome[end:]...)
 	// Choose where to insert the splice
-	var insert = rand.Intn(len(outer))
+	var insert = rand.Int() % len(outer)
 	// Splice and insert
 	indi.Genome = append(
 		outer[:insert],
@@ -77,8 +74,7 @@ func (mut MutPermute) Apply(indi *Individual, generator *rand.Rand) {
 
 // MutUniformS permutes two genes.
 type MutUniformS struct {
-	// Corpus to replace genes with
-	Corpus []string
+	Corpus []string // Corpus to replace genes with
 }
 
 // Apply permutation mutation.

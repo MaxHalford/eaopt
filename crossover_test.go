@@ -22,17 +22,15 @@ func TestCrossovers(t *testing.T) {
 		generator = rand.New(source)
 		nbIndis   = 5
 		nbGenes   = 4
-		nbParents = 2
 		selector  = SelTournament{2}
 	)
 	for _, c := range crossovers {
 		var indis = makeIndividuals(nbIndis, nbGenes)
-		var parents = selector.Apply(nbParents, indis, generator)
 		// Assign genomes
 		for _, indi := range indis {
 			c.init.apply(&indi, generator)
 		}
-		var offsprings = c.crossover.Apply(parents, generator)
+		var offsprings = c.crossover.Apply(indis, selector, generator)
 		// Check the offspring has a valid genome
 		for _, offspring := range offsprings {
 			if len(offspring.Genome) != nbGenes {

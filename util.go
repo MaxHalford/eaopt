@@ -46,3 +46,12 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+// Compute the mean of a slice of float64s.
+func mean(slice []float64) float64 {
+	var sum float64
+	for _, v := range slice {
+		sum += v
+	}
+	return sum / float64(len(slice))
+}

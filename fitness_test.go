@@ -2,8 +2,8 @@ package gago
 
 import "testing"
 
-func TestFloatFunction(t *testing.T) {
-	var ff = FloatFunction{func(X []float64) float64 {
+func TestFloat64Function(t *testing.T) {
+	var ff = Float64Function{func(X []float64) float64 {
 		sum := 0.0
 		for _, x := range X {
 			sum += x

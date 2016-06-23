@@ -80,11 +80,14 @@ func main() {
 	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
-	for i := 0; i < 2000; i++ {
+	for i := 0; i < 1000; i++ {
 		ga.Enhance()
 	}
 	fmt.Println(ga.Best.Fitness)
 	// Extract the genome of the best individual
-	var points = ga.Best.Genome.CastString()
+	var points = make([]string, len(names))
+	for i, gene := range ga.Best.Genome {
+		points[i] = gene.(string)
+	}
 	graph(points)
 }
