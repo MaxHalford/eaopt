@@ -68,3 +68,68 @@ func TestIndividualsSort(t *testing.T) {
 		}
 	}
 }
+
+func TestGetFitnesses(t *testing.T) {
+	var (
+		indis = Individuals{
+			Individual{nil, 0.0, 0, "a"},
+			Individual{nil, 1.0, 0, "b"},
+			Individual{nil, 2.0, 0, "c"},
+		}
+		target    = []float64{0.0, 1.0, 2.0}
+		fitnesses = indis.getFitnesses()
+	)
+	for i, fitness := range fitnesses {
+		if fitness != target[i] {
+			t.Error("getFitnesses didn't work as expected")
+		}
+	}
+}
+
+func TestFitnessMean(t *testing.T) {
+	var testCases = []struct {
+		indis Individuals
+		mean  float64
+	}{
+		{Individuals{
+			Individual{nil, 1.0, 0, "a"},
+		}, 1.0},
+		{Individuals{
+			Individual{nil, 1.0, 0, "a"},
+			Individual{nil, 2.0, 0, "b"},
+		}, 1.5},
+		{Individuals{
+			Individual{nil, -1.0, 0, "a"},
+			Individual{nil, 1.0, 0, "b"},
+		}, 0.0},
+	}
+	for _, testCase := range testCases {
+		if testCase.indis.FitnessMean() != testCase.mean {
+			t.Error("FitnessMean didn't work as expected")
+		}
+	}
+}
+
+func TestFitnessVariance(t *testing.T) {
+	var testCases = []struct {
+		indis    Individuals
+		variance float64
+	}{
+		{Individuals{
+			Individual{nil, 1.0, 0, "a"},
+		}, 0.0},
+		{Individuals{
+			Individual{nil, -1.0, 0, "a"},
+			Individual{nil, 1.0, 0, "b"},
+		}, 1.0},
+		{Individuals{
+			Individual{nil, -2.0, 0, "a"},
+			Individual{nil, 2.0, 0, "b"},
+		}, 4.0},
+	}
+	for _, testCase := range testCases {
+		if testCase.indis.FitnessVar() != testCase.variance {
+			t.Error("FitnessVar didn't work as expected")
+		}
+	}
+}

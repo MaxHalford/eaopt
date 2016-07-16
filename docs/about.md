@@ -94,8 +94,9 @@ gago is designed with flexibility in mind. The fact is that there isn't "a" gene
 ## Why use gago?
 
 - It's architectured in a modular way.
+- It allows using different evolutionary models.
 - It's ambitious in the sense that it wants to implement every kind of operator possible.
-- It's easy to add custom models and operators.
+- It allows implementing custom genetic operators.
 - It makes it possible to use speciation.
 - It makes it possible to run multiple populations in parallel (and to add migration).
 - It's open to suggestions and to improvements.

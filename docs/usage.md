@@ -44,8 +44,8 @@ To modify the behavior off the GA, you can change the `gago.GA` struct before ru
 
 | Variable in the code   | Type                      | Description                                                      |
 |------------------------|---------------------------|------------------------------------------------------------------|
-| `NbPopulations`              | `int`                     | Number of Populations in the GA                               |
-| `NbIndividuals`        | `int`                     | Number of individuals in each population                              |
+| `NbrPopulations`              | `int`                     | Number of Populations in the GA                               |
+| `NbrIndividuals`        | `int`                     | Number of individuals in each population                              |
 | `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual                        |
 | `Model` (struct)    | `Model` (interface)    | Model for applying genetic operators |
 | `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the populations             |
@@ -72,5 +72,5 @@ The only requirement for solving a problem is that the problem itself can be mod
 - Don't hesitate to add more populations if you have a multi-core machine, the overhead is very small.
 - Consider the fact that most of the computation is for evaluating the fitness function.
 - Increasing the number of selected parents (`NbParents`) during selection usually increases the converrngce rate (which is not necessarily good, but is sometimes desired).
-- Increasing the number of individuals per population (`NbIndividuals`) adds variety to the genetic algorithm, however it is more costly.
+- Increasing the number of individuals per population (`NbrIndividuals`) adds variety to the genetic algorithm, however it is more costly.
 - You can access the GA's `duration` attribute or implement your own stopwatch to enhance the GA for a fixed duration.

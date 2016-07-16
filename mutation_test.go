@@ -28,7 +28,7 @@ func TestPotentMutators(t *testing.T) {
 		indi    = makeIndividual(nbGenes, rng)
 		init    = InitUniformF{-5.0, 5.0}
 	)
-	init.apply(&indi, rng)
+	init.Apply(&indi, rng)
 	var genome = make([]interface{}, len(indi.Genome))
 	copy(genome, indi.Genome)
 	// Probability to mutate is equal to 1

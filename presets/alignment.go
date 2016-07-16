@@ -7,9 +7,9 @@ import "github.com/MaxHalford/gago"
 // belonging to a corpus of elements.
 func Alignment(length int, corpus []string, distance func([]string) float64) gago.GA {
 	return gago.GA{
-		NbPopulations: 2,
-		NbIndividuals: 30,
-		NbGenes:       length,
+		NbrPopulations: 2,
+		NbrIndividuals: 30,
+		NbrGenes:       length,
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
