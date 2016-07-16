@@ -98,6 +98,15 @@ func TestValidationFf(t *testing.T) {
 	ga.Ff = ff
 }
 
+func TestValidationModel(t *testing.T) {
+	// Check presence of model
+	ga.Model = nil
+	if ga.Validate() == nil {
+		t.Error("Nil model didn't return an error")
+	}
+	ga.Model = model
+}
+
 func TestValidationInit(t *testing.T) {
 	// Check presence of initializer
 	ga.Initializer = nil
