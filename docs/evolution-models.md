@@ -1,4 +1,4 @@
-There are numerous variants of the genetic algorithm. We attempt to make our implementation as generic as possible. Our implementation is based on the GA described in "Evolutionary algorithms in theory and practice". It is also very similar to the GA described in "Evolution in time and space", but we use tournament selection instead of proportional selection, and we use elitism.
+There are numerous variants of the genetic algorithm. gago is genetic enough so as to make it possible to easy use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does without considering whatsoever the underlying operators. In a nutshell, an evolution model attemps to mimic evolution in the real world. It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA.
 
 ## Generational model
 
@@ -36,7 +36,7 @@ replace population with offsprings
 
 ## Steady state model
 
-This GA is steady state meaning that there are no generations. It differs from the generic GA in that tournament selection does not replace the selected individuals in the population, and instead of adding the children of the selected parents into the next generation, the two best individuals out of the two parents and two children are added back into the population so that the population size remains constant.
+The steady state model differs from the generational model in that the entire population isn't replaced between each generations. Instead of adding the children of the selected parents into the next generation, the two best individuals out of the two parents and two children are added back into the population so that the population size remains constant.
 
 P <- generate a population of individuals randomly
 while stopping criterion has not been met:

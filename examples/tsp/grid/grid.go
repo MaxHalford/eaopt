@@ -22,7 +22,7 @@ func euclidian(a, b point) float64 {
 }
 
 var (
-	size   = 10
+	size   = 6
 	points = make(map[string]point)
 )
 
@@ -71,7 +71,7 @@ func main() {
 	var ga = presets.TSP(names, distance)
 	ga.Initialize()
 	// Enhance
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1000; i++ {
 		ga.Enhance()
 	}
 	var optimal = float64((size + 1) * (size - 1))

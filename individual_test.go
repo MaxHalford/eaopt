@@ -9,13 +9,13 @@ import (
 
 func TestIndividualsSample(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
+		src       = rand.NewSource(time.Now().UnixNano())
+		rng       = rand.New(src)
 		nbIndis   = 5
 		nbGenes   = 4
-		indis     = makeIndividuals(nbIndis, nbGenes)
+		indis     = makeIndividuals(nbIndis, nbGenes, rng)
 		size      = 3
-		_, sample = indis.sample(size, generator)
+		_, sample = indis.sample(size, rng)
 	)
 	// Check the size of the sample
 	if len(sample) != size {
@@ -51,7 +51,9 @@ func TestIndividualsSort(t *testing.T) {
 	var (
 		nbIndis = 5
 		nbGenes = 4
-		indis   = makeIndividuals(nbIndis, nbGenes)
+		src     = rand.NewSource(time.Now().UnixNano())
+		rng     = rand.New(src)
+		indis   = makeIndividuals(nbIndis, nbGenes, rng)
 	)
 	// Assign fitness in decreasing order
 	for i := range indis {

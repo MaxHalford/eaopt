@@ -3,6 +3,7 @@ package gago
 import (
 	"errors"
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -92,7 +93,7 @@ func (ga *GA) Initialize() {
 	}
 	wg.Wait()
 	// Best individual (dummy initialization)
-	ga.Best = makeIndividual(ga.NbGenes)
+	ga.Best = makeIndividual(ga.NbGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
 	// Find the best individual
 	ga.findBest()
 }
