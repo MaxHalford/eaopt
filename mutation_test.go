@@ -22,18 +22,18 @@ var mutators = []Mutator{
 
 func TestPotentMutators(t *testing.T) {
 	var (
-		nbGenes   = 4
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		indi      = makeIndividual(nbGenes)
-		init      = InitUniformF{-5.0, 5.0}
+		nbGenes = 4
+		src     = rand.NewSource(time.Now().UnixNano())
+		rng     = rand.New(src)
+		indi    = makeIndividual(nbGenes, rng)
+		init    = InitUniformF{-5.0, 5.0}
 	)
-	init.apply(&indi, generator)
+	init.apply(&indi, rng)
 	var genome = make([]interface{}, len(indi.Genome))
 	copy(genome, indi.Genome)
 	// Probability to mutate is equal to 1
 	for _, mutator := range mutators {
-		mutator.Apply(&indi, generator)
+		mutator.Apply(&indi, rng)
 		// Check the genome is still the same size
 		if len(indi.Genome) != nbGenes {
 			t.Error("Genome size was changed after mutation")

@@ -17,6 +17,7 @@ type Individual struct {
 	Genome  Genome
 	Fitness float64
 	Age     int
+	Name    string
 }
 
 // Evaluate the fitness of an individual.
@@ -29,11 +30,12 @@ func (indi *Individual) evaluate(ff FitnessFunction) {
 }
 
 // Generate a new individual.
-func makeIndividual(nbGenes int) Individual {
+func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
 	return Individual{
 		Genome:  make([]interface{}, nbGenes),
 		Fitness: math.Inf(1),
 		Age:     0,
+		Name:    randomName(6, rng),
 	}
 }
 
@@ -48,10 +50,10 @@ func (indis Individuals) evaluate(ff FitnessFunction) {
 }
 
 // Generate a slice of new individuals.
-func makeIndividuals(nbIndis, nbGenes int) Individuals {
+func makeIndividuals(nbIndis, nbGenes int, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, nbIndis)
 	for i := range indis {
-		indis[i] = makeIndividual(nbGenes)
+		indis[i] = makeIndividual(nbGenes, rng)
 	}
 	return indis
 }
@@ -66,50 +68,33 @@ func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], in
 // Convenience method for calling the Sort method of the sort package
 func (indis Individuals) sort() { sort.Sort(indis) }
 
-// Sample n unique individuals from a slice of individuals
-func (indis Individuals) sample(n int, generator *rand.Rand) ([]int, Individuals) {
+// Sample k unique individuals from a slice of n individuals.
+func (indis Individuals) sample(k int, rng *rand.Rand) ([]int, Individuals) {
 	var (
-		sample  = make(Individuals, n)
-		indexes = generator.Perm(len(indis))[:n]
+		indexes, _ = randomInts(k, 0, len(indis), rng)
+		sample     = make(Individuals, k)
 	)
-	for i, j := range indexes {
-		sample[i] = indis[j]
+	for i := 0; i < k; i++ {
+		sample[i] = indis[indexes[i]]
 	}
 	return indexes, sample
 }
 
-// FitnessMean returns the average fitness of the individuals.
-func (indis Individuals) FitnessMean() float64 {
+// Extract the fitness of a slice of individuals into a float64 slice.
+func (indis Individuals) getFitnesses() []float64 {
 	var fitnesses = make([]float64, len(indis))
 	for i, indi := range indis {
 		fitnesses[i] = indi.Fitness
 	}
-	return mean(fitnesses)
+	return fitnesses
 }
 
-// FitnessStd returns the individuals fitness standard deviation.
-func (indis Individuals) FitnessStd() float64 {
-	var sumSquares = make([]float64, len(indis))
-	for i, indi := range indis {
-		sumSquares[i] = math.Pow(indi.Fitness, 2)
-	}
-	return math.Sqrt(mean(sumSquares) - math.Pow(indis.FitnessMean(), 2))
+// FitnessMean returns the average fitness of a slice of individuals.
+func (indis Individuals) FitnessMean() float64 {
+	return mean(indis.getFitnesses())
 }
 
-// AgeMean returns the average age of the individuals.
-func (indis Individuals) AgeMean() float64 {
-	var ages = make([]float64, len(indis))
-	for i, indi := range indis {
-		ages[i] = float64(indi.Age)
-	}
-	return mean(ages)
-}
-
-// AgeStd returns the individuals age standard deviation.
-func (indis Individuals) AgeStd() float64 {
-	var sumSquares = make([]float64, len(indis))
-	for i, indi := range indis {
-		sumSquares[i] = math.Pow(float64(indi.Age), 2)
-	}
-	return math.Sqrt(mean(sumSquares) - math.Pow(indis.AgeMean(), 2))
+// FitnessVar returns the variance of the fitness of a slice of individuals.
+func (indis Individuals) FitnessVar() float64 {
+	return variance(indis.getFitnesses())
 }

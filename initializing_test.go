@@ -9,14 +9,14 @@ import (
 
 func TestFloatUniform(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		indi      = makeIndividual(4)
-		lower     = -5.0
-		upper     = 5.0
-		init      = InitUniformF{lower, upper}
+		src   = rand.NewSource(time.Now().UnixNano())
+		rng   = rand.New(src)
+		indi  = makeIndividual(4, rng)
+		lower = -5.0
+		upper = 5.0
+		init  = InitUniformF{lower, upper}
 	)
-	init.apply(&indi, generator)
+	init.apply(&indi, rng)
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
 		// Check if gene has changed
@@ -32,15 +32,15 @@ func TestFloatUniform(t *testing.T) {
 
 func TestFloatGaussian(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		nbGenes   = 4
-		indi      = makeIndividual(nbGenes)
-		mean      = 0.0
-		std       = 1.0
-		init      = InitGaussianF{mean, std}
+		src     = rand.NewSource(time.Now().UnixNano())
+		rng     = rand.New(src)
+		nbGenes = 4
+		indi    = makeIndividual(nbGenes, rng)
+		mean    = 0.0
+		std     = 1.0
+		init    = InitGaussianF{mean, std}
 	)
-	init.apply(&indi, generator)
+	init.apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
@@ -52,14 +52,14 @@ func TestFloatGaussian(t *testing.T) {
 
 func TestStringUniform(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		nbGenes   = 4
-		indi      = makeIndividual(nbGenes)
-		alphabet  = []string{"T", "E", "S", "T"}
-		init      = InitUniformS{alphabet}
+		src      = rand.NewSource(time.Now().UnixNano())
+		rng      = rand.New(src)
+		nbGenes  = 4
+		indi     = makeIndividual(nbGenes, rng)
+		alphabet = []string{"T", "E", "S", "T"}
+		init     = InitUniformS{alphabet}
 	)
-	init.apply(&indi, generator)
+	init.apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(string)
@@ -71,14 +71,14 @@ func TestStringUniform(t *testing.T) {
 
 func TestStringUnique(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		alphabet  = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
-		nbGenes   = len(alphabet)
-		indi      = makeIndividual(nbGenes)
-		init      = InitUniqueS{alphabet}
+		src      = rand.NewSource(time.Now().UnixNano())
+		rng      = rand.New(src)
+		alphabet = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
+		nbGenes  = len(alphabet)
+		indi     = makeIndividual(nbGenes, rng)
+		init     = InitUniqueS{alphabet}
 	)
-	init.apply(&indi, generator)
+	init.apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(string)

@@ -9,17 +9,18 @@ markdown_extensions:
   - fenced_code
   - tables
 
-maxdepth: 2
-
 pages:
 - Home: index.md
 - About: about.md
+- Usage: usage.md
 - Evolution models: evolution-models.md
 - Presets: presets.md
-- Extending gago: extending.md
 - Examples: examples.md
 - Contributing: contributing.md
 
+repo_url: https://github.com/MaxHalford/gago
+site_author: Max Halford
+site_description: Genetic algorithm framework written in Go
 site_name: gago
 
 theme: readthedocs

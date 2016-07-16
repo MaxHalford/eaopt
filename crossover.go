@@ -6,11 +6,9 @@ import (
 )
 
 // Crossover generates new individuals called "offsprings" are by mixing the
-// genomes of a sample group of individuals. Instead of using the same sample
-// for generating each offspring, each crossover resamples the population in
-// order to preserve diversity.
+// genomes of two parents.
 type Crossover interface {
-	Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals
+	Apply(p1 Individual, p2 Individual, rng *rand.Rand) (o1 Individual, o2 Individual)
 }
 
 // CrossPoint selects identical random points on each parent's genome and
@@ -21,41 +19,33 @@ type CrossPoint struct {
 }
 
 // Apply n-point crossover.
-func (cross CrossPoint) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
+func (cross CrossPoint) Apply(p1 Individual, p2 Individual, rng *rand.Rand) (Individual, Individual) {
+	// Choose n random points along the genome
 	var (
-		// Choose two individuals at random
-		_, parents = sel.Apply(2, indis, generator)
-		// Choose n random points along the genome
-		points = generator.Perm(len(parents[0].Genome))[:cross.NbPoints]
+		points, _ = randomInts(cross.NbPoints, 0, len(p1.Genome), rng)
+		nbGenes   = len(p1.Genome)
+		o1        = makeIndividual(nbGenes, rng)
+		o2        = makeIndividual(nbGenes, rng)
+		// Use a switch to know which parent to copy onto each offspring
+		s = true
 	)
 	// Sort the points
 	sort.Ints(points)
 	// Add the start and end of the genome points
 	points = append([]int{0}, points...)
-	points = append(points, len(parents[0].Genome))
-	// Create offsprings
-	var (
-		nbGenes    = len(parents[0].Genome)
-		offsprings = makeIndividuals(len(parents), nbGenes)
-		// Use switching indexes to know which parent's genome to copy
-		a = 0
-		b = 1
-	)
+	points = append(points, nbGenes)
 	for i := 0; i < len(points)-1; i++ {
-		// Copy the first parent's segment onto the first offspring's segment
-		copy(
-			offsprings[0].Genome[points[i]:points[i+1]],
-			parents[a].Genome[points[i]:points[i+1]],
-		)
-		// Copy the second parent's segment onto the second offspring's segment
-		copy(
-			offsprings[1].Genome[points[i]:points[i+1]],
-			parents[b].Genome[points[i]:points[i+1]],
-		)
+		if s {
+			copy(o1.Genome[points[i]:points[i+1]], p1.Genome[points[i]:points[i+1]])
+			copy(o2.Genome[points[i]:points[i+1]], p2.Genome[points[i]:points[i+1]])
+		} else {
+			copy(o1.Genome[points[i]:points[i+1]], p2.Genome[points[i]:points[i+1]])
+			copy(o2.Genome[points[i]:points[i+1]], p1.Genome[points[i]:points[i+1]])
+		}
 		// Alternate for the new copying
-		a, b = b, a
+		s = !true
 	}
-	return offsprings
+	return o1, o2
 }
 
 // CrossUniformF crossover combines two individuals (the parents) into one
@@ -66,22 +56,20 @@ func (cross CrossPoint) Apply(indis Individuals, sel Selector, generator *rand.R
 type CrossUniformF struct{}
 
 // Apply uniform float crossover.
-func (cross CrossUniformF) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
+func (cross CrossUniformF) Apply(p1 Individual, p2 Individual, rng *rand.Rand) (Individual, Individual) {
 	var (
-		_, parents = sel.Apply(2, indis, generator)
-		mother     = parents[0]
-		father     = parents[1]
-		nbGenes    = len(mother.Genome)
-		offsprings = makeIndividuals(len(parents), nbGenes)
+		nbGenes = len(p1.Genome)
+		o1      = makeIndividual(nbGenes, rng)
+		o2      = makeIndividual(nbGenes, rng)
 	)
 	// For every gene
 	for i := 0; i < nbGenes; i++ {
 		// Pick a random number between 0 and 1
-		var p = generator.Float64()
-		offsprings[0].Genome[i] = p*mother.Genome[i].(float64) + (1-p)*father.Genome[i].(float64)
-		offsprings[1].Genome[i] = (1-p)*mother.Genome[i].(float64) + p*father.Genome[i].(float64)
+		var p = rng.Float64()
+		o1.Genome[i] = p*p1.Genome[i].(float64) + (1-p)*p2.Genome[i].(float64)
+		o2.Genome[i] = (1-p)*p1.Genome[i].(float64) + p*p2.Genome[i].(float64)
 	}
-	return offsprings
+	return o1, o2
 }
 
 // CrossProportionateF crossover combines any number of individuals. Each of the
@@ -96,30 +84,6 @@ type CrossProportionateF struct {
 	NbParents int
 }
 
-// Apply proportionate float crossover.
-func (cross CrossProportionateF) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
-	var (
-		_, parents = sel.Apply(cross.NbParents, indis, generator)
-		nbGenes    = len(parents[0].Genome)
-		offspring  = makeIndividual(nbGenes)
-	)
-	// For every gene in the parent's genome
-	for i := range offspring.Genome {
-		var (
-			// Weight of each individual in the crossover
-			weights = generateWeights(len(indis))
-			// Create the new gene as the product of the individuals' genes
-			gene float64
-		)
-		for j := range parents {
-			gene += parents[j].Genome[i].(float64) * weights[j]
-		}
-		// Assign the new gene to the offspring
-		offspring.Genome[i] = gene
-	}
-	return Individuals{offspring}
-}
-
 // CrossPMX (Partially Mapped Crossover) randomly picks a crossover point. The
 // offsprings are generated by copying one of the parents and then copying the
 // other parent's values up to the crossover point. Each gene that is replaced
@@ -131,30 +95,30 @@ func (cross CrossProportionateF) Apply(indis Individuals, sel Selector, generato
 type CrossPMX struct{}
 
 // Apply partially mixed crossover.
-func (c CrossPMX) Apply(indis Individuals, sel Selector, generator *rand.Rand) Individuals {
+func (c CrossPMX) Apply(p1 Individual, p2 Individual, rng *rand.Rand) (Individual, Individual) {
 	var (
-		_, parents = sel.Apply(2, indis, generator)
-		nbGenes    = len(parents[0].Genome)
-		offsprings = makeIndividuals(len(parents), nbGenes)
+		nbGenes = len(p1.Genome)
+		o1      = makeIndividual(nbGenes, rng)
+		o2      = makeIndividual(nbGenes, rng)
 	)
-	copy(offsprings[0].Genome, parents[0].Genome)
-	copy(offsprings[1].Genome, parents[1].Genome)
+	copy(o1.Genome, p1.Genome)
+	copy(o2.Genome, p2.Genome)
 	// Choose a random crossover point p such that 0 < p < (nbGenes - 1)
 	var (
-		p = generator.Intn(nbGenes-2) + 1
+		p = rng.Intn(nbGenes-2) + 1
 		a int
 		b int
 	)
 	// Paste the father's genome up to the crossover point
 	for i := 0; i < p; i++ {
 		// Find where the second parent's gene is in the first offspring's genome
-		a = getIndex(parents[1].Genome[i], offsprings[0].Genome)
+		a = getIndex(p2.Genome[i], o1.Genome)
 		// Swap the genes
-		offsprings[0].Genome[a], offsprings[0].Genome[i] = offsprings[0].Genome[i], parents[1].Genome[i]
+		o1.Genome[a], o1.Genome[i] = o1.Genome[i], p2.Genome[i]
 		// Find where the first parent's gene is in the second offspring's genome
-		b = getIndex(parents[0].Genome[i], offsprings[1].Genome)
+		b = getIndex(p1.Genome[i], o2.Genome)
 		// Swap the genes
-		offsprings[1].Genome[b], offsprings[1].Genome[i] = offsprings[1].Genome[i], parents[0].Genome[i]
+		o2.Genome[b], o2.Genome[i] = o2.Genome[i], p1.Genome[i]
 	}
-	return offsprings
+	return o1, o2
 }

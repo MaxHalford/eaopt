@@ -81,7 +81,7 @@ func main() {
 	ga.Initialize()
 	// Enhance
 	for i := 0; i < 10000; i++ {
-		fmt.Println(ga.Best.Fitness)
+		fmt.Println(gag.Best.Fitness)
 		ga.Enhance()
 	}
 	// Extract the genome of the best individual
