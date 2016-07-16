@@ -10,34 +10,34 @@ import (
 
 // A GA contains population which themselves contain individuals.
 type GA struct {
-	NbPopulations int // Number of populations
-	NbIndividuals int // Initial number of individuals in each population
-	NbGenes       int // Number of genes in each individual (imposed by the problem)
-	Populations   []Population
-	Best          Individual      // Overall best individual (dummy initialization at the beginning)
-	Ff            FitnessFunction // Fitness function to evaluate individuals (imposed by the problem)
-	Initializer   Initializer
-	Model         Model
-	Migrator      Migrator
-	MigFrequency  int // Migration frequency
-	Generations   int
-	Duration      time.Duration
+	NbrPopulations int // Number of populations
+	NbrIndividuals int // Initial number of individuals in each population
+	NbrGenes       int // Number of genes in each individual (imposed by the problem)
+	Populations    []Population
+	Best           Individual      // Overall best individual (dummy initialization at the beginning)
+	Ff             FitnessFunction // Fitness function to evaluate individuals (imposed by the problem)
+	Initializer    Initializer
+	Model          Model
+	Migrator       Migrator
+	MigFrequency   int // Migration frequency
+	Generations    int
+	Duration       time.Duration
 }
 
 // Validate the parameters of a GA to ensure it will run correctly. Some
 // settings or combination of settings may be incoherent during runtime.
 func (ga *GA) Validate() error {
 	// Check the number of populations
-	if ga.NbPopulations < 1 {
-		return errors.New("'NbPopulations' should be higher or equal to 1")
+	if ga.NbrPopulations < 1 {
+		return errors.New("'NbrPopulations' should be higher or equal to 1")
 	}
 	// Check the number of individuals
-	if ga.NbIndividuals < 2 {
-		return errors.New("'NbIndividuals' should be higher or equal to 2")
+	if ga.NbrIndividuals < 2 {
+		return errors.New("'NbrIndividuals' should be higher or equal to 2")
 	}
 	// Check the number of genes
-	if ga.NbGenes < 1 {
-		return errors.New("'NbGenes' should be higher or equal to 1")
+	if ga.NbrGenes < 1 {
+		return errors.New("'NbrGenes' should be higher or equal to 1")
 	}
 	// Check the fitness function presence
 	if ga.Ff == nil {
@@ -77,14 +77,14 @@ func (ga *GA) Initialize() {
 	ga.Generations = 0
 	ga.Duration = 0
 	// Create the populations
-	ga.Populations = make([]Population, ga.NbPopulations)
+	ga.Populations = make([]Population, ga.NbrPopulations)
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(ga.NbIndividuals, ga.NbGenes, ga.Initializer)
+			ga.Populations[j] = makePopulation(ga.NbrIndividuals, ga.NbrGenes, ga.Ff, ga.Initializer)
 			// Evaluate it's individuals
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
 			// Sort it's individuals
@@ -93,7 +93,7 @@ func (ga *GA) Initialize() {
 	}
 	wg.Wait()
 	// Best individual (dummy initialization)
-	ga.Best = makeIndividual(ga.NbGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
+	ga.Best = makeIndividual(ga.NbrGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
 	// Find the best individual
 	ga.findBest()
 }
@@ -118,7 +118,7 @@ func (ga *GA) Enhance() {
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
 	// generation count
-	if ga.NbPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+	if ga.NbrPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations)
 	}
 	// Use a wait group to enhance the populations in parallel

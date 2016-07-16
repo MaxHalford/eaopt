@@ -16,7 +16,7 @@ func TestFloatUniform(t *testing.T) {
 		upper = 5.0
 		init  = InitUniformF{lower, upper}
 	)
-	init.apply(&indi, rng)
+	init.Apply(&indi, rng)
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
 		// Check if gene has changed
@@ -40,7 +40,7 @@ func TestFloatGaussian(t *testing.T) {
 		std     = 1.0
 		init    = InitGaussianF{mean, std}
 	)
-	init.apply(&indi, rng)
+	init.Apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(float64)
@@ -59,7 +59,7 @@ func TestStringUniform(t *testing.T) {
 		alphabet = []string{"T", "E", "S", "T"}
 		init     = InitUniformS{alphabet}
 	)
-	init.apply(&indi, rng)
+	init.Apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(string)
@@ -78,7 +78,7 @@ func TestStringUnique(t *testing.T) {
 		indi     = makeIndividual(nbGenes, rng)
 		init     = InitUniqueS{alphabet}
 	)
-	init.apply(&indi, rng)
+	init.Apply(&indi, rng)
 	// Check if genome has changed
 	for _, gene := range indi.Genome {
 		var _, err = gene.(string)
