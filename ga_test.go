@@ -140,8 +140,8 @@ func TestSizes(t *testing.T) {
 func TestGenerators(t *testing.T) {
 	for i := range ga.Populations {
 		for j := i + 1; j < len(ga.Populations); j++ {
-			if &ga.Populations[i].generator == &ga.Populations[j].generator {
-				t.Error("population share generator")
+			if &ga.Populations[i].rng == &ga.Populations[j].rng {
+				t.Error("population share random number generators")
 			}
 		}
 	}
@@ -195,5 +195,11 @@ func TestDuration(t *testing.T) {
 	}
 	if totalDuration < ga.Duration {
 		t.Error("Inefficient parallelism")
+	}
+}
+
+func BenchmarkEnhance(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ga.Enhance()
 	}
 }

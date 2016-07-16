@@ -11,12 +11,12 @@ type tspMutator struct{}
 var permute = gago.MutPermute{Max: 3}
 var splice = gago.MutSplice{}
 
-func (tspmut tspMutator) Apply(indi *gago.Individual, generator *rand.Rand) {
-	if generator.Float64() < 0.35 {
-		permute.Apply(indi, generator)
+func (tspmut tspMutator) Apply(indi *gago.Individual, rng *rand.Rand) {
+	if rng.Float64() < 0.35 {
+		permute.Apply(indi, rng)
 	}
-	if generator.Float64() < 0.45 {
-		splice.Apply(indi, generator)
+	if rng.Float64() < 0.45 {
+		splice.Apply(indi, rng)
 	}
 }
 
@@ -25,7 +25,7 @@ func (tspmut tspMutator) Apply(indi *gago.Individual, generator *rand.Rand) {
 // function.
 func TSP(places []string, distance func([]string) float64) gago.GA {
 	return gago.GA{
-		NbPopulations: 2,
+		NbPopulations: 1,
 		NbIndividuals: 100,
 		NbGenes:       len(places),
 		Ff: gago.StringFunction{

@@ -10,27 +10,30 @@ var crossovers = []struct {
 	crossover Crossover
 	init      Initializer
 }{
-	{CrossPoint{}, InitUniformF{-5.0, 5.0}},
+	{CrossPoint{NbPoints: 2}, InitUniformF{-5.0, 5.0}},
 	{CrossUniformF{}, InitUniformF{-5.0, 5.0}},
-	{CrossProportionateF{NbParents: 2}, InitUniformF{-5.0, 5.0}},
 	{CrossPMX{}, InitUniqueS{[]string{"A", "B", "C", "D"}}},
 }
 
 func TestCrossovers(t *testing.T) {
 	var (
-		source    = rand.NewSource(time.Now().UnixNano())
-		generator = rand.New(source)
-		nbIndis   = 5
-		nbGenes   = 4
-		selector  = SelTournament{2}
+		src      = rand.NewSource(time.Now().UnixNano())
+		rng      = rand.New(src)
+		nbIndis  = 5
+		nbGenes  = 4
+		selector = SelTournament{2}
 	)
 	for _, c := range crossovers {
-		var indis = makeIndividuals(nbIndis, nbGenes)
+		var indis = makeIndividuals(nbIndis, nbGenes, rng)
 		// Assign genomes
 		for _, indi := range indis {
-			c.init.apply(&indi, generator)
+			c.init.apply(&indi, rng)
 		}
-		var offsprings = c.crossover.Apply(indis, selector, generator)
+		var (
+			parents, _             = selector.Apply(2, indis, rng)
+			offspring1, offspring2 = c.crossover.Apply(parents[0], parents[1], rng)
+			offsprings             = Individuals{offspring1, offspring2}
+		)
 		// Check the offspring has a valid genome
 		for _, offspring := range offsprings {
 			if len(offspring.Genome) != nbGenes {
