@@ -6,9 +6,9 @@ import "github.com/MaxHalford/gago"
 // functions with a given number of variables.
 func Float(n int, function func([]float64) float64) gago.GA {
 	return gago.GA{
-		NbPopulations: 2,
-		NbIndividuals: 30,
-		NbGenes:       n,
+		NbrPopulations: 2,
+		NbrIndividuals: 30,
+		NbrGenes:       n,
 		Ff: gago.Float64Function{
 			Image: function,
 		},

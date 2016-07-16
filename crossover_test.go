@@ -27,7 +27,7 @@ func TestCrossovers(t *testing.T) {
 		var indis = makeIndividuals(nbIndis, nbGenes, rng)
 		// Assign genomes
 		for _, indi := range indis {
-			c.init.apply(&indi, rng)
+			c.init.Apply(&indi, rng)
 		}
 		var (
 			parents, _             = selector.Apply(2, indis, rng)

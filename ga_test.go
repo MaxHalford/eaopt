@@ -41,9 +41,9 @@ var (
 )
 
 func init() {
-	ga.NbPopulations = nbPopulations
-	ga.NbIndividuals = nbIndividuals
-	ga.NbGenes = nbGenes
+	ga.NbrPopulations = nbPopulations
+	ga.NbrIndividuals = nbIndividuals
+	ga.NbrGenes = nbGenes
 	ga.Initializer = initializer
 	ga.Ff = ff
 	ga.Model = model
@@ -62,31 +62,31 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationNbPopulations(t *testing.T) {
+func TestValidationNbrPopulations(t *testing.T) {
 	// Check invalid number of population
-	ga.NbPopulations = 0
+	ga.NbrPopulations = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of populations didn't return an error")
 	}
-	ga.NbPopulations = nbIndividuals
+	ga.NbrPopulations = nbIndividuals
 }
 
-func TestValidationNbIndividuals(t *testing.T) {
+func TestValidationNbrIndividuals(t *testing.T) {
 	// Check invalid number of individuals
-	ga.NbIndividuals = 1
+	ga.NbrIndividuals = 1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of individuals didn't return an error")
 	}
-	ga.NbIndividuals = nbIndividuals
+	ga.NbrIndividuals = nbIndividuals
 }
 
-func TestValidationNbGenes(t *testing.T) {
+func TestValidationNbrGenes(t *testing.T) {
 	// Check invalid number of genes
-	ga.NbGenes = 0
+	ga.NbrGenes = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of genes didn't return an error")
 	}
-	ga.NbGenes = nbGenes
+	ga.NbrGenes = nbGenes
 }
 
 func TestValidationFf(t *testing.T) {

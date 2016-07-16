@@ -8,8 +8,10 @@ import (
 
 type tspMutator struct{}
 
-var permute = gago.MutPermute{Max: 3}
-var splice = gago.MutSplice{}
+var (
+	permute = gago.MutPermute{Max: 3}
+	splice  = gago.MutSplice{}
+)
 
 func (tspmut tspMutator) Apply(indi *gago.Individual, rng *rand.Rand) {
 	if rng.Float64() < 0.35 {
@@ -25,9 +27,9 @@ func (tspmut tspMutator) Apply(indi *gago.Individual, rng *rand.Rand) {
 // function.
 func TSP(places []string, distance func([]string) float64) gago.GA {
 	return gago.GA{
-		NbPopulations: 1,
-		NbIndividuals: 100,
-		NbGenes:       len(places),
+		NbrPopulations: 1,
+		NbrIndividuals: 100,
+		NbrGenes:       len(places),
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
