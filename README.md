@@ -44,3 +44,4 @@
 
 <br/>
 
+For an introduction, example usage, contributing guidelines, please access the [**documentation**](https://godoc.org/github.com/MaxHalford/gago).

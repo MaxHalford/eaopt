@@ -77,7 +77,7 @@ func TestMean(t *testing.T) {
 	}{
 		{[]float64{1.0}, 1.0},
 		{[]float64{1.0, 2.0}, 1.5},
-		{[]float64{-1.0, 1}, 0.0},
+		{[]float64{-1.0, 1.0}, 0.0},
 	}
 	for _, testCase := range testCases {
 		if mean(testCase.values) != testCase.mean {

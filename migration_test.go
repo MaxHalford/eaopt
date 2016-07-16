@@ -16,6 +16,13 @@ func TestMigSizes(t *testing.T) {
 		}
 		populationSizes = []int{1, 2, 4}
 		nbIndis         = []int{1, 2, 10}
+		ff              = Float64Function{func(X []float64) float64 {
+			sum := 0.0
+			for _, x := range X {
+				sum += x
+			}
+			return sum
+		}}
 	)
 	for _, migrator := range migrators {
 		for _, size := range populationSizes {
@@ -23,7 +30,7 @@ func TestMigSizes(t *testing.T) {
 				// Instantiate populations
 				var pops = make([]Population, size)
 				for i := 0; i < size; i++ {
-					pops[i] = makePopulation(n, 2, initializer)
+					pops[i] = makePopulation(n, 2, ff, initializer)
 				}
 				// Apply the migration method
 				migrator.Apply(pops)
