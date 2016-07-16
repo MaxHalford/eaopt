@@ -44,5 +44,5 @@
 
 <br/>
 
-<div align="center">For an introduction, example usage, contributing guidelines, please refer to the <a href="http://gago.readthedocs.io/"><b>documentation</b></a></div>
+<div align="center">For an introduction, example usage, contributing guidelines, please refer to the <a href="http://gago.readthedocs.io/"><b>documentation</b></a>.</div>
 
