@@ -42,5 +42,7 @@
 
 <div align="center"><code>gago</code> is a <b>framework</b> written in <b>Go</b> for running <b>genetic algorithms</b></div>
 
-<div align="center">For an introduction, example usage, contributing guidelines, please refer to the [**documentation**](http://gago.readthedocs.io/).</div>
+<br/>
+
+<div align="center">For an introduction, example usage, contributing guidelines, please refer to the **[documentation](http://gago.readthedocs.io/)**.</div>
 
