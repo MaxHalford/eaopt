@@ -6,7 +6,7 @@ import "math/rand"
 // population. It applies to an individual level and instantiates it's genome gene by
 // gene.
 type Initializer interface {
-	apply(indi *Individual, generator *rand.Rand)
+	apply(indi *Individual, rng *rand.Rand)
 }
 
 // InitUniformF generates random floating points x such that lower < x < upper.
@@ -15,14 +15,14 @@ type InitUniformF struct {
 }
 
 // Apply the InitUniformF initializer.
-func (init InitUniformF) apply(indi *Individual, generator *rand.Rand) {
+func (init InitUniformF) apply(indi *Individual, rng *rand.Rand) {
 	for i := range indi.Genome {
 		var gene float64
 		// Decide if positive or negative
-		if generator.Float64() < 0.5 {
-			gene = generator.Float64() * init.Lower
+		if rng.Float64() < 0.5 {
+			gene = rng.Float64() * init.Lower
 		} else {
-			gene = generator.Float64() * init.Upper
+			gene = rng.Float64() * init.Upper
 		}
 		indi.Genome[i] = gene
 	}
@@ -35,9 +35,9 @@ type InitGaussianF struct {
 }
 
 // Apply the InitGaussianF initializer.
-func (init InitGaussianF) apply(indi *Individual, generator *rand.Rand) {
+func (init InitGaussianF) apply(indi *Individual, rng *rand.Rand) {
 	for i := range indi.Genome {
-		indi.Genome[i] = generator.NormFloat64()*init.Std + init.Mean
+		indi.Genome[i] = rng.NormFloat64()*init.Std + init.Mean
 	}
 }
 
@@ -47,9 +47,9 @@ type InitUniformS struct {
 }
 
 // Apply the InitUniformS initializer.
-func (init InitUniformS) apply(indi *Individual, generator *rand.Rand) {
+func (init InitUniformS) apply(indi *Individual, rng *rand.Rand) {
 	for i := range indi.Genome {
-		indi.Genome[i] = init.Corpus[generator.Intn(len(init.Corpus))]
+		indi.Genome[i] = init.Corpus[rng.Intn(len(init.Corpus))]
 	}
 }
 
@@ -63,8 +63,8 @@ type InitUniqueS struct {
 }
 
 // Apply the InitUniqueS initializer.
-func (init InitUniqueS) apply(indi *Individual, generator *rand.Rand) {
-	var strings = shuffleStrings(init.Corpus, generator)
+func (init InitUniqueS) apply(indi *Individual, rng *rand.Rand) {
+	var strings = shuffleStrings(init.Corpus, rng)
 	for i := range indi.Genome {
 		indi.Genome[i] = strings[i]
 	}

@@ -14,7 +14,7 @@ then it isn't possible to solve the problem with classical methods because there
 
 GAs make abstraction of how the problem is written. Instead, they ***only*** consider the input and the output of the problem. This is very important to understand. This way of thinking enables the potential solving of ***any*** problem. Indeed, a problem always has to have a set of candidate solutions (the input) and an associated response (the output).
 
-GAs use heuristics to explore the search space defined by the inputs in an intelligent manner. In this sense a genetic algorithm is a machine learning technique. Specifically GAs are inspired from natural evolution and intend to mimic the interaction between individuals in a population.
+GAs use heuristics to explore the search space defined by the inputs in an intellirngt manner. In this sense a genetic algorithm is a machine learning technique. Specifically GAs are inspired from natural evolution and intend to mimic the interaction between individuals in a population.
 
 !!! note "Note"
     Mathematical optimization techniques will usually outperform genetic algorithms if a function can be written mathematically. Genetic algorithms lose in power regarding potentially mathematically written functions because they don't suppose anything on the function itself.
@@ -81,10 +81,25 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## When to use genetic algorithms?
 
-Genetic algorithms are often a good solution to [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They usually perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently.
+Genetic algorithms are often a good solution to [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They usually perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intellirngtly.
 
 As mentionned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in neural networks is an open problem that doesn't yet have a reliable solution. Neural networks used in production are usually architectured by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, either by optimizing the network's topology or it's weights and biases.
 
 ## How is gago designed?
 
+> TLDR: gago gives you the freedom to tweak every single part of a genetic algorithm.
+
+gago is designed with flexibility in mind. The fact is that there isn't "a" genetic algorithm per say; a GA can take many shapes and different evolution models are suited for different problems. The main piece of the puzzle is defining a model that explicits how evolution happens throughout the GA. This is why there is a dedicated models section in the documentation. Once a model is chosen then one can begin to choose which operators to use. This is where gago shines, indeed it's extremely easy to consider operators as swapable blocks. This design makes it easy to iterate and to try out new combinations. On a side-note, this design make theoretically easy to run a GA on top of a GA, by considering that genetic operators are simply parameters to finding the optimal GA!
+
 ## Why use gago?
+
+- It's architectured in a modular way.
+- It's ambitious in the sense that it wants to implement every kind of operator possible.
+- It's easy to add custom models and operators.
+- It makes it possible to use speciation.
+- It makes it possible to run multiple populations in parallel (and to add migration).
+- It's open to suggestions and to improvements.
+- It's heavily commented.
+- It has no external dependencies.
+- It's got a high test coverage.
+- It's actively maintained and will remain one my priorities for a very long time.

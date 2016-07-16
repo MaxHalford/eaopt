@@ -1,7 +1,7 @@
 ![logo](img/logo.png)
 
 Apple
-:   Pomaceous fruit of plants of the genus Malus in
+:   Pomaceous fruit of plants of the rngus Malus in
     the family Rosaceae.
 
 !!! tip "Tip"
