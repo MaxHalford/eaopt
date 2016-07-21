@@ -24,9 +24,9 @@ for each individual of offsprings:
 replace population with offsprings
 ```
 
-### Operators
+### Parameters
 
-| Operator        | Presence |
+| Parameter       | Presence |
 |-----------------|----------|
 | Selector        | Required |
 | Crossover       | Required |
@@ -61,9 +61,9 @@ for each parent:
         mutate(parent)
 ```
 
-### Operators
+### Parameters
 
-| Operator        | Presence |
+| Parameter       | Presence |
 |-----------------|----------|
 | Selector        | Required |
 | Crossover       | Required |
@@ -91,9 +91,9 @@ for each individual of individuals:
         mutate(individual)
 ```
 
-### Operators
+### Parameters
 
-| Operator        | Presence |
+| Parameter       | Presence |
 |-----------------|----------|
 | NbrOffsprings   | Required |
 | SelectorA       | Required |
@@ -103,9 +103,9 @@ for each individual of individuals:
 | Mutation rate   | Optional |
 
 
-## Island ring
+## Ring model
 
-In the island ring model, each individual crosses over with its neighbor in a one-directional ring topology. One of the individuals out of offsprings or the original individual is selected to replace the original individual. Formally, an individual at position $i$ will crossover with it's neighbour at position $i+1$ and generates 2 offsprings. The last individual is connected to the first individual.
+In the ring model, each individual crosses over with its neighbor in a one-directional ring topology. One of the individuals out of offsprings or the original individual is selected to replace the original individual. Formally, an individual at position $i$ will crossover with it's neighbour at position $i+1$ and generates 2 offsprings. The last individual is connected to the first individual.
 
 ### Diagram
 
@@ -123,9 +123,9 @@ for each individual of individuals:
         mutate(individual)
 ```
 
-### Operators
+### Parameters
 
-| Operator        | Presence |
+| Parameter       | Presence |
 |-----------------|----------|
 | Selector        | Required |
 | Crossover       | Required |
@@ -133,61 +133,70 @@ for each individual of individuals:
 | Mutation rate   | Optional |
 
 
-## Lonely mutant
+## Simulated annealing
 
-In this algorithm, a single individual is initialized randomly. Mutation is applied and whenever the mutant is superior to the original, the mutant replaces the original. No crossover occurs.
+Although [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) isn't a genetic algorithm, it can nonetheless be implemented with gago. A mutator is the only necessary operator. Other than that a starting temperature, a stopping temperature and a decrease rate have to be provided. Effectively a single simulated annealing is run for each individual in the population.
 
-m <- generate one individual randomly
-while stopping criterion has not been met:
-    m' <- mutate m
-    if fitness(m') > fitness(m)
-        m <- m'
+!!! note "Note"
+    The temperature evolution is relative to one single generation. In order to mimic the original simulated annealing algorithm, one would the number of individuals to 1 and would run the algorithm for only 1 generation. However, nothing stops you from running many simulated annealings and to repeat them over many generations.
 
-## Hill climbing
+### Diagram
 
-This is a deterministic hill climbing algorithm. An individual is initialized randomly. While the individual is not at a local optimum, the algorithm takes a ``step" (increments or decrements one of its genes by the step size). If the resulting individual has better fitness, it replaces the original and the step size doubles. If the result is worse, the step size halves. Once a gene is at a local optimum (holding all other genes constant) then stepping begins again on the next gene. When the individual reaches a local optimum, a new solution is randomly generated and hill climbing begins again. The best prior solution is remembered. This algorithm is only intended for problems that take an integer or floating point array as input.
+### Pseudocode
 
-i <- generate an individual randomly
-best_so_far <- i
-while stopping criterion has not been met:
-    get i's bit string and convert it to the problem representation (int or float)
-    increment or decrement one of the genes by the step size
-    if the resulting individual has higher fitness
-        replace i with this individual and increase the step size
-    else
-        decrease the step size
-    if the step size reaches zero and increments and decrements of the current gene have been tested
-        move on to the next gene
-    if i is at a local optimum
-        if fitness(i) > fitness(best_so_far)
-            best_so_far <- i
+```
+while T > T_min:
+    foreach i, individual in individuals:
+        neighbour = mutate(individual)
+        if neighbour.fitness < individual.fitness:
+            individuals[i] = neighbour
+        else:
+            ap = exp((neighbour.fitness - individual.fitness) / T)
+            if rand() < ap:
+                individuals[i] = neighbour
+    T = T * alpha
+```
 
-## King of the hill
+### Parameters
 
-This algorithm is identical to the hill climber except that once two solutions reach a local optimum, they begin to crossover with each other.
+| Parameter                     | Presence |
+|-------------------------------|----------|
+| Mutator                       | Required |
+| Starting temperature (T)      | Required |
+| Stopping temperature (Tmin)   | Required |
+| Decrease rate (Alpha)         | Required |
 
-i <- generate an individual randomly
-P <- ()
-while stopping criterion has not been met:
-    get i's bit string and convert it to the problem representation (int or float)
-    increment or decrement one of the genes by the step size
-    if the resulting individual has higher fitness
-        replace i with this individual and increase the step size
-    else
-        decrease the step size
-    if the step size reaches zero and increments and decrements of the current gene have been tested
-        move on to the next gene
-    if i is at a local optimum
-        add i to P
-        if there are individuals in P added by crossover that have not climbed their local hills
-            i <- the next child of crossover that has not hill climbed
-        else
-            i <- generate an individual randomly
-    if size(P) > 1
-        parent1, parent2 <- get two random individuals from P
-        child1, child2 <- crossover parent1, parent2
-        if the fitness of child1 is greater than the fitness of the worse of the two parents
-            add child1 to P
-        if the fitness of child2 is greater than the fitness of the worse of the two parents
-            add child2 to P
-        i <- generate an individual randomly
+
+## Mutation only
+
+Although [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) isn't a genetic algorithm, it can nonetheless be implemented with gago. A mutator is the only necessary operator. Other than that a starting temperature, a stopping temperature and a decrease rate have to be provided. Effectively a single simulated annealing is run for each individual in the population.
+
+### Diagram
+
+### Pseudocode
+
+```
+parents = select(nbr_parents, individuals)
+offsprings = []
+i = 0
+
+foreach parent of parents:
+    if keep_parents:
+        offsprings[i] = parent
+        i++
+    for j in 0 to nbr_offsprings:
+        offsprings[j] = mutate(parent)
+        i++
+
+individuals = offsprings
+```
+
+### Parameters
+
+| Parameter                     | Presence |
+|-------------------------------|----------|
+| NbrParents                    | Required |
+| Selector                      | Required |
+| KeepParents                   | Required |
+| NbrOffsprings                 | Required |
+| Mutator                       | Required |

@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"math"
 	"math/rand"
 )
 
@@ -77,7 +78,7 @@ func (mod ModGenerational) Validate() error {
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
-		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
 }
@@ -136,7 +137,7 @@ func (mod ModSteadyState) Validate() error {
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
-		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
 }
@@ -197,21 +198,21 @@ func (mod ModDownToSize) Validate() error {
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
-		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
 }
 
-// ModIslandRing implements the island ring model.
-type ModIslandRing struct {
+// ModRing implements the island ring model.
+type ModRing struct {
 	Crossover Crossover
 	Selector  Selector
 	Mutator   Mutator
 	MutRate   float64
 }
 
-// Apply the island ring model to a population.
-func (mod ModIslandRing) Apply(pop *Population) {
+// Apply the ring model to a population.
+func (mod ModRing) Apply(pop *Population) {
 	for i, indi := range pop.Individuals {
 		var (
 			neighbour              = pop.Individuals[i%len(pop.Individuals)]
@@ -234,7 +235,7 @@ func (mod ModIslandRing) Apply(pop *Population) {
 }
 
 // Validate the model to verify the parameters are coherent.
-func (mod ModIslandRing) Validate() error {
+func (mod ModRing) Validate() error {
 	// Check the crossover method presence
 	if mod.Crossover == nil {
 		return errors.New("'Crossover' cannot be nil")
@@ -245,7 +246,120 @@ func (mod ModIslandRing) Validate() error {
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
-		return errors.New("'MutRate' should be comprised between 0 and 1 (included)")
+		return errors.New("'MutRate' should belong to the [0, 1] interval")
+	}
+	return nil
+}
+
+// ModSimAnn implements simulated annealing.
+type ModSimAnn struct {
+	Mutator Mutator
+	T       float64 // Starting temperature
+	Tmin    float64 // Stopping temperature
+	Alpha   float64 // Decrease rate per iteration
+}
+
+// Apply simulated annealing to a population.
+func (mod ModSimAnn) Apply(pop *Population) {
+	// Continue until having reached the minimum temperature
+	for mod.T > mod.Tmin {
+		for i, indi := range pop.Individuals {
+			// Generate a random neighbour through mutation
+			var neighbour = indi
+			mod.Mutator.Apply(&neighbour, pop.rng)
+			indi.evaluate(pop.ff)
+			// Check if the neighbour is better or not
+			if neighbour.Fitness < indi.Fitness {
+				pop.Individuals[i] = neighbour
+			} else {
+				// Compute the expectance probability
+				var ap = math.Exp((indi.Fitness - neighbour.Fitness) / mod.T)
+				if pop.rng.Float64() < ap {
+					pop.Individuals[i] = neighbour
+				}
+			}
+		}
+		// Reduce the temperature
+		mod.T *= mod.Alpha
+	}
+}
+
+// Validate the model to verify the parameters are coherent.
+func (mod ModSimAnn) Validate() error {
+	// Check the mutator method presence
+	if mod.Mutator == nil {
+		return errors.New("'Mutator' cannot be nil")
+	}
+	// Check the stopping temperature value
+	if mod.Tmin < 0 {
+		return errors.New("'Tmin' should be higher than 0")
+	}
+	// Check the starting temperature value
+	if mod.T < mod.Tmin {
+		return errors.New("'T' should be a number higher than 'Tmin'")
+	}
+	// Check the decrease rate value
+	if mod.Alpha <= 0 || mod.Alpha >= 1 {
+		return errors.New("'MutRate' should belong to the (0, 1) interval")
+	}
+	return nil
+}
+
+// ModMutationOnly implements the mutation only model.
+type ModMutationOnly struct {
+	NbrParents    int
+	Selector      Selector
+	KeepParents   bool
+	NbrOffsprings int // Number of offsprings per parent
+	Mutator       Mutator
+}
+
+// Apply mutation only to a population.
+func (mod ModMutationOnly) Apply(pop *Population) {
+	var (
+		parents, _ = mod.Selector.Apply(mod.NbrParents, pop.Individuals, pop.rng)
+		offsprings Individuals
+		i          = 0
+	)
+	// The length of the new slice of individuals varies if the parents are kept or not
+	if mod.KeepParents {
+		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings)
+	} else {
+		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings+mod.NbrParents)
+	}
+	// Generate offsprings for each parent by copying the parent and then mutating it
+	for _, parent := range parents {
+		if mod.KeepParents {
+			offsprings[i] = parent
+			i++
+		}
+		for j := 0; j < mod.NbrOffsprings; j++ {
+			var offspring = parent
+			mod.Mutator.Apply(&offspring, pop.rng)
+			offsprings[i] = offspring
+			i++
+		}
+	}
+	pop.Individuals = offsprings
+}
+
+// Validate the model to verify the parameters are coherent.
+func (mod ModMutationOnly) Validate() error {
+	// Check the number of parents value
+	if mod.NbrParents < 1 {
+		return errors.New("'NbrParents' should be higher than 0")
+	}
+	// Check the selector presence
+	if mod.Selector == nil {
+		return errors.New("'Selector' cannot be nil")
+	}
+	// Check the number of offsprings value
+	if mod.NbrOffsprings < 1 {
+		return errors.New("'NbrOffsprings' should be higher than 0")
+	}
+	// Check the mutator presence
+	if mod.Mutator == nil {
+		return errors.New("'Mutator' should be higher than 0")
 	}
 	return nil
 }
