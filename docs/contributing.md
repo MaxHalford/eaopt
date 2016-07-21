@@ -1,25 +1,19 @@
 ## Genetic operators
 
-There are many genetic operators yet to be implemented. Feel free to send pull requests with your implementations. The only requirements are that the genetic operator respects the existing [naming convention](#naming-convention) and includes a test in the corresponding `*_test.go` file.
+There are many genetic operators yet to be implemented. Feel free to send pull requests with your implementations. The only requirements are that the implementation respects the existing [naming convention](#naming-convention) and includes a test in the corresponding `*_test.go` file.
 
-## Roadmap
+## Ideas
 
-- Tidy tests
-- Statistics
-- Benchmarking vs other libraries
-- Profiling
-- Implement more genetic operators
-- More examples
-- Possibility to add manual heuristics
-- Add different stopping criterions
-- Count evaluations
+- Implement analysis tools to track the performance of the GAs
+- Benchmark against other libraries
+- Add more example usage
 
 ## Code style
 
 ### Guidelines
 
 - Keep names short
-- Aim for 80 characters per line
+- Aim for 100 characters per line
 
 ### Variable declaration
 
@@ -99,4 +93,5 @@ Genetic algorithms are notorious for being [embarrassingly parallel](http://www.
 ## Editing the documentation
 
 - The documentation is built with [mkdocs](https://mkdocs.readthedocs.io).
+- Each page has an associated markdown file in the `docs/` folder.
 - You can `mkdocs serve` to enable live editing of the documentation.

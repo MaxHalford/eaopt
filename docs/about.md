@@ -1,5 +1,3 @@
-# About
-
 ## A brief introduction to genetic algorithms
 
 gago is intended to not be a blackbox. On the contrary, it's codebase is meant to be cristal clear. As such, an introduction to genetic algorithms is necessary in order to understand gago's implementation.

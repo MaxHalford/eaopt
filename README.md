@@ -6,7 +6,7 @@
 <div align="center">
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
-    <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="logo"/>
+    <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="mit"/>
   </a>
   <!-- godoc -->
   <a href="https://godoc.org/github.com/MaxHalford/gago">
@@ -46,3 +46,78 @@
 
 <div align="center">For an introduction, example usage, contributing guidelines, please refer to the <a href="http://gago.readthedocs.io/"><b>documentation</b></a>.</div>
 
+## Quick start
+
+It's relatively easy to start using gago by using a [preset](http://gago.readthedocs.io/en/latest/presets/).
+
+```go
+package main
+
+import (
+  "fmt"
+  m "math"
+
+  "github.com/MaxHalford/gago/presets"
+)
+
+// Sphere function minimum is 0 reached in (0, ..., 0).
+func sphere(X []float64) float64 {
+  sum := 0.0
+  for _, x := range X {
+    sum += m.Pow(x, 2)
+  }
+  return sum
+}
+
+func main() {
+  // Instantiate a GA with 2 variables and the fitness function
+  var ga = presets.Float(2, sphere)
+  ga.Initialize()
+  // Enhancement
+  for i := 0; i < 1000; i++ {
+    ga.Enhance()
+  }
+  // Display the best obtained solution
+  fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
+}
+```
+
+A preset is simply a genetic algorithm configuration. It's unlikely that a preset will find an optimal solution as is. Presets should be considered as starting points and should be tuned for specific problems.
+
+```go
+// Float returns a configuration for minimizing continuous mathematical
+// functions with a given number of variables.
+func Float(n int, function func([]float64) float64) gago.GA {
+  return gago.GA{
+    NbrPopulations: 2,
+    NbrIndividuals: 30,
+    NbrGenes:       n,
+    Ff: gago.Float64Function{
+      Image: function,
+    },
+    Initializer: gago.InitUniformF{
+      Lower: -1,
+      Upper: 1,
+    },
+    Model: gago.ModGenerational{
+      Selector: gago.SelTournament{
+        NbParticipants: 3,
+      },
+      Crossover: gago.CrossUniformF{},
+      Mutator: gago.MutNormalF{
+        Rate: 0.5,
+        Std:  3,
+      },
+      MutRate: 0.5,
+    },
+    Migrator:     gago.MigShuffle{},
+    MigFrequency: 10,
+  }
+}
+```
+
+## Alternatives
+
+- [GeneticGo](https://github.com/handcraftsman/GeneticGo)
+- [goga](https://github.com/tomcraven/goga)
+- [go-galib](https://github.com/thoj/go-galib)

@@ -6,6 +6,9 @@ import (
 	"sort"
 )
 
+// EVALUATIONS tracks the total number of times the fitness function was evaluated
+var EVALUATIONS = 0
+
 // A Genome contains genes
 type Genome []interface{}
 
@@ -25,6 +28,7 @@ func (indi *Individual) evaluate(ff FitnessFunction) {
 	// Don't evaluate individuals that have already been evaluated
 	if indi.Age == 0 {
 		indi.Fitness = ff.apply(indi.Genome)
+		EVALUATIONS++
 	}
 	indi.Age++
 }
