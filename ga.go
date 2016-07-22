@@ -10,35 +10,28 @@ import (
 
 // A GA contains population which themselves contain individuals.
 type GA struct {
-	NbrPopulations int // Number of populations
-	NbrIndividuals int // Initial number of individuals in each population
-	NbrGenes       int // Number of genes in each individual (imposed by the problem)
-	Populations    []Population
-	Best           Individual      // Overall best individual (dummy initialization at the beginning)
+
+	// Parameters that have to be provided
 	Ff             FitnessFunction // Fitness function to evaluate individuals (imposed by the problem)
 	Initializer    Initializer
-	Model          Model
-	Migrator       Migrator
 	MigFrequency   int // Migration frequency
-	Generations    int
-	Duration       time.Duration
+	Migrator       Migrator
+	Model          Model
+	NbrClusters    int // Number of clusters each populations is split into before evolving
+	NbrGenes       int // Number of genes in each individual (imposed by the problem)
+	NbrIndividuals int // Initial number of individuals in each population
+	NbrPopulations int // Number of populations
+
+	// Parameters that are generated at runtime
+	Best        Individual // Overall best individual (dummy initialization at the beginning)
+	Duration    time.Duration
+	Generations int
+	Populations Populations
 }
 
 // Validate the parameters of a GA to ensure it will run correctly. Some
 // settings or combination of settings may be incoherent during runtime.
 func (ga *GA) Validate() error {
-	// Check the number of populations
-	if ga.NbrPopulations < 1 {
-		return errors.New("'NbrPopulations' should be higher or equal to 1")
-	}
-	// Check the number of individuals
-	if ga.NbrIndividuals < 2 {
-		return errors.New("'NbrIndividuals' should be higher or equal to 2")
-	}
-	// Check the number of genes
-	if ga.NbrGenes < 1 {
-		return errors.New("'NbrGenes' should be higher or equal to 1")
-	}
 	// Check the fitness function presence
 	if ga.Ff == nil {
 		return errors.New("'Ff' cannot be nil")
@@ -46,6 +39,10 @@ func (ga *GA) Validate() error {
 	// Check the initialization method presence
 	if ga.Initializer == nil {
 		return errors.New("'Initializer' cannot be nil")
+	}
+	// Check the migration frequency in the presence of a migrator
+	if ga.Migrator != nil && ga.MigFrequency < 1 {
+		return errors.New("'MigFrequency' should be strictly higher than 0")
 	}
 	// Check the model presence
 	if ga.Model == nil {
@@ -56,9 +53,21 @@ func (ga *GA) Validate() error {
 	if modelErr != nil {
 		return modelErr
 	}
-	// Check the migration frequency in the presence of a migrator
-	if ga.Migrator != nil && ga.MigFrequency < 1 {
-		return errors.New("'MigFrequency' should be strictly higher than 0")
+	// Check the number of clusters
+	if ga.NbrClusters < 0 {
+		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
+	}
+	// Check the number of genes
+	if ga.NbrGenes < 1 {
+		return errors.New("'NbrGenes' should be higher or equal to 1")
+	}
+	// Check the number of individuals
+	if ga.NbrIndividuals < 2 {
+		return errors.New("'NbrIndividuals' should be higher or equal to 2")
+	}
+	// Check the number of populations
+	if ga.NbrPopulations < 1 {
+		return errors.New("'NbrPopulations' should be higher or equal to 1")
 	}
 	// No error
 	return nil
@@ -84,7 +93,12 @@ func (ga *GA) Initialize() {
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(ga.NbrIndividuals, ga.NbrGenes, ga.Ff, ga.Initializer)
+			ga.Populations[j] = makePopulation(
+				ga.NbrIndividuals,
+				ga.NbrGenes,
+				ga.Ff,
+				ga.Initializer,
+			)
 			// Evaluate it's individuals
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
 			// Sort it's individuals
@@ -114,6 +128,7 @@ func (ga *GA) findBest() {
 // run, the GA level operations are run.
 func (ga *GA) Enhance() {
 	var start = time.Now()
+	// Increment the generations counter at the beginning to not migrate at generation 0
 	ga.Generations++
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
@@ -127,8 +142,19 @@ func (ga *GA) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// Apply the evolution model
-			ga.Model.Apply(&ga.Populations[j])
+			// Apply clustering if a number of clusters has been given
+			if ga.NbrClusters > 0 {
+				var clusters = ga.Populations[j].cluster(ga.NbrClusters)
+				for k := range clusters {
+					// Apply the evolution model to the cluster
+					ga.Model.Apply(&clusters[k])
+				}
+				// Merge each cluster back into the original population
+				ga.Populations[j].Individuals = clusters.merge()
+			} else {
+				// Else apply the evolution model to the entire population
+				ga.Model.Apply(&ga.Populations[j])
+			}
 			// Evaluate and sort
 			ga.Populations[j].Individuals.evaluate(ga.Ff)
 			ga.Populations[j].Individuals.sort()
