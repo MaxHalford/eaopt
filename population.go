@@ -21,7 +21,6 @@ func makePopulation(nbIndis, nbGenes int, ff FitnessFunction, init Initializer) 
 		rng = rand.New(src)
 		pop = Population{
 			Individuals: makeIndividuals(nbIndis, nbGenes, rng),
-			Duration:    0,
 			rng:         rng,
 			ff:          ff,
 		}
@@ -32,3 +31,6 @@ func makePopulation(nbIndis, nbGenes int, ff FitnessFunction, init Initializer) 
 	}
 	return pop
 }
+
+// Populations type is necessary for migration and clusterting purposes.
+type Populations []Population
