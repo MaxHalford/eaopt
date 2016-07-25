@@ -2,9 +2,9 @@ package presets
 
 import "github.com/MaxHalford/gago"
 
-// Float returns a configuration for minimizing continuous mathematical
+// Float64 returns a configuration for minimizing continuous mathematical
 // functions with a given number of variables.
-func Float(n int, function func([]float64) float64) gago.GA {
+func Float64(n int, function func([]float64) float64) gago.GA {
 	return gago.GA{
 		NbrPopulations: 2,
 		NbrIndividuals: 30,

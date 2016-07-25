@@ -62,13 +62,22 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationNbrPopulations(t *testing.T) {
-	// Check invalid number of population
-	ga.NbrPopulations = 0
+func TestValidationNbrCluster(t *testing.T) {
+	// Check invalid number of clusters
+	ga.NbrClusters = -1
 	if ga.Validate() == nil {
-		t.Error("Invalid number of populations didn't return an error")
+		t.Error("Invalid number of clusters didn't return an error")
 	}
-	ga.NbrPopulations = nbIndividuals
+	ga.NbrGenes = nbGenes
+}
+
+func TestValidationNbrGenes(t *testing.T) {
+	// Check invalid number of genes
+	ga.NbrGenes = 0
+	if ga.Validate() == nil {
+		t.Error("Invalid number of genes didn't return an error")
+	}
+	ga.NbrGenes = nbGenes
 }
 
 func TestValidationNbrIndividuals(t *testing.T) {
@@ -80,13 +89,13 @@ func TestValidationNbrIndividuals(t *testing.T) {
 	ga.NbrIndividuals = nbIndividuals
 }
 
-func TestValidationNbrGenes(t *testing.T) {
-	// Check invalid number of genes
-	ga.NbrGenes = 0
+func TestValidationNbrPopulations(t *testing.T) {
+	// Check invalid number of population
+	ga.NbrPopulations = 0
 	if ga.Validate() == nil {
-		t.Error("Invalid number of genes didn't return an error")
+		t.Error("Invalid number of populations didn't return an error")
 	}
-	ga.NbrGenes = nbGenes
+	ga.NbrPopulations = nbIndividuals
 }
 
 func TestValidationFf(t *testing.T) {

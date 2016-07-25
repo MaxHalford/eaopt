@@ -54,16 +54,12 @@ func (mod ModGenerational) Apply(pop *Population) {
 		mod.Crossover,
 		pop.rng,
 	)
+	// Apply mutation to the offsprings
+	if mod.Mutator != nil {
+		offsprings.Mutate(mod.Mutator, mod.MutRate, pop.rng)
+	}
 	// Replace the old population with the new one
 	pop.Individuals = offsprings
-	// Apply mutation
-	if mod.Mutator != nil {
-		for _, individual := range pop.Individuals {
-			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&individual, pop.rng)
-			}
-		}
-	}
 }
 
 // Validate the model to verify the parameters are coherent.
@@ -98,26 +94,27 @@ func (mod ModSteadyState) Apply(pop *Population) {
 		parents, indexes       = mod.Selector.Apply(2, pop.Individuals, pop.rng)
 		offspring1, offspring2 = mod.Crossover.Apply(parents[0], parents[1], pop.rng)
 	)
+	// Apply mutation to the offsprings
+	if mod.Mutator != nil {
+		if pop.rng.Float64() < mod.MutRate {
+			mod.Mutator.Apply(&offspring1, pop.rng)
+		}
+		if pop.rng.Float64() < mod.MutRate {
+			mod.Mutator.Apply(&offspring2, pop.rng)
+		}
+	}
 	if mod.KeepBest {
 		// Replace the chosen parents with the best individuals out of the parents and the individuals
-		offspring1.evaluate(pop.ff)
-		offspring2.evaluate(pop.ff)
+		offspring1.Evaluate(pop.ff)
+		offspring2.Evaluate(pop.ff)
 		var indis = Individuals{parents[0], parents[1], offspring1, offspring2}
-		indis.sort()
+		indis.Sort()
 		pop.Individuals[indexes[0]] = indis[0]
 		pop.Individuals[indexes[1]] = indis[1]
 	} else {
 		// Replace the chosen parents with the offsprings
 		pop.Individuals[indexes[0]] = offspring1
 		pop.Individuals[indexes[1]] = offspring2
-	}
-	// Apply mutation
-	if mod.Mutator != nil {
-		for _, index := range indexes {
-			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&pop.Individuals[index], pop.rng)
-			}
-		}
 	}
 }
 
@@ -161,21 +158,17 @@ func (mod ModDownToSize) Apply(pop *Population) {
 		mod.Crossover,
 		pop.rng,
 	)
+	// Apply mutation to the offsprings
+	if mod.Mutator != nil {
+		offsprings.Mutate(mod.Mutator, mod.MutRate, pop.rng)
+	}
+	offsprings.Evaluate(pop.ff)
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
-	offsprings.evaluate(pop.ff)
 	// Select down to size
 	var selected, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.rng)
 	// Replace the current population of individuals
 	copy(pop.Individuals, selected)
-	// Apply mutation
-	if mod.Mutator != nil {
-		for _, indi := range pop.Individuals {
-			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&indi, pop.rng)
-			}
-		}
-	}
 }
 
 // Validate the model to verify the parameters are coherent.
@@ -218,19 +211,20 @@ func (mod ModRing) Apply(pop *Population) {
 			neighbour              = pop.Individuals[i%len(pop.Individuals)]
 			offspring1, offspring2 = mod.Crossover.Apply(indi, neighbour, pop.rng)
 		)
-		offspring1.evaluate(pop.ff)
-		offspring2.evaluate(pop.ff)
+		// Apply mutation to the offsprings
+		if mod.Mutator != nil {
+			if pop.rng.Float64() < mod.MutRate {
+				mod.Mutator.Apply(&offspring1, pop.rng)
+			}
+			if pop.rng.Float64() < mod.MutRate {
+				mod.Mutator.Apply(&offspring2, pop.rng)
+			}
+		}
+		offspring1.Evaluate(pop.ff)
+		offspring2.Evaluate(pop.ff)
 		// Select an individual out of the original individual and the offsprings
 		var selected, _ = mod.Selector.Apply(1, Individuals{indi, offspring1, offspring2}, pop.rng)
 		pop.Individuals[i] = selected[0]
-	}
-	// Apply mutation
-	if mod.Mutator != nil {
-		for _, indi := range pop.Individuals {
-			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&indi, pop.rng)
-			}
-		}
 	}
 }
 
@@ -267,7 +261,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 			// Generate a random neighbour through mutation
 			var neighbour = indi
 			mod.Mutator.Apply(&neighbour, pop.rng)
-			indi.evaluate(pop.ff)
+			indi.Evaluate(pop.ff)
 			// Check if the neighbour is better or not
 			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
