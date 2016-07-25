@@ -261,7 +261,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 			// Generate a random neighbour through mutation
 			var neighbour = indi
 			mod.Mutator.Apply(&neighbour, pop.rng)
-			indi.Evaluate(pop.ff)
+			neighbour.Evaluate(pop.ff)
 			// Check if the neighbour is better or not
 			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
