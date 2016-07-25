@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	m "math"
-
-	"github.com/MaxHalford/gago/presets"
 )
 
 // Sphere function minimum is 0 reached in (0, ..., 0).
@@ -19,7 +17,7 @@ func sphere(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = presets.Float(2, sphere)
+	var ga = preset.Float64(2, sphere)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 1000; i++ {

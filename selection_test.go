@@ -96,8 +96,8 @@ func TestTournamentAndElitism(t *testing.T) {
 		elite, _   = elitism.Apply(size, indis, rng)
 		tourney, _ = tournament.Apply(size, indis, rng)
 	)
-	elite.sort()
-	tourney.sort()
+	elite.Sort()
+	tourney.Sort()
 	// Check the individual is from the initial population
 	if elite[0].Fitness != tourney[0].Fitness {
 		t.Error("Elitism and full tournament selection differed")

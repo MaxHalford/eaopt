@@ -104,4 +104,3 @@ gago is designed with flexibility in mind. The fact is that there isn't "a" gene
 - It has no external dependencies.
 - It's got a high test coverage.
 - It's actively maintained and will remain one my priorities for a very long time.
-
