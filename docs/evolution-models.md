@@ -40,6 +40,8 @@ The steady state model differs from the generational model in that the entire po
 
 ### Diagram
 
+![steady-state](img/models/steady-state.png)
+
 ### Pseudocode
 
 ```
@@ -77,6 +79,8 @@ for each parent:
 The select down to size method uses two selection rounds. The first one is classic and picks parents to generate new individuals with crossover. However, the offsprings are then added to the original population and a second selection round occurs to determine which individuals will survive to the next generation. Formally $m$ offsprings are generated from a population of $n$, the $n+m$ individuals are then "selected down to size" so that there only remains $n$ individuals. Finally the $n$ newly selected individuals may be mutated.
 
 ### Diagram
+
+![select-down-to-size](img/models/select-down-to-size.png)
 
 ### Pseudocode
 

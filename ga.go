@@ -31,7 +31,7 @@ type GA struct {
 
 // Validate the parameters of a GA to ensure it will run correctly. Some
 // settings or combination of settings may be incoherent during runtime.
-func (ga *GA) Validate() error {
+func (ga GA) Validate() error {
 	// Check the fitness function presence
 	if ga.Ff == nil {
 		return errors.New("'Ff' cannot be nil")
@@ -100,9 +100,9 @@ func (ga *GA) Initialize() {
 				ga.Initializer,
 			)
 			// Evaluate it's individuals
-			ga.Populations[j].Individuals.evaluate(ga.Ff)
+			ga.Populations[j].Individuals.Evaluate(ga.Ff)
 			// Sort it's individuals
-			ga.Populations[j].Individuals.sort()
+			ga.Populations[j].Individuals.Sort()
 		}(i)
 	}
 	wg.Wait()
@@ -119,6 +119,15 @@ func (ga *GA) findBest() {
 		var best = pop.Individuals[0]
 		if best.Fitness < ga.Best.Fitness {
 			ga.Best = best
+		}
+	}
+}
+
+// Increment the age of each individual of each population of the GA.
+func (ga *GA) incrementAge() {
+	for i := range ga.Populations {
+		for j := range ga.Populations[i].Individuals {
+			ga.Populations[i].Individuals[j].Age++
 		}
 	}
 }
@@ -156,13 +165,14 @@ func (ga *GA) Enhance() {
 				ga.Model.Apply(&ga.Populations[j])
 			}
 			// Evaluate and sort
-			ga.Populations[j].Individuals.evaluate(ga.Ff)
-			ga.Populations[j].Individuals.sort()
+			ga.Populations[j].Individuals.Evaluate(ga.Ff)
+			ga.Populations[j].Individuals.Sort()
 			ga.Populations[j].Duration += time.Since(start)
 		}(i)
 	}
 	wg.Wait()
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
+	ga.incrementAge()
 	ga.Duration += time.Since(start)
 }

@@ -24,7 +24,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 		// Sample the GA
 		var roundIndexes, sample = indis.sample(sel.NbParticipants, rng)
 		// The winner is the best individual participating in the tournament
-		sample.sort()
+		sample.Sort()
 		indexes[i] = roundIndexes[0]
 		winners[i] = sample[0]
 	}
