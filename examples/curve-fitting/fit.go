@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	m "math"
+
+	"github.com/MaxHalford/gago/presets"
 )
 
 // Target function the GA has to approach
@@ -34,7 +36,7 @@ func leastSquares(B []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 3 variables and the fitness function
-	var ga = preset.Float64(3, leastSquares)
+	var ga = presets.Float64(3, leastSquares)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 1000; i++ {

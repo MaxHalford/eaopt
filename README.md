@@ -121,3 +121,7 @@ func Float(n int, function func([]float64) float64) gago.GA {
 - [GeneticGo](https://github.com/handcraftsman/GeneticGo)
 - [goga](https://github.com/tomcraven/goga)
 - [go-galib](https://github.com/thoj/go-galib)
+
+## Contact
+
+Feel free to contact me at **maxhalford25@gmail.com** for any enquiries.
