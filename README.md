@@ -10,6 +10,8 @@
   </a>
 </div>
 
+<br/>
+
 <div align="center">
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
@@ -17,7 +19,7 @@
   </a>
   <!-- CodeWake -->
   <a href="https://www.codewake.com/p/gago">
-    <img src="https://www.codewake.com/badges/codewake.svg" alt="codewake"/>
+    <img src="https://www.codewake.com/badges/codewake2.svg" alt="codewake"/>
   </a>
   <!-- godoc -->
   <a href="https://godoc.org/github.com/MaxHalford/gago">
