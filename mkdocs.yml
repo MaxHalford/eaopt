@@ -15,8 +15,6 @@ pages:
 - Usage: usage.md
 - Evolution models: evolution-models.md
 - Clustering: clustering.md
-- Presets: presets.md
-- Examples: examples.md
 - Contributing: contributing.md
 
 repo_url: https://github.com/MaxHalford/gago

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	m "math"
+
+	"github.com/MaxHalford/gago/presets"
 )
 
 // Griewank minimum is 0 reached in (0, ..., 0)
@@ -21,7 +23,7 @@ func griewank(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = preset.Float64(2, griewank)
+	var ga = presets.Float64(2, griewank)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 50; i++ {

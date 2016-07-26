@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	m "math"
+
+	"github.com/MaxHalford/gago/presets"
 )
 
 // Rastrigin minimum is 0 reached in (0, ..., 0)
@@ -17,7 +19,7 @@ func rastrigin(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = preset.Float64(2, rastrigin)
+	var ga = presets.Float64(2, rastrigin)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 40; i++ {
