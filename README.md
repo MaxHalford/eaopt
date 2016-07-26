@@ -8,6 +8,10 @@
   <a href="https://opensource.org/licenses/MIT">
     <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="mit"/>
   </a>
+  <!-- CodeWake -->
+  <a href="https://www.codewake.com/p/gago">
+    <img src="https://www.codewake.com/badges/codewake.svg" alt="codewake"/>
+  </a>
   <!-- godoc -->
   <a href="https://godoc.org/github.com/MaxHalford/gago">
     <img src="https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square" alt="godoc" />
