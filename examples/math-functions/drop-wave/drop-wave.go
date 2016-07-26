@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	m "math"
+
+	"github.com/MaxHalford/gago/presets"
 )
 
 // DropWave minimum is -1 reached in (0, 0)
@@ -15,7 +17,7 @@ func dropWave(X []float64) float64 {
 
 func main() {
 	// Instantiate a GA with 2 variables and the fitness function
-	var ga = preset.Float64(2, dropWave)
+	var ga = presets.Float64(2, dropWave)
 	ga.Initialize()
 	// Enhancement
 	for i := 0; i < 30; i++ {

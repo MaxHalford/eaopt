@@ -7,6 +7,7 @@ There are many genetic operators yet to be implemented. Feel free to send pull r
 - Implement analysis tools to track the performance of the GAs
 - Benchmark against other libraries
 - Add more example usage
+- Add a way to compare individuals based on their genome to improve clustering
 
 ## Code style
 

@@ -144,15 +144,16 @@ func TestRandomInts(t *testing.T) {
 	}
 }
 
-func TestRandomName(t *testing.T) {
+func TestRandomString(t *testing.T) {
 	var (
-		src     = rand.NewSource(time.Now().UnixNano())
-		rng     = rand.New(src)
-		lengths = []int{0, 1, 6}
+		src = rand.NewSource(time.Now().UnixNano())
+		rng = rand.New(src)
+		N   = []int{0, 1, 42}
 	)
-	for _, length := range lengths {
-		if len(randomName(length, rng)) != length {
-			t.Error("randomName didn't work as expected")
+	for _, n := range N {
+		var str = randomString(n, rng)
+		if len(str) != n {
+			t.Error("randomString didn't generate a string of the right length")
 		}
 	}
 }

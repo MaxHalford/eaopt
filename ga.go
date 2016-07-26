@@ -123,15 +123,6 @@ func (ga *GA) findBest() {
 	}
 }
 
-// Increment the age of each individual of each population of the GA.
-func (ga *GA) incrementAge() {
-	for i := range ga.Populations {
-		for j := range ga.Populations[i].Individuals {
-			ga.Populations[i].Individuals[j].Age++
-		}
-	}
-}
-
 // Enhance each population in the GA. The population level operations are done
 // in parallel with a wait group. After all the population operations have been
 // run, the GA level operations are run.
@@ -173,6 +164,5 @@ func (ga *GA) Enhance() {
 	wg.Wait()
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
-	ga.incrementAge()
 	ga.Duration += time.Since(start)
 }

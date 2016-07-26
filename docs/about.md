@@ -12,7 +12,7 @@ Any solution to a problem can be found on a search space defined by the possible
 
 then it isn't possible to solve the problem with classical methods because there isn't a clear way of writing this in a closed-form expression enabling the use of such methods.
 
-GAs make abstraction of how the problem is written. Instead, they ***only*** consider the input and the output of the problem. This is very important to understand. This way of thinking enables the potential solving of ***any*** problem. Indeed, a problem always has to have a set of candidate solutions (the input) and an associated response (the output).
+GAs make abstraction of how the problem is written. Instead, they **only** consider the input and the output of the problem. This is very important to understand. This way of thinking enables the potential solving of **any** problem. Indeed, a problem always has to have a set of candidate solutions (the input) and an associated response (the output).
 
 GAs use heuristics to explore the search space defined by the inputs in an intellirngt manner. In this sense a genetic algorithm is a machine learning technique. Specifically GAs are inspired from natural evolution and intend to mimic the interaction between individuals in a population.
 
@@ -27,16 +27,16 @@ Fitness function
 :   The fitness function is simply the function associated to a given problem. It takes in an input and returns an output.
 
 Individual
-:   An individual contains a ***genome*** which represents a candidate solution. In the physical world, an individual's genome is composed of acids. In an imaginary world, it could be composed of floating point numbers or string sequences representing cities. A ***fitness*** can be associated to a genome thanks to the fitness function. For example, one could measure the height of a group of individuals in order to rank them. In this case the genome is the body of the individual, the fitness function is the act of measuring the height of the individual's body and the fitness is the height of individual measured by the fitness function.
+:   An individual contains a **genome** which represents a candidate solution. In the physical world, an individual's genome is composed of acids. In an imaginary world, it could be composed of floating point numbers or string sequences representing cities. A **fitness** can be associated to a genome thanks to the fitness function. For example, one could measure the height of a group of individuals in order to rank them. In this case the genome is the body of the individual, the fitness function is the act of measuring the height of the individual's body and the fitness is the height of individual measured by the fitness function.
 
 Population
 :   Individuals are contained in a population wherein they can interact.
 
 Crossover
-:   A crossover acts on two or more individuals (called ***parents***) and mixes their genome in order to produce one or more new individuals (called ***offsprings***). Crossover is really what sets genetic algorithms apart from other evolutionary methods. An optimal crossover
+:   A crossover acts on two or more individuals (called **parents**) and mixes their genome in order to produce one or more new individuals (called **offsprings**). Crossover is really what sets genetic algorithms apart from other evolutionary methods. An optimal crossover
 
 Selection
-:   Selection is a process in which parents are selected to generate offsprings, most often by applying a crossover method. Popular selection methods include ***elitism selection*** and ***tournament selection***.
+:   Selection is a process in which parents are selected to generate offsprings, most often by applying a crossover method. Popular selection methods include **elitism selection** and **tournament selection**.
 
 Mutation
 :   Mutation applies random modifications to an individual's genome without interacting with other individuals.
@@ -45,7 +45,7 @@ Mutation
     Crossover, selection, mutation are more generally called **genetic operators**. A genetic operator is simply a method an individual uses to modify it's genome, either through interaction with other individuals or by itself.
 
 Migration
-:   ***Multi-population*** GAs run more than one population in parallel and exchange individuals between each other.
+:   **Multi-population** GAs run more than one population in parallel and exchange individuals between each other.
 
 Speciation
 :   In the physical world, individuals do not mate at random. Instead, they mate with similar individuals. For some problems such as neural network topology optimization, crossover will often generate poor solutions. Speciation sidesteps this by mating similar individuals (called **species**) separately.
@@ -69,7 +69,7 @@ In a nutshell, a GA solves an optimization problem by doing the following:
 
 ![overview](img/overview.png)
 
-This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a *model*, a fact that is often omitted in introductions to genetic algorithms.
+This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a **model**, a fact that is often omitted in introductions to genetic algorithms.
 
 !!! note "Note"
     Popular stopping criterions include a fixed number of generations, a fixed duration and an indicator that the population is stagnating.

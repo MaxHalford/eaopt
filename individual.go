@@ -20,7 +20,6 @@ type Individual struct {
 	Genome    Genome
 	Fitness   float64
 	Evaluated bool
-	Age       int
 	Name      string
 }
 
@@ -29,9 +28,15 @@ func (indi *Individual) Evaluate(ff FitnessFunction) {
 	// Don't evaluate individuals that have already been evaluated
 	if indi.Evaluated == false {
 		indi.Fitness = ff.apply(indi.Genome)
-		indi.Evaluated = true
 		EVALUATIONS++
 	}
+	indi.Evaluated = true
+}
+
+// Mutate applies a mutator to an individual and sets it's `Evaluated` property to `false`.
+func (indi *Individual) Mutate(mutator Mutator, rng *rand.Rand) {
+	mutator.Apply(indi, rng)
+	indi.Evaluated = false
 }
 
 // Generate a new individual.
@@ -40,8 +45,7 @@ func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
 		Genome:    make([]interface{}, nbGenes),
 		Fitness:   math.Inf(1),
 		Evaluated: false,
-		Age:       0,
-		Name:      randomName(6, rng),
+		Name:      randomString(6, rng),
 	}
 }
 
@@ -56,13 +60,10 @@ func (indis Individuals) Evaluate(ff FitnessFunction) {
 }
 
 // Mutate is a convenience function for mutating each individual in a slice of individuals.
-// Whatsmore, the `Evaluated` attribute of the individual is reset to `false` if a mutation
-// occurs.
 func (indis Individuals) Mutate(mutator Mutator, mutRate float64, rng *rand.Rand) {
 	for i := range indis {
 		if rng.Float64() < mutRate {
-			mutator.Apply(&indis[i], rng)
-			indis[i].Evaluated = false
+			indis[i].Mutate(mutator, rng)
 		}
 	}
 }
@@ -84,7 +85,7 @@ func (indis Individuals) Less(i, j int) bool { return indis[i].Fitness < indis[j
 func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], indis[i] }
 
 // Sort is a convenience method for calling the Sort method of the sort package
-func (indis Individuals) Sort() { sort.Sort(indis) }
+func (indis *Individuals) Sort() { sort.Sort(indis) }
 
 // Sample k unique individuals from a slice of n individuals.
 func (indis Individuals) sample(k int, rng *rand.Rand) ([]int, Individuals) {
