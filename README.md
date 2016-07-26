@@ -1,4 +1,11 @@
 <div align="center">
+  <!-- Go awesome -->
+  <a href="https://github.com/sindresorhus/awesome">
+    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="go_awesome" />
+  </a>
+</div>
+
+<div align="center">
   <!-- Logo -->
    <img src="docs/img/logo.png" alt="logo"/>
 </div>
@@ -35,10 +42,6 @@
   <!-- Dependencies -->
   <a href="https://godoc.org/github.com/MaxHalford/gago?imports">
     <img src="https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square" alt="dependencies" />
-  </a>
-  <!-- Go awesome -->
-  <a href="https://github.com/sindresorhus/awesome">
-    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="go_awesome" />
   </a>
 </div>
 
