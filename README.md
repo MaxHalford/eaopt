@@ -48,7 +48,7 @@
 
 ## Quick start
 
-It's relatively easy to start using gago by using a [preset](http://gago.readthedocs.io/en/latest/presets/).
+It's relatively easy to start using gago by using a [preset](http://gago.readthedocs.io/en/latest/usage/#presets).
 
 ```go
 package main
