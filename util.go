@@ -97,8 +97,8 @@ const (
 	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
 )
 
-// Generate a random name of size n.
-func randomName(n int, rng *rand.Rand) string {
+// Generate a random string of size n.
+func randomString(n int, rng *rand.Rand) string {
 	b := make([]byte, n)
 	for i, cache, remain := n-1, rng.Int63(), letterIdxMax; i >= 0; {
 		if remain == 0 {

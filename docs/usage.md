@@ -1,4 +1,4 @@
-The following code shows a basic usage of `gago`.
+The following code shows a very basic usage of `gago`.
 
 ```go
 package main
@@ -22,7 +22,7 @@ func sphere(X []float64) float64 {
 
 func main() {
     // Instantiate a GA with 2 variables and the fitness function
-    var ga = presets.Float(2, sphere)
+    var ga = presets.Float64(2, sphere)
     ga.Initialize()
     // Enhancement
     for i := 0; i < 10; i++ {
@@ -33,23 +33,14 @@ func main() {
 }
 ```
 
-The user has a function `Sphere` he wishes to minimize. He initiates a predefined set of parameters `presets.Float(2, sphere)`. Finally the user orders `gago` to find an appropriate solution with `ga.Enhance()`. By convention `gago` will try to **minimize** the fitness function. If instead you want to maximize a function `f(x)`, you can minimize `-f(x)`.
+The user has a function `Sphere` he wishes to minimize. He initiates a predefined set of parameters `presets.Float64(2, sphere)`. Finally the user orders `gago` to find an appropriate solution with `ga.Enhance()`. By convention `gago` will try to **minimize** the fitness function. If instead you want to maximize a function `f(x)`, you can minimize `-f(x)`.
 
 The nice thing thing is that the GA only requires a function and a number of variables, hence it can be used for minimizing any function as long the function outputs a floating point number (`float64` in Go). Because Go is a statically typed language and doesn't provide explicit generic types, the input type of the function has be handled. This is done using interfaces and is [documented further down](#using-different-types).
 
 
 ## Parameters
 
-To modify the behavior off the GA, you can change the `gago.GA` struct before running `ga.Initialize`. You can either instantiate a new `gago.GA` or use a predefined one from the `configuration.go` file.
-
-| Variable in the code   | Type                      | Description                                                      |
-|------------------------|---------------------------|------------------------------------------------------------------|
-| `NbrPopulations`              | `int`                     | Number of Populations in the GA                               |
-| `NbrIndividuals`        | `int`                     | Number of individuals in each population                              |
-| `Initializer` (struct) | `Initializer` (interface) | Method for initializing a new individual                        |
-| `Model` (struct)    | `Model` (interface)    | Model for applying genetic operators |
-| `Migrator` (struct)    | `Migrator` (interface)    | Method for exchanging individuals between the populations             |
-| `MigFrequency`     | `int`     | Migration frequency                      |
+To modify the behavior off the GA, you can change the `gago.GA` struct before running `ga.Initialize()`. You can either instantiate a new `gago.GA` or use a predefined preset and build on top of it. It's best to look at the [ga.go file](https://github.com/MaxHalford/gago/blob/master/ga.go) to see what parameters can be modified and how they are used in the `Initialize` and `Enhance` methods.
 
 The `gago.GA` struct also contains a `Best` variable which is of type `Individual`, it represents the best individual overall. The `Populations` variable is a slice containing each GA in the GA. The populations are sorted at each generation so that the first individual in each GA is the best individual for that specific GA.
 
@@ -64,11 +55,17 @@ Some genetic operators target a specific type, these ones are suffixed with the 
 
 You should think of `gago` as a framework for implementing your problems, and not as an all in one solution. It's quite easy to implement custom operators for exotic problems, for example the [TSP problem](examples/tsp/).
 
-The only requirement for solving a problem is that the problem itself can be modeled as a function that returns a floating point value. Because Go is statically typed, you have to provide a [wrapper for the function](fitness.go) and make sure that the genetic operators make sense for your problem. The reasoning behing `gago` makes more sense once you start looking at the examples.
+The only requirement for solving a problem is that the problem itself can be modeled as a function that returns a floating point value. Because Go is statically typed, you have to provide a [wrapper for the function](https://github.com/MaxHalford/gago/blob/master/fitness.go) and make sure that the genetic operators make sense for your problem. The reasoning behing `gago` makes more sense once you start looking at the examples.
+
+
+## Presets
+
+A GA requires a certain number of parameters. What's more, some boilerplate code has to be written to handle different types. Presets exist to make gago easier to try out and to provided example setups. These can be found in the `presets/` folder and have to imported on top of `gago`.
+
 
 ## Advice
 
-- Wrap multiple mutators into a single `Mutator` `struct` if you wish to apply multiple mutators, for an example see the [TSP preset](presets/tsp.go).
+- Wrap multiple mutators into a single `Mutator` `struct` if you wish to apply multiple mutators, for an example see the [TSP preset](https://github.com/MaxHalford/gago/blob/master/presets/tsp.go).
 - Don't hesitate to add more populations if you have a multi-core machine, the overhead is very small.
 - Consider the fact that most of the computation is for evaluating the fitness function.
 - Increasing the number of selected parents (`NbParents`) during selection usually increases the converrngce rate (which is not necessarily good, but is sometimes desired).

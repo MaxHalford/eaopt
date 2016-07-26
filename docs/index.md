@@ -1,66 +1,7 @@
 ![logo](img/logo.png)
 
-Apple
-:   Pomaceous fruit of plants of the rngus Malus in
-    the family Rosaceae.
+This is the documentation for [gago](http://gago.readthedocs.io/en/latest/), a genetic algorithm library written in Go. The aim of this project is to make it possible to implement any kind genetic algorithm very quickly. The project is designed with modularity in mind so as to make easy enough to switch genetic operators in a declarative manner. Indeed, every genetic operator can be though of as a brick which can be simply switched with another brick.
 
-!!! tip "Tip"
-    ...
+The main reason why gago has been implemented with [Go](https://golang.org/) is speed. Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel) and Go makes it easy to run loops in parallel. What's more, interpreted languages like Python are simply not fast enough for using genetic algorithms in production. Altough not offering as many generic capabilities as other languages, Go is both an extremely quick language and readable one.
 
-!!! caution "Caution"
-    ...
-
-!!! note "Note"
-    ...
-
-```go
-package main
-
-import (
-    "fmt"
-    "math"
-
-    "github.com/MaxHalford/gago/presets"
-)
-
-// Sphere function minimum is 0 reached in (0, ..., 0).
-// Any search domain is fine.
-func sphere(X []float64) float64 {
-    sum := 0.0
-    for _, x := range X {
-        sum += math.Pow(x, 2)
-    }
-    return sum
-}
-
-func main() {
-    // Instantiate a GA with 2 variables and the fitness function
-    var ga = presets.Float(2, sphere)
-    ga.Initialize()
-    // Enhancement
-    for i := 0; i < 10; i++ {
-        ga.Enhance()
-    }
-    // Display the best obtained solution
-    fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
-}
-```
-
-For full documentation visit [mkdocs.org](http://mkdocs.org).
-
-When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
-$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
-
-## Commands
-
-- `mkdocs new [dir-name]` - Create a new project.
-- `mkdocs serve` - Start the live-reloading docs server.
-- `mkdocs build` - Build the documentation site.
-- `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+A lot of effort has been made to make the code readable and commented. I've also taken the time to provide [some examples](https://github.com/MaxHalford/gago/tree/master/examples) to get started. Feel free to contact me if ever something isn't clear in these examples.

@@ -72,9 +72,9 @@ func TestIndividualsSort(t *testing.T) {
 func TestGetFitnesses(t *testing.T) {
 	var (
 		indis = Individuals{
-			Individual{nil, 0.0, false, 0, "a"},
-			Individual{nil, 1.0, false, 0, "b"},
-			Individual{nil, 2.0, false, 0, "c"},
+			Individual{nil, 0.0, false, "a"},
+			Individual{nil, 1.0, false, "b"},
+			Individual{nil, 2.0, false, "c"},
 		}
 		target    = []float64{0.0, 1.0, 2.0}
 		fitnesses = indis.getFitnesses()
@@ -92,15 +92,15 @@ func TestFitnessMean(t *testing.T) {
 		mean  float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false, 0, "a"},
+			Individual{nil, 1.0, false, "a"},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false, 0, "a"},
-			Individual{nil, 2.0, false, 0, "b"},
+			Individual{nil, 1.0, false, "a"},
+			Individual{nil, 2.0, false, "b"},
 		}, 1.5},
 		{Individuals{
-			Individual{nil, -1.0, false, 0, "a"},
-			Individual{nil, 1.0, false, 0, "b"},
+			Individual{nil, -1.0, false, "a"},
+			Individual{nil, 1.0, false, "b"},
 		}, 0.0},
 	}
 	for _, testCase := range testCases {
@@ -116,15 +116,15 @@ func TestFitnessVariance(t *testing.T) {
 		variance float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false, 0, "a"},
+			Individual{nil, 1.0, false, "a"},
 		}, 0.0},
 		{Individuals{
-			Individual{nil, -1.0, false, 0, "a"},
-			Individual{nil, 1.0, false, 0, "b"},
+			Individual{nil, -1.0, false, "a"},
+			Individual{nil, 1.0, false, "b"},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, -2.0, false, 0, "a"},
-			Individual{nil, 2.0, false, 0, "b"},
+			Individual{nil, -2.0, false, "a"},
+			Individual{nil, 2.0, false, "b"},
 		}, 4.0},
 	}
 	for _, testCase := range testCases {
