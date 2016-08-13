@@ -70,6 +70,7 @@ import (
 )
 
 // Sphere function minimum is 0 reached in (0, ..., 0).
+// Any search domain is fine.
 func sphere(X []float64) float64 {
     sum := 0.0
     for _, x := range X {
@@ -80,18 +81,26 @@ func sphere(X []float64) float64 {
 
 func main() {
     // Instantiate a GA with 2 variables and the fitness function
-    var ga = presets.Float(2, sphere)
+    var ga = presets.Float64(2, sphere)
     ga.Initialize()
     // Enhancement
-    for i := 0; i < 1000; i++ {
-      ga.Enhance()
+    for i := 0; i < 10; i++ {
+        ga.Enhance()
+        // Display the current best solution
+        fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
     }
-    // Display the best obtained solution
-    fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 }
 ```
 
-A preset is simply a genetic algorithm configuration. It's unlikely that a preset will find an optimal solution as is. Presets should be considered as starting points and should be tuned for specific problems.
+<br/>
+
+<div align="center">
+  <img src="docs/img/command-line.png" alt="command_line" />
+</div>
+
+<br/>
+
+A preset is simply a genetic algorithm configuration. It's unlikely that a preset will find an optimal solution as is. Presets should be considered as starting points and should be tuned for specific problems. The following is the preset that was used for the previous example.
 
 ```go
 // Float returns a configuration for minimizing continuous mathematical
@@ -125,6 +134,20 @@ func Float(n int, function func([]float64) float64) gago.GA {
 }
 ```
 
+## Why use gago?
+
+- It's architectured in a modular way.
+- It allows using different evolutionary models.
+- It's ambitious in the sense that it wants to implement every kind of operator possible.
+- It allows implementing custom genetic operators.
+- It makes it possible to use speciation.
+- It makes it possible to run multiple populations in parallel (and to add migration).
+- It's open to suggestions and to improvements.
+- It's heavily commented.
+- It has no external dependencies.
+- It's got a high test coverage.
+- It's actively maintained and will remain one my priorities for a very long time.
+
 ## Alternatives
 
 - [GeneticGo](https://github.com/handcraftsman/GeneticGo)
@@ -134,3 +157,5 @@ func Float(n int, function func([]float64) float64) gago.GA {
 ## Contact
 
 Feel free to contact me at **maxhalford25@gmail.com** for any enquiries.
+
+You can also ask questions on [codewake](https://www.codewake.com/p/gago).
