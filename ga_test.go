@@ -62,7 +62,7 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationNbrCluster(t *testing.T) {
+func TestValidationNbrClusters(t *testing.T) {
 	// Check invalid number of clusters
 	ga.NbrClusters = -1
 	if ga.Validate() == nil {

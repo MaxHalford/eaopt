@@ -22,9 +22,9 @@ func main() {
 	var ga = presets.Float64(2, sphere)
 	ga.Initialize()
 	// Enhancement
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10; i++ {
 		ga.Enhance()
+		// Display the current best solution
+		fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 	}
-	// Display the best obtained solution
-	fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 }
