@@ -317,9 +317,9 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 	)
 	// The length of the new slice of individuals varies if the parents are kept or not
 	if mod.KeepParents {
-		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings)
-	} else {
 		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings+mod.NbrParents)
+	} else {
+		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings)
 	}
 	// Generate offsprings for each parent by copying the parent and then mutating it
 	for _, parent := range parents {

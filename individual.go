@@ -23,6 +23,16 @@ type Individual struct {
 	Name      string
 }
 
+// Generate a new individual.
+func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
+	return Individual{
+		Genome:    make([]interface{}, nbGenes),
+		Fitness:   math.Inf(1),
+		Evaluated: false,
+		Name:      randomString(6, rng),
+	}
+}
+
 // Evaluate the fitness of an individual.
 func (indi *Individual) Evaluate(ff FitnessFunction) {
 	// Don't evaluate individuals that have already been evaluated
@@ -39,18 +49,17 @@ func (indi *Individual) Mutate(mutator Mutator, rng *rand.Rand) {
 	indi.Evaluated = false
 }
 
-// Generate a new individual.
-func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
-	return Individual{
-		Genome:    make([]interface{}, nbGenes),
-		Fitness:   math.Inf(1),
-		Evaluated: false,
-		Name:      randomString(6, rng),
-	}
-}
-
 // Individuals type is necessary for sorting and selection purposes.
 type Individuals []Individual
+
+// Generate a slice of new individuals.
+func makeIndividuals(nbIndis, nbGenes int, rng *rand.Rand) Individuals {
+	var indis = make(Individuals, nbIndis)
+	for i := range indis {
+		indis[i] = makeIndividual(nbGenes, rng)
+	}
+	return indis
+}
 
 // Evaluate each individual
 func (indis Individuals) Evaluate(ff FitnessFunction) {
@@ -66,15 +75,6 @@ func (indis Individuals) Mutate(mutator Mutator, mutRate float64, rng *rand.Rand
 			indis[i].Mutate(mutator, rng)
 		}
 	}
-}
-
-// Generate a slice of new individuals.
-func makeIndividuals(nbIndis, nbGenes int, rng *rand.Rand) Individuals {
-	var indis = make(Individuals, nbIndis)
-	for i := range indis {
-		indis[i] = makeIndividual(nbGenes, rng)
-	}
-	return indis
 }
 
 // Sort the individuals of a population in ascending order based on their
