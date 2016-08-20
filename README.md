@@ -1,6 +1,6 @@
 <div align="center">
   <!-- Logo -->
-   <img src="docs/img/logo.png" alt="logo"/>
+  <img src="docs/img/logo.png" alt="logo"/>
 </div>
 
 <div align="center">
@@ -49,7 +49,7 @@
 
 <br/>
 
-<div align="center"><code>gago</code> is a <b>framework</b> written in <b>Go</b> for running <b>genetic algorithms</b></div>
+<div align="center"><code>gago</code> is a tool for building and running <b>genetic algorithms</b> in a <b>modular</b> fashion</div>
 
 <br/>
 
@@ -103,9 +103,7 @@ func main() {
 A preset is simply a genetic algorithm configuration. It's unlikely that a preset will find an optimal solution as is. Presets should be considered as starting points and should be tuned for specific problems. The following is the preset that was used for the previous example.
 
 ```go
-// Float returns a configuration for minimizing continuous mathematical
-// functions with a given number of variables.
-func Float(n int, function func([]float64) float64) gago.GA {
+func Float64(n int, function func([]float64) float64) gago.GA {
     return gago.GA{
         NbrPopulations: 2,
         NbrIndividuals: 30,
