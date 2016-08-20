@@ -49,7 +49,7 @@
 
 <br/>
 
-<div align="center"><code>gago</code> is a tool for building and running <b>genetic algorithms</b> in a <b>modular</b> fashion</div>
+<div align="center">gago is a tool for implementing <b>genetic algorithms</b> in a <b>modular</b> fashion</div>
 
 <br/>
 
