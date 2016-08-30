@@ -71,7 +71,7 @@ func variance(slice []float64) float64 {
 }
 
 // Sample k unique integers in range [min, max) using reservoir sampling,
-// specifically Algorithm R. It can be proven by induction that each interger
+// specifically Algorithm R. It can be proven by induction that each integer
 // has probability of 1/(max-min) to be selected.
 func randomInts(k, min, max int, rng *rand.Rand) ([]int, error) {
 	if max-min < k {

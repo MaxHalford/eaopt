@@ -11,10 +11,10 @@ import (
 // A GA contains population which themselves contain individuals.
 type GA struct {
 
-	// Parameters that have to be provided
-	Ff             FitnessFunction // Fitness function to evaluate individuals (imposed by the problem)
-	Initializer    Initializer
-	MigFrequency   int // Migration frequency
+	// Fields that have to be provided by the user
+	Ff             FitnessFunction // Fitness function to evaluate individuals (depends on the problem)
+	Initializer    Initializer     // Method for initializing a new individual (depends on the problem)
+	MigFrequency   int             // Frequency at which migrations occur
 	Migrator       Migrator
 	Model          Model
 	NbrClusters    int // Number of clusters each populations is split into before evolving
@@ -22,7 +22,7 @@ type GA struct {
 	NbrIndividuals int // Initial number of individuals in each population
 	NbrPopulations int // Number of populations
 
-	// Parameters that are generated at runtime
+	// Fields that are generated at runtime
 	Best        Individual // Overall best individual (dummy initialization at the beginning)
 	Duration    time.Duration
 	Generations int
@@ -145,8 +145,8 @@ func (ga *GA) Enhance() {
 			// Apply clustering if a number of clusters has been given
 			if ga.NbrClusters > 0 {
 				var clusters = ga.Populations[j].cluster(ga.NbrClusters)
+				// Apply the evolution model to each cluster
 				for k := range clusters {
-					// Apply the evolution model to the cluster
 					ga.Model.Apply(&clusters[k])
 				}
 				// Merge each cluster back into the original population
