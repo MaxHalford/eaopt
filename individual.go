@@ -37,7 +37,7 @@ func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
 func (indi *Individual) Evaluate(ff FitnessFunction) {
 	// Don't evaluate individuals that have already been evaluated
 	if indi.Evaluated == false {
-		indi.Fitness = ff.apply(indi.Genome)
+		indi.Fitness = ff.Apply(indi.Genome)
 		EVALUATIONS++
 	}
 	indi.Evaluated = true

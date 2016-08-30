@@ -14,7 +14,7 @@ func TestFloat64Function(t *testing.T) {
 	test = append(test, 1.0)
 	test = append(test, 2.0)
 	test = append(test, 3.0)
-	if ff.apply(test) != 6.0 {
+	if ff.Apply(test) != 6.0 {
 		t.Error("Problem with FloatFunction")
 	}
 }
@@ -35,7 +35,7 @@ func TestStringFunction(t *testing.T) {
 	test = append(test, "O")
 	test = append(test, "C")
 	test = append(test, "A")
-	if ff.apply(test) != 4.0 {
+	if ff.Apply(test) != 4.0 {
 		t.Error("Problem with StringFunction")
 	}
 }
