@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -19,10 +20,10 @@ func init() {
 	var (
 		infile, _ = os.Open("black-and-violet-1923.jpg")
 		inImg, _  = jpeg.Decode(infile)
-		inBounds  = inImg.Bounds()
 	)
-	refImg = image.NewRGBA(image.Rect(0, 0, inBounds.Dx(), inBounds.Dy()))
-	draw.Draw(refImg, refImg.Bounds(), inImg, inBounds.Min, draw.Src)
+	refBnds = inImg.Bounds()
+	refImg = image.NewRGBA(image.Rect(0, 0, refBnds.Dx(), refBnds.Dy()))
+	draw.Draw(refImg, refImg.Bounds(), inImg, refBnds.Min, draw.Src)
 }
 
 // A Point defines a vertex in a Polygon.
@@ -34,14 +35,6 @@ type Point struct {
 type Polygon struct {
 	points []Point
 	color  color.Color
-}
-
-func castGenomeToPolygons(genome gago.Genome) []Polygon {
-	var polygons = make([]Polygon, len(genome))
-	for i := range genome {
-		polygons[i] = genome[i].(Polygon)
-	}
-	return polygons
 }
 
 func main() {
@@ -58,12 +51,17 @@ func main() {
 			Selector: gago.SelTournament{
 				NbParticipants: 3,
 			},
-			KeepParents:   true,
+			KeepParents:   false,
 			NbrOffsprings: 6,
 			Mutator:       MutatePolygons{},
 		},
 		NbrGenes:       50,
 		NbrIndividuals: 30,
 		NbrPopulations: 1,
+	}
+	ga.Initialize()
+	for i := 0; i < 100; i++ {
+		ga.Enhance()
+		fmt.Println(ga.Populations[0].Individuals.FitnessMean())
 	}
 }
