@@ -3,7 +3,6 @@ package main
 import (
 	"image"
 	"image/color"
-	"image/draw"
 	"math"
 
 	"github.com/MaxHalford/gago"
@@ -17,7 +16,11 @@ type PolygonsFunction struct {
 
 // Apply the fitness function wrapped in PolygonsFunction.
 func (ff PolygonsFunction) Apply(genome gago.Genome) float64 {
-	return ff.Image(castGenomeToPolygons(genome))
+	var polygons = make([]Polygon, len(genome))
+	for i := range genome {
+		polygons[i] = genome[i].(Polygon)
+	}
+	return ff.Image(polygons)
 }
 
 // Project a slice of Polygons on an image and compare every pixel to the ones in the original image
@@ -29,7 +32,13 @@ func polygonsFitness(polygons []Polygon) float64 {
 	)
 
 	// To start with, paint the whole image black
-	draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.ZP, draw.Src)
+	brush.SetFillColor(color.Black)
+	brush.MoveTo(0, 0)
+	brush.LineTo(float64(refBnds.Max.X-1), 0)
+	brush.LineTo(float64(refBnds.Max.X-1), float64(refBnds.Max.Y-1))
+	brush.LineTo(0, float64(refBnds.Max.Y-1))
+	brush.Close()
+	brush.Fill()
 
 	brush.SetLineWidth(1)
 
@@ -50,7 +59,7 @@ func polygonsFitness(polygons []Polygon) float64 {
 	}
 
 	var fitness float64
-	for i := 0; i < len(img.Pix); i++ {
+	for i := range img.Pix {
 		fitness += math.Abs(float64(img.Pix[i]) - float64(refImg.Pix[i]))
 	}
 	return fitness
