@@ -259,7 +259,8 @@ func (mod ModSimAnn) Apply(pop *Population) {
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
 			// Generate a random neighbour through mutation
-			var neighbour = indi
+			var neighbour = makeIndividual(len(indi.Genome), pop.rng)
+			neighbour.Genome = indi.Genome
 			mod.Mutator.Apply(&neighbour, pop.rng)
 			neighbour.Evaluate(pop.ff)
 			// Check if the neighbour is better or not
@@ -328,7 +329,9 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 			i++
 		}
 		for j := 0; j < mod.NbrOffsprings; j++ {
-			var offspring = parent
+			// Create a new individual and copy the parent's genome onto it
+			var offspring = makeIndividual(len(parent.Genome), pop.rng)
+			offspring.Genome = parent.Genome
 			mod.Mutator.Apply(&offspring, pop.rng)
 			offsprings[i] = offspring
 			i++
