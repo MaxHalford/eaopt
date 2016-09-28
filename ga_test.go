@@ -62,8 +62,22 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
+func TestValidationModel(t *testing.T) {
+	// Check invalid model raises error
+	ga.Model = ModGenerational{}
+	if ga.Validate() == nil {
+		t.Error("Invalid model didn't return an error")
+	}
+	// Check no presence of model raises error
+	ga.Model = nil
+	if ga.Validate() == nil {
+		t.Error("Nil model didn't return an error")
+	}
+	ga.Model = model
+}
+
 func TestValidationNbrClusters(t *testing.T) {
-	// Check invalid number of clusters
+	// Check invalid number of clusters raises error
 	ga.NbrClusters = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of clusters didn't return an error")
@@ -72,7 +86,7 @@ func TestValidationNbrClusters(t *testing.T) {
 }
 
 func TestValidationNbrGenes(t *testing.T) {
-	// Check invalid number of genes
+	// Check invalid number of genes raises error
 	ga.NbrGenes = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of genes didn't return an error")
@@ -81,7 +95,7 @@ func TestValidationNbrGenes(t *testing.T) {
 }
 
 func TestValidationNbrIndividuals(t *testing.T) {
-	// Check invalid number of individuals
+	// Check invalid number of individuals raises error
 	ga.NbrIndividuals = 1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of individuals didn't return an error")
@@ -90,7 +104,7 @@ func TestValidationNbrIndividuals(t *testing.T) {
 }
 
 func TestValidationNbrPopulations(t *testing.T) {
-	// Check invalid number of population
+	// Check invalid number of population raises error
 	ga.NbrPopulations = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of populations didn't return an error")
@@ -99,7 +113,7 @@ func TestValidationNbrPopulations(t *testing.T) {
 }
 
 func TestValidationFf(t *testing.T) {
-	// Check presence of fitness function
+	// Check no presence of fitness function raises error
 	ga.Ff = nil
 	if ga.Validate() == nil {
 		t.Error("Nil fitness function didn't return an error")
@@ -107,17 +121,8 @@ func TestValidationFf(t *testing.T) {
 	ga.Ff = ff
 }
 
-func TestValidationModel(t *testing.T) {
-	// Check presence of model
-	ga.Model = nil
-	if ga.Validate() == nil {
-		t.Error("Nil model didn't return an error")
-	}
-	ga.Model = model
-}
-
 func TestValidationInit(t *testing.T) {
-	// Check presence of initializer
+	// Check no presence of initializer raises error
 	ga.Initializer = nil
 	if ga.Validate() == nil {
 		t.Error("Nil initializer didn't return an error")
@@ -126,7 +131,7 @@ func TestValidationInit(t *testing.T) {
 }
 
 func TestValidationMigFrequency(t *testing.T) {
-	// Check migration frequency
+	// Check invalid migration frequency raises error
 	ga.MigFrequency = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid migration frequency didn't return an error")
