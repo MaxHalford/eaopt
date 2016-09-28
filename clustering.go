@@ -12,11 +12,8 @@ func (pop Population) cluster(k int) Populations {
 	var (
 		pops = make(Populations, k)
 		n    = len(pop.Individuals)
-		m    = int(math.Ceil(float64(n / k)))
+		m    = min(int(math.Ceil(float64(n/k))), n)
 	)
-	if m > n {
-		m = n
-	}
 	for i := range pops {
 		var (
 			a = i * m

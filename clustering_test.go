@@ -17,7 +17,7 @@ func TestClustering(t *testing.T) {
 	for _, n := range N {
 		for _, k := range K {
 			var (
-				m        = int(math.Ceil(float64(n / k)))
+				m        = min(int(math.Ceil(float64(n/k))), n)
 				indis    = makeIndividuals(n, 1, rng)
 				pop      = Population{Individuals: indis}
 				clusters = pop.cluster(k)
