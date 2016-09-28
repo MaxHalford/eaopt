@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -16,7 +17,7 @@ func TestClustering(t *testing.T) {
 	for _, n := range N {
 		for _, k := range K {
 			var (
-				m        = n/k + 1
+				m        = int(math.Ceil(float64(n / k)))
 				indis    = makeIndividuals(n, 1, rng)
 				pop      = Population{Individuals: indis}
 				clusters = pop.cluster(k)
@@ -52,6 +53,40 @@ func TestClusteringMerge(t *testing.T) {
 			if len(indis) != nbi*nbc {
 				t.Error("Merge didn't work properly")
 			}
+		}
+	}
+}
+
+func TestClusteringEnhancement(t *testing.T) {
+	var ga = GA{
+		NbrPopulations: 4,
+		NbrIndividuals: 30,
+		NbrGenes:       2,
+		Initializer: InitUniformF{
+			Lower: -1,
+			Upper: 1,
+		},
+		Ff: Float64Function{
+			Image: func(X []float64) float64 {
+				var sum float64
+				for _, x := range X {
+					sum += x
+				}
+				return sum
+			},
+		},
+		Model: ModGenerational{
+			Selector:  SelElitism{},
+			Crossover: CrossUniformF{},
+		},
+	}
+	for _, n := range []int{1, 3, 10} {
+		ga.NbrClusters = n
+		ga.Initialize()
+		var best = ga.Best
+		ga.Enhance()
+		if best.Fitness < ga.Best.Fitness {
+			t.Error("Clustering didn't work as expected")
 		}
 	}
 }

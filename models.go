@@ -128,10 +128,6 @@ func (mod ModSteadyState) Validate() error {
 	if mod.Crossover == nil {
 		return errors.New("'Crossover' cannot be nil")
 	}
-	// Check the keep best parameter presence
-	if mod.Crossover == nil {
-		return errors.New("'KeepBest' cannot be nil")
-	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
 		return errors.New("'MutRate' should belong to the [0, 1] interval")

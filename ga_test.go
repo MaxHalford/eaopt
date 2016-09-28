@@ -7,12 +7,13 @@ import (
 )
 
 var (
-	ga            GA
-	nbPopulations = 4
-	nbIndividuals = 30
-	nbGenes       = 2
-	nbGenerations = 10
-	initializer   = InitUniformF{
+	ga             GA
+	nbrPopulations = 4
+	nbrIndividuals = 30
+	nbrClusters    = 2
+	nbrGenes       = 2
+	nbrGenerations = 10
+	initializer    = InitUniformF{
 		Lower: -1,
 		Upper: 1,
 	}
@@ -41,16 +42,16 @@ var (
 )
 
 func init() {
-	ga.NbrPopulations = nbPopulations
-	ga.NbrIndividuals = nbIndividuals
-	ga.NbrGenes = nbGenes
+	ga.NbrPopulations = nbrPopulations
+	ga.NbrIndividuals = nbrIndividuals
+	ga.NbrGenes = nbrGenes
 	ga.Initializer = initializer
 	ga.Ff = ff
 	ga.Model = model
 	ga.Migrator = migrator
 	ga.MigFrequency = migFrequency
 	ga.Initialize()
-	for i := 0; i < nbGenerations; i++ {
+	for i := 0; i < nbrGenerations; i++ {
 		ga.Enhance()
 	}
 }
@@ -82,7 +83,7 @@ func TestValidationNbrClusters(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of clusters didn't return an error")
 	}
-	ga.NbrGenes = nbGenes
+	ga.NbrClusters = nbrClusters
 }
 
 func TestValidationNbrGenes(t *testing.T) {
@@ -91,7 +92,7 @@ func TestValidationNbrGenes(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of genes didn't return an error")
 	}
-	ga.NbrGenes = nbGenes
+	ga.NbrGenes = nbrGenes
 }
 
 func TestValidationNbrIndividuals(t *testing.T) {
@@ -100,7 +101,7 @@ func TestValidationNbrIndividuals(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of individuals didn't return an error")
 	}
-	ga.NbrIndividuals = nbIndividuals
+	ga.NbrIndividuals = nbrIndividuals
 }
 
 func TestValidationNbrPopulations(t *testing.T) {
@@ -109,7 +110,7 @@ func TestValidationNbrPopulations(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid number of populations didn't return an error")
 	}
-	ga.NbrPopulations = nbIndividuals
+	ga.NbrPopulations = nbrPopulations
 }
 
 func TestValidationFf(t *testing.T) {
@@ -141,19 +142,19 @@ func TestValidationMigFrequency(t *testing.T) {
 
 func TestSizes(t *testing.T) {
 	// Number of Populations
-	if len(ga.Populations) != nbPopulations {
+	if len(ga.Populations) != nbrPopulations {
 		t.Error("Wrong number of Populations")
 	}
 	// Number of individuals
 	for _, pop := range ga.Populations {
-		if len(pop.Individuals) != nbIndividuals {
+		if len(pop.Individuals) != nbrIndividuals {
 			t.Error("Wrong number of individuals")
 		}
 	}
 	// Genome size
 	for _, pop := range ga.Populations {
 		for _, indi := range pop.Individuals {
-			if len(indi.Genome) != nbGenes {
+			if len(indi.Genome) != nbrGenes {
 				t.Error("Wrong genome size")
 			}
 		}
@@ -203,7 +204,7 @@ func TestFindBest(t *testing.T) {
 }
 
 func TestGenerations(t *testing.T) {
-	if ga.Generations != nbGenerations {
+	if ga.Generations != nbrGenerations {
 		t.Error("Generations counter wasn't incremented")
 	}
 }

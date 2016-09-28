@@ -119,20 +119,32 @@ func TestModelRequiredParameters(t *testing.T) {
 	var models = []Model{
 		// Generational
 		ModGenerational{
-			Selector:  nil,
+			Selector:  nil, // Missing selector
 			Crossover: CrossPoint{2},
 			Mutator:   MutNormalF{0.1, 1},
 			MutRate:   0.2,
 		},
 		ModGenerational{
 			Selector:  SelTournament{3},
-			Crossover: nil,
+			Crossover: nil, // Missing crossover
 			Mutator:   MutNormalF{0.1, 1},
 			MutRate:   0.2,
+		},
+		ModGenerational{
+			Selector:  SelTournament{3},
+			Crossover: CrossPoint{2},
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   -1, // Invalid probability
+		},
+		ModGenerational{
+			Selector:  SelTournament{3},
+			Crossover: CrossPoint{2},
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   2, // Invalid probability
 		},
 		// Steady state
 		ModSteadyState{
-			Selector:  nil,
+			Selector:  nil, // Missing selector
 			Crossover: CrossPoint{2},
 			KeepBest:  false,
 			Mutator:   MutNormalF{0.1, 1},
@@ -140,14 +152,28 @@ func TestModelRequiredParameters(t *testing.T) {
 		},
 		ModSteadyState{
 			Selector:  SelTournament{3},
-			Crossover: nil,
+			Crossover: nil, // Missing crossover
 			KeepBest:  false,
 			Mutator:   MutNormalF{0.1, 1},
 			MutRate:   0.2,
 		},
+		ModSteadyState{
+			Selector:  SelTournament{3},
+			Crossover: CrossPoint{2},
+			KeepBest:  false,
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   -1, // Invalid probability
+		},
+		ModSteadyState{
+			Selector:  SelTournament{3},
+			Crossover: CrossPoint{2},
+			KeepBest:  false,
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   2, // Invalid probability
+		},
 		// Select down to size
 		ModDownToSize{
-			NbrOffsprings: 0,
+			NbrOffsprings: 0, // Invalid number
 			SelectorA:     SelTournament{3},
 			Crossover:     CrossPoint{2},
 			SelectorB:     SelElitism{},
@@ -156,7 +182,7 @@ func TestModelRequiredParameters(t *testing.T) {
 		},
 		ModDownToSize{
 			NbrOffsprings: 5,
-			SelectorA:     nil,
+			SelectorA:     nil, // Missing selector
 			Crossover:     CrossPoint{2},
 			SelectorB:     SelElitism{},
 			Mutator:       MutNormalF{0.1, 1},
@@ -165,7 +191,7 @@ func TestModelRequiredParameters(t *testing.T) {
 		ModDownToSize{
 			NbrOffsprings: 5,
 			SelectorA:     SelTournament{3},
-			Crossover:     nil,
+			Crossover:     nil, // Missing crossover
 			SelectorB:     SelElitism{},
 			Mutator:       MutNormalF{0.1, 1},
 			MutRate:       0.2,
@@ -174,39 +200,67 @@ func TestModelRequiredParameters(t *testing.T) {
 			NbrOffsprings: 5,
 			SelectorA:     SelTournament{3},
 			Crossover:     CrossPoint{2},
-			SelectorB:     nil,
+			SelectorB:     nil, // Missing selector
 			Mutator:       MutNormalF{0.1, 1},
 			MutRate:       0.2,
+		},
+		ModDownToSize{
+			NbrOffsprings: 5,
+			SelectorA:     SelTournament{3},
+			Crossover:     CrossPoint{2},
+			SelectorB:     SelElitism{},
+			Mutator:       MutNormalF{0.1, 1},
+			MutRate:       -1, // Invalid probability
+		},
+		ModDownToSize{
+			NbrOffsprings: 5,
+			SelectorA:     SelTournament{3},
+			Crossover:     CrossPoint{2},
+			SelectorB:     SelElitism{},
+			Mutator:       MutNormalF{0.1, 1},
+			MutRate:       2, // Invalid probability
 		},
 		// Ring
 		ModRing{
-			Crossover: nil,
+			Crossover: nil, // Missing crossover
 			Selector:  SelTournament{3},
 			Mutator:   MutNormalF{0.1, 1},
 			MutRate:   0.2,
 		},
 		ModRing{
 			Crossover: CrossPoint{2},
-			Selector:  nil,
+			Selector:  nil, // Missing selector
 			Mutator:   MutNormalF{0.1, 1},
 			MutRate:   0.2,
 		},
+		ModRing{
+			Crossover: CrossPoint{2},
+			Selector:  SelTournament{3},
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   -1, // Invalid probability
+		},
+		ModRing{
+			Crossover: CrossPoint{2},
+			Selector:  SelTournament{3},
+			Mutator:   MutNormalF{0.1, 1},
+			MutRate:   2, // Invalid probability
+		},
 		// Simulated annealing
 		ModSimAnn{
-			Mutator: nil,
+			Mutator: nil, // Missing mutator
 			T:       10,
 			Tmin:    1,
 			Alpha:   0.3,
 		},
 		ModSimAnn{
 			Mutator: MutNormalF{0.1, 1},
-			T:       -1,
-			Tmin:    1,
+			T:       10,
+			Tmin:    -1, // Invalid number
 			Alpha:   0.3,
 		},
 		ModSimAnn{
 			Mutator: MutNormalF{0.1, 1},
-			T:       1,
+			T:       1, // Should be higher than Tmin
 			Tmin:    2,
 			Alpha:   0.3,
 		},
@@ -214,17 +268,17 @@ func TestModelRequiredParameters(t *testing.T) {
 			Mutator: MutNormalF{0.1, 1},
 			T:       10,
 			Tmin:    1,
-			Alpha:   0,
+			Alpha:   0, // Invalid number
 		},
 		ModSimAnn{
 			Mutator: MutNormalF{0.1, 1},
 			T:       10,
 			Tmin:    1,
-			Alpha:   1,
+			Alpha:   1, // Invalid number
 		},
 		// Mutation
 		ModMutationOnly{
-			NbrParents:    0,
+			NbrParents:    0, // Invalid number
 			Selector:      SelTournament{2},
 			KeepParents:   false,
 			NbrOffsprings: 2,
@@ -232,7 +286,7 @@ func TestModelRequiredParameters(t *testing.T) {
 		},
 		ModMutationOnly{
 			NbrParents:    3,
-			Selector:      nil,
+			Selector:      nil, // Missing selector
 			KeepParents:   false,
 			NbrOffsprings: 2,
 			Mutator:       MutNormalF{0.1, 1},
@@ -241,7 +295,7 @@ func TestModelRequiredParameters(t *testing.T) {
 			NbrParents:    3,
 			Selector:      SelTournament{2},
 			KeepParents:   false,
-			NbrOffsprings: 0,
+			NbrOffsprings: 0, // Invalid number
 			Mutator:       MutNormalF{0.1, 1},
 		},
 		ModMutationOnly{
@@ -249,7 +303,7 @@ func TestModelRequiredParameters(t *testing.T) {
 			Selector:      SelTournament{2},
 			KeepParents:   false,
 			NbrOffsprings: 2,
-			Mutator:       nil,
+			Mutator:       nil, // Missing mutator
 		},
 	}
 	for _, model := range models {
