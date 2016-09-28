@@ -6,14 +6,6 @@ import (
 	"math/rand"
 )
 
-// A Model specifies a manner and a order to apply genetic operators to a
-// population at generation n in order for it obtain better individuals at
-// generation n+1.
-type Model interface {
-	Apply(pop *Population)
-	Validate() error
-}
-
 // generateOffsprings is a DRY utility function. It also handles the case of
 // having to generate a non-even number of individuals.
 func generateOffsprings(n int, indis Individuals, sel Selector, cross Crossover, rng *rand.Rand) Individuals {
@@ -34,6 +26,14 @@ func generateOffsprings(n int, indis Individuals, sel Selector, cross Crossover,
 		}
 	}
 	return offsprings
+}
+
+// A Model specifies a manner and a order to apply genetic operators to a
+// population at generation n in order for it obtain better individuals at
+// generation n+1.
+type Model interface {
+	Apply(pop *Population)
+	Validate() error
 }
 
 // ModGenerational implements the generational model.
