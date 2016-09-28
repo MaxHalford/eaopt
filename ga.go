@@ -2,7 +2,6 @@ package gago
 
 import (
 	"errors"
-	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -77,11 +76,6 @@ func (ga GA) Validate() error {
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
-	// Validate the parameters of the GA
-	var err = ga.Validate()
-	if err != nil {
-		log.Fatal(err)
-	}
 	// Reset the number of generations and the elapsed duration
 	ga.Generations = 0
 	ga.Duration = 0
