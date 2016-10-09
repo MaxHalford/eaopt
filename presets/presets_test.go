@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGAFloat(t *testing.T) {
+func TestGAFloat64(t *testing.T) {
 	var (
 		nbVariables = 4
 		ff          = func(X []float64) float64 {
@@ -16,7 +16,7 @@ func TestGAFloat(t *testing.T) {
 			}
 			return sum
 		}
-		ga = Float(nbVariables, ff)
+		ga = Float64(nbVariables, ff)
 	)
 	ga.Initialize()
 	var err = ga.Validate()

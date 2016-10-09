@@ -7,19 +7,24 @@ import (
 	"time"
 )
 
+// A Topology holds all the information relative to the size of a GA.
+type Topology struct {
+	NbrPopulations int // Number of populations
+	NbrClusters    int // Number of clusters each populations is split into before evolving
+	NbrIndividuals int // Initial number of individuals in each population
+	NbrGenes       int // Number of genes in each individual (imposed by the problem)
+}
+
 // A GA contains population which themselves contain individuals.
 type GA struct {
 
 	// Fields that have to be provided by the user
-	Ff             FitnessFunction // Fitness function to evaluate individuals (depends on the problem)
-	Initializer    Initializer     // Method for initializing a new individual (depends on the problem)
-	MigFrequency   int             // Frequency at which migrations occur
-	Migrator       Migrator
-	Model          Model
-	NbrClusters    int // Number of clusters each populations is split into before evolving
-	NbrGenes       int // Number of genes in each individual (imposed by the problem)
-	NbrIndividuals int // Initial number of individuals in each population
-	NbrPopulations int // Number of populations
+	Ff           FitnessFunction // Fitness function to evaluate individuals (depends on the problem)
+	Initializer  Initializer     // Method for initializing a new individual (depends on the problem)
+	Topology     Topology
+	Model        Model
+	MigFrequency int // Frequency at which migrations occur
+	Migrator     Migrator
 
 	// Fields that are generated at runtime
 	Best        Individual // Overall best individual (dummy initialization at the beginning)
@@ -53,19 +58,19 @@ func (ga GA) Validate() error {
 		return modelErr
 	}
 	// Check the number of clusters
-	if ga.NbrClusters < 0 {
+	if ga.Topology.NbrClusters < 0 {
 		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
 	}
 	// Check the number of genes
-	if ga.NbrGenes < 1 {
+	if ga.Topology.NbrGenes < 1 {
 		return errors.New("'NbrGenes' should be higher or equal to 1")
 	}
 	// Check the number of individuals
-	if ga.NbrIndividuals < 2 {
+	if ga.Topology.NbrIndividuals < 2 {
 		return errors.New("'NbrIndividuals' should be higher or equal to 2")
 	}
 	// Check the number of populations
-	if ga.NbrPopulations < 1 {
+	if ga.Topology.NbrPopulations < 1 {
 		return errors.New("'NbrPopulations' should be higher or equal to 1")
 	}
 	// No error
@@ -80,7 +85,7 @@ func (ga *GA) Initialize() {
 	ga.Generations = 0
 	ga.Duration = 0
 	// Create the populations
-	ga.Populations = make([]Population, ga.NbrPopulations)
+	ga.Populations = make([]Population, ga.Topology.NbrPopulations)
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
@@ -88,8 +93,8 @@ func (ga *GA) Initialize() {
 			defer wg.Done()
 			// Generate a population
 			ga.Populations[j] = makePopulation(
-				ga.NbrIndividuals,
-				ga.NbrGenes,
+				ga.Topology.NbrIndividuals,
+				ga.Topology.NbrGenes,
 				ga.Ff,
 				ga.Initializer,
 			)
@@ -101,7 +106,7 @@ func (ga *GA) Initialize() {
 	}
 	wg.Wait()
 	// Best individual (dummy initialization)
-	ga.Best = makeIndividual(ga.NbrGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
+	ga.Best = makeIndividual(ga.Topology.NbrGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
 	// Find the best individual
 	ga.findBest()
 }
@@ -127,7 +132,7 @@ func (ga *GA) Enhance() {
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
 	// generation count
-	if ga.NbrPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+	if ga.Topology.NbrPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations)
 	}
 	// Use a wait group to enhance the populations in parallel
@@ -137,8 +142,8 @@ func (ga *GA) Enhance() {
 		go func(j int) {
 			defer wg.Done()
 			// Apply clustering if a number of clusters has been given
-			if ga.NbrClusters > 0 {
-				var clusters = ga.Populations[j].cluster(ga.NbrClusters)
+			if ga.Topology.NbrClusters > 0 {
+				var clusters = ga.Populations[j].cluster(ga.Topology.NbrClusters)
 				// Apply the evolution model to each cluster
 				for k := range clusters {
 					ga.Model.Apply(&clusters[k])
