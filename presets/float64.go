@@ -6,9 +6,6 @@ import "github.com/MaxHalford/gago"
 // functions with a given number of variables.
 func Float64(n int, function func([]float64) float64) gago.GA {
 	return gago.GA{
-		NbrPopulations: 2,
-		NbrIndividuals: 30,
-		NbrGenes:       n,
 		Ff: gago.Float64Function{
 			Image: function,
 		},
@@ -16,9 +13,14 @@ func Float64(n int, function func([]float64) float64) gago.GA {
 			Lower: -1,
 			Upper: 1,
 		},
+		Topology: gago.Topology{
+			NbrPopulations: 2,
+			NbrIndividuals: 30,
+			NbrGenes:       n,
+		},
 		Model: gago.ModGenerational{
 			Selector: gago.SelTournament{
-				NbParticipants: 3,
+				NbrParticipants: 3,
 			},
 			Crossover: gago.CrossUniformF{},
 			Mutator: gago.MutNormalF{

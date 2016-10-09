@@ -28,7 +28,7 @@ var (
 	}
 	model = ModGenerational{
 		Selector: SelTournament{
-			NbParticipants: 3,
+			NbrParticipants: 3,
 		},
 		Crossover: CrossUniformF{},
 		Mutator: MutNormalF{
@@ -42,9 +42,9 @@ var (
 )
 
 func init() {
-	ga.NbrPopulations = nbrPopulations
-	ga.NbrIndividuals = nbrIndividuals
-	ga.NbrGenes = nbrGenes
+	ga.Topology.NbrPopulations = nbrPopulations
+	ga.Topology.NbrIndividuals = nbrIndividuals
+	ga.Topology.NbrGenes = nbrGenes
 	ga.Initializer = initializer
 	ga.Ff = ff
 	ga.Model = model
@@ -79,38 +79,38 @@ func TestValidationModel(t *testing.T) {
 
 func TestValidationNbrClusters(t *testing.T) {
 	// Check invalid number of clusters raises error
-	ga.NbrClusters = -1
+	ga.Topology.NbrClusters = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of clusters didn't return an error")
 	}
-	ga.NbrClusters = nbrClusters
+	ga.Topology.NbrClusters = nbrClusters
 }
 
 func TestValidationNbrGenes(t *testing.T) {
 	// Check invalid number of genes raises error
-	ga.NbrGenes = 0
+	ga.Topology.NbrGenes = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of genes didn't return an error")
 	}
-	ga.NbrGenes = nbrGenes
+	ga.Topology.NbrGenes = nbrGenes
 }
 
 func TestValidationNbrIndividuals(t *testing.T) {
 	// Check invalid number of individuals raises error
-	ga.NbrIndividuals = 1
+	ga.Topology.NbrIndividuals = 1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of individuals didn't return an error")
 	}
-	ga.NbrIndividuals = nbrIndividuals
+	ga.Topology.NbrIndividuals = nbrIndividuals
 }
 
 func TestValidationNbrPopulations(t *testing.T) {
 	// Check invalid number of population raises error
-	ga.NbrPopulations = 0
+	ga.Topology.NbrPopulations = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid number of populations didn't return an error")
 	}
-	ga.NbrPopulations = nbrPopulations
+	ga.Topology.NbrPopulations = nbrPopulations
 }
 
 func TestValidationFf(t *testing.T) {
