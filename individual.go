@@ -6,7 +6,8 @@ import (
 	"sort"
 )
 
-// EVALUATIONS tracks the total number of times the fitness function was evaluated
+// EVALUATIONS tracks the total number of times the fitness function was
+// evaluated.
 var EVALUATIONS = 0
 
 // A Genome contains genes
