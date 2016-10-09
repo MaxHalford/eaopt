@@ -27,18 +27,20 @@ func (tspmut tspMutator) Apply(indi *gago.Individual, rng *rand.Rand) {
 // function.
 func TSP(places []string, distance func([]string) float64) gago.GA {
 	return gago.GA{
-		NbrPopulations: 1,
-		NbrIndividuals: 100,
-		NbrGenes:       len(places),
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
 		Initializer: gago.InitUniqueS{
 			Corpus: places,
 		},
+		Topology: gago.Topology{
+			NbrPopulations: 1,
+			NbrIndividuals: 100,
+			NbrGenes:       len(places),
+		},
 		Model: gago.ModGenerational{
 			Selector: gago.SelTournament{
-				NbParticipants: 17,
+				NbrParticipants: 17,
 			},
 			Crossover: gago.CrossPMX{},
 			Mutator:   tspMutator{},
