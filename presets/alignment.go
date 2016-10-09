@@ -7,18 +7,20 @@ import "github.com/MaxHalford/gago"
 // belonging to a corpus of elements.
 func Alignment(length int, corpus []string, distance func([]string) float64) gago.GA {
 	return gago.GA{
-		NbrPopulations: 2,
-		NbrIndividuals: 30,
-		NbrGenes:       length,
 		Ff: gago.StringFunction{
 			Image: distance,
 		},
 		Initializer: gago.InitUniformS{
 			Corpus: corpus,
 		},
+		Topology: gago.Topology{
+			NbrPopulations: 2,
+			NbrIndividuals: 30,
+			NbrGenes:       length,
+		},
 		Model: gago.ModGenerational{
 			Selector: gago.SelTournament{
-				NbParticipants: 3,
+				NbrParticipants: 3,
 			},
 			Crossover: gago.CrossPoint{
 				NbPoints: 2,

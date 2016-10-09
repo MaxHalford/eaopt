@@ -22,9 +22,18 @@ func main() {
 	var ga = presets.Float64(2, sphere)
 	ga.Initialize()
 	// Enhancement
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 8; i++ {
 		ga.Enhance()
 		// Display the current best solution
 		fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
 	}
 }
+
+>>> The best obtained solution is 0.018692
+>>> The best obtained solution is 0.003595
+>>> The best obtained solution is 0.000473
+>>> The best obtained solution is 0.000311
+>>> The best obtained solution is 0.000235
+>>> The best obtained solution is 0.000064
+>>> The best obtained solution is 0.000006
+>>> The best obtained solution is 0.000001

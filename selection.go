@@ -11,7 +11,7 @@ type Selector interface {
 // The tournament is composed of randomly chosen individuals. The winner of the
 // tournament is the individual with the lowest fitness.
 type SelTournament struct {
-	NbParticipants int
+	NbrParticipants int
 }
 
 // Apply tournament selection.
@@ -22,7 +22,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 	)
 	for i := range winners {
 		// Sample the GA
-		var roundIndexes, sample = indis.sample(sel.NbParticipants, rng)
+		var roundIndexes, sample = indis.sample(sel.NbrParticipants, rng)
 		// The winner is the best individual participating in the tournament
 		sample.Sort()
 		indexes[i] = roundIndexes[0]
@@ -31,7 +31,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 	return winners, indexes
 }
 
-// SelElitism selection returns the best individuals in the GA.
+// SelElitism selection returns the n best individuals of a group.
 type SelElitism struct{}
 
 // Apply elitism selection.
