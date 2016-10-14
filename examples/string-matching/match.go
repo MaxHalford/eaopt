@@ -19,6 +19,9 @@ var (
 	target = strings.Split("Hello world!", "")
 )
 
+// The hamming distance measures the minimum number of
+// substitutions required to change one string into the other.
+// The GA will seek to minimize the hamming distance.
 func hamming(str []string) float64 {
 	var errors float64
 	for i, s := range str {
