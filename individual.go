@@ -13,9 +13,9 @@ var EVALUATIONS = 0
 // A Genome contains genes
 type Genome []interface{}
 
-// An Individual represents a potential solution to a problem. The individual's
-// is defined by it's genome, which is a slice containing genes. Every gene is a
-// floating point numbers. The fitness is the individual's phenotype and is
+// An Individual represents a potential solution to a problem. Each individual
+// is defined by its genome, which is a slice containing genes. Every gene is a
+// floating point number. The fitness is the individual's phenotype and is
 // represented by a floating point number.
 type Individual struct {
 	Genome    Genome
@@ -44,7 +44,7 @@ func (indi *Individual) Evaluate(ff FitnessFunction) {
 	indi.Evaluated = true
 }
 
-// Mutate applies a mutator to an individual and sets it's `Evaluated` property to `false`.
+// Mutate applies a mutator to an individual and sets its `Evaluated` property to `false`.
 func (indi *Individual) Mutate(mutator Mutator, rng *rand.Rand) {
 	mutator.Apply(indi, rng)
 	indi.Evaluated = false

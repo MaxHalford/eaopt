@@ -174,7 +174,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ### When to use genetic algorithms?
 
-Genetic algorithms are often a good solution to [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They usually perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intellirngtly.
+Genetic algorithms are often a good solution to [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They usually perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently.
 
 As mentionned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in neural networks is an open problem that doesn't yet have a reliable solution. Neural networks used in production are usually architectured by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, either by optimizing the network's topology or it's weights and biases.
 
@@ -413,7 +413,7 @@ The purpose of a partinioning individuals is to apply genetic operators to simil
 
 Using clustering/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely dissapear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't dissapear immediatly. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
-With gago it's possible to use clustering on top of all the rest. For the while the only kind of clustering is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of $n$ individuals is clustered into $k$ before applying an evolution model to each cluster. The $k$ clusters are then merged into a new population of $n$ individuals. This way each cluster didn't interact with the other clusters.
+With gago it's possible to use clustering on top of all the rest. For the time, the only kind of clustering is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` clusters before applying an evolution model to each cluster. The `k` clusters are then merged into a new population of `n` individuals. This way, clusters don't interact with other clusters.
 
 ![clustering](img/clustering.png)
 
