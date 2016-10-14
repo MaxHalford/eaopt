@@ -14,7 +14,7 @@ var EVALUATIONS = 0
 type Genome []interface{}
 
 // An Individual represents a potential solution to a problem. Each individual
-// is defined by it's genome, which is a slice containing genes. Every gene is a
+// is defined by its genome, which is a slice containing genes. Every gene is a
 // floating point number. The fitness is the individual's phenotype and is
 // represented by a floating point number.
 type Individual struct {
