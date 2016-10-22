@@ -1,8 +1,7 @@
-package gago
+package gago2
 
 import (
 	"errors"
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -12,15 +11,30 @@ type Topology struct {
 	NbrPopulations int // Number of populations
 	NbrClusters    int // Number of clusters each populations is split into before evolving
 	NbrIndividuals int // Initial number of individuals in each population
-	NbrGenes       int // Number of genes in each individual (imposed by the problem)
+}
+
+// Validate the properties of a Topology.
+func (topo Topology) Validate() error {
+	// Check the number of clusters
+	if topo.NbrClusters < 0 {
+		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
+	}
+	// Check the number of individuals
+	if topo.NbrIndividuals < 2 {
+		return errors.New("'NbrIndividuals' should be higher or equal to 2")
+	}
+	// Check the number of populations
+	if topo.NbrPopulations < 1 {
+		return errors.New("'NbrPopulations' should be higher or equal to 1")
+	}
+	// No error
+	return nil
 }
 
 // A GA contains population which themselves contain individuals.
 type GA struct {
-
-	// Fields that have to be provided by the user
-	Ff           FitnessFunction // Fitness function to evaluate individuals (depends on the problem)
-	Initializer  Initializer     // Method for initializing a new individual (depends on the problem)
+	// Fields that are provided by the user
+	MakeGenome   GenomeMaker
 	Topology     Topology
 	Model        Model
 	MigFrequency int // Frequency at which migrations occur
@@ -33,20 +47,17 @@ type GA struct {
 	Populations Populations
 }
 
-// Validate the parameters of a GA to ensure it will run correctly. Some
+// Validate the parameters of a GA to ensure it will run correctly; some
 // settings or combination of settings may be incoherent during runtime.
 func (ga GA) Validate() error {
-	// Check the fitness function presence
-	if ga.Ff == nil {
-		return errors.New("'Ff' cannot be nil")
+	// Check the GenomeMaker presence
+	if ga.MakeGenome == nil {
+		return errors.New("'GenomeMaker' cannot be nil")
 	}
-	// Check the initialization method presence
-	if ga.Initializer == nil {
-		return errors.New("'Initializer' cannot be nil")
-	}
-	// Check the migration frequency in the presence of a migrator
-	if ga.Migrator != nil && ga.MigFrequency < 1 {
-		return errors.New("'MigFrequency' should be strictly higher than 0")
+	// Check the topology is valid
+	var topoErr = ga.Topology.Validate()
+	if topoErr != nil {
+		return topoErr
 	}
 	// Check the model presence
 	if ga.Model == nil {
@@ -57,21 +68,9 @@ func (ga GA) Validate() error {
 	if modelErr != nil {
 		return modelErr
 	}
-	// Check the number of clusters
-	if ga.Topology.NbrClusters < 0 {
-		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
-	}
-	// Check the number of genes
-	if ga.Topology.NbrGenes < 1 {
-		return errors.New("'NbrGenes' should be higher or equal to 1")
-	}
-	// Check the number of individuals
-	if ga.Topology.NbrIndividuals < 2 {
-		return errors.New("'NbrIndividuals' should be higher or equal to 2")
-	}
-	// Check the number of populations
-	if ga.Topology.NbrPopulations < 1 {
-		return errors.New("'NbrPopulations' should be higher or equal to 1")
+	// Check the migration frequency in the presence of a migrator
+	if ga.Migrator != nil && ga.MigFrequency < 1 {
+		return errors.New("'MigFrequency' should be strictly higher than 0")
 	}
 	// No error
 	return nil
@@ -92,22 +91,16 @@ func (ga *GA) Initialize() {
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(
-				ga.Topology.NbrIndividuals,
-				ga.Topology.NbrGenes,
-				ga.Ff,
-				ga.Initializer,
-			)
+			ga.Populations[j] = makePopulation(ga.Topology.NbrIndividuals, ga.MakeGenome)
 			// Evaluate it's individuals
-			ga.Populations[j].Individuals.Evaluate(ga.Ff)
+			ga.Populations[j].Individuals.Evaluate()
 			// Sort it's individuals
 			ga.Populations[j].Individuals.Sort()
 		}(i)
 	}
 	wg.Wait()
-	// Best individual (dummy initialization)
-	ga.Best = makeIndividual(ga.Topology.NbrGenes, rand.New(rand.NewSource(time.Now().UnixNano())))
-	// Find the best individual
+	// The initial best individual is initialized randomly
+	ga.Best = MakeIndividual(ga.MakeGenome(makeRandomNumberGenerator()))
 	ga.findBest()
 }
 
@@ -155,7 +148,7 @@ func (ga *GA) Enhance() {
 				ga.Model.Apply(&ga.Populations[j])
 			}
 			// Evaluate and sort
-			ga.Populations[j].Individuals.Evaluate(ga.Ff)
+			ga.Populations[j].Individuals.Evaluate()
 			ga.Populations[j].Individuals.Sort()
 			ga.Populations[j].Duration += time.Since(start)
 		}(i)

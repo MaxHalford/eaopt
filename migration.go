@@ -1,4 +1,4 @@
-package gago
+package gago2
 
 import "math/rand"
 
