@@ -1,4 +1,4 @@
-package gago
+package gago2
 
 import (
 	"math"
@@ -10,8 +10,16 @@ import (
 // evaluated.
 var EVALUATIONS = 0
 
-// A Genome contains genes
-type Genome []interface{}
+// A Genome is an object that can have any number and kinds of properties. As
+// long as it can be evaluated, mutated and crossedover then it can evolved.
+type Genome interface {
+	Evaluate() float64
+	Mutate(rng *rand.Rand)
+	Crossover(genome interface{}, rng *rand.Rand) (Genome, Genome)
+}
+
+// A GenomeMaker is a method that generates a new Genome with random properties.
+type GenomeMaker func(rng *rand.Rand) Genome
 
 // An Individual represents a potential solution to a problem. The individual's
 // is defined by it's genome, which is a slice containing genes. Every gene is a
@@ -21,59 +29,72 @@ type Individual struct {
 	Genome    Genome
 	Fitness   float64
 	Evaluated bool
-	Name      string
 }
 
-// Generate a new individual.
-func makeIndividual(nbGenes int, rng *rand.Rand) Individual {
+// MakeIndividual returns a fresh individual.
+func MakeIndividual(genome Genome) Individual {
 	return Individual{
-		Genome:    make([]interface{}, nbGenes),
+		Genome:    genome,
 		Fitness:   math.Inf(1),
 		Evaluated: false,
-		Name:      randomString(6, rng),
 	}
 }
 
-// Evaluate the fitness of an individual.
-func (indi *Individual) Evaluate(ff FitnessFunction) {
-	// Don't evaluate individuals that have already been evaluated
+// DeepCopy an individual.
+func (indi Individual) DeepCopy() Individual {
+	return MakeIndividual(indi.Genome)
+}
+
+// Evaluate the fitness of an individual. Don't evaluate individuals that have
+// already been evaluated.
+func (indi *Individual) Evaluate() {
 	if indi.Evaluated == false {
-		indi.Fitness = ff.Apply(indi.Genome)
+		indi.Fitness = indi.Genome.Evaluate()
 		EVALUATIONS++
+		indi.Evaluated = true
 	}
-	indi.Evaluated = true
 }
 
-// Mutate applies a mutator to an individual and sets it's `Evaluated` property to `false`.
-func (indi *Individual) Mutate(mutator Mutator, rng *rand.Rand) {
-	mutator.Apply(indi, rng)
+// Mutate an individual by calling the Mutate method of it's Genome.
+func (indi *Individual) Mutate(rng *rand.Rand) {
+	indi.Genome.Mutate(rng)
 	indi.Evaluated = false
 }
 
-// Individuals type is necessary for sorting and selection purposes.
+// Crossover an individual by calling the Crossover method of it's Genome.
+func (indi *Individual) Crossover(indi2 Individual, rng *rand.Rand) (Individual, Individual) {
+	var (
+		genome1, genome2       = indi.Genome.Crossover(indi2.Genome, rng)
+		offspring1, offspring2 = MakeIndividual(genome1), MakeIndividual(genome2)
+	)
+	return offspring1, offspring2
+}
+
+// Individuals is a convenience type, methods that belong to an Individual can
+// be called declaratively.
 type Individuals []Individual
 
-// Generate a slice of new individuals.
-func makeIndividuals(nbIndis, nbGenes int, rng *rand.Rand) Individuals {
-	var indis = make(Individuals, nbIndis)
+// Generate a slice of n new individuals.
+func makeIndividuals(n int, gm GenomeMaker, rng *rand.Rand) Individuals {
+	var indis = make(Individuals, n)
 	for i := range indis {
-		indis[i] = makeIndividual(nbGenes, rng)
+		indis[i] = MakeIndividual(gm(rng))
 	}
 	return indis
 }
 
-// Evaluate each individual
-func (indis Individuals) Evaluate(ff FitnessFunction) {
+// Evaluate each individual.
+func (indis Individuals) Evaluate() {
 	for i := range indis {
-		indis[i].Evaluate(ff)
+		indis[i].Evaluate()
 	}
 }
 
-// Mutate is a convenience function for mutating each individual in a slice of individuals.
-func (indis Individuals) Mutate(mutator Mutator, mutRate float64, rng *rand.Rand) {
+// Mutate each individual.
+func (indis Individuals) Mutate(mutRate float64, rng *rand.Rand) {
 	for i := range indis {
 		if rng.Float64() < mutRate {
-			indis[i].Mutate(mutator, rng)
+			indis[i].Mutate(rng)
 		}
 	}
 }
@@ -85,7 +106,7 @@ func (indis Individuals) Len() int           { return len(indis) }
 func (indis Individuals) Less(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
 func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], indis[i] }
 
-// Sort is a convenience method for calling the Sort method of the sort package
+// Sort is a convenience method for calling the Sort method of the sort package.
 func (indis *Individuals) Sort() { sort.Sort(indis) }
 
 // Sample k unique individuals from a slice of n individuals.
