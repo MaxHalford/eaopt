@@ -2,29 +2,43 @@ package main
 
 import (
 	"fmt"
-	m "math"
+	"math"
+	"math/rand"
 
-	"github.com/MaxHalford/gago/presets"
+	"github.com/MaxHalford/gago2"
+	"github.com/MaxHalford/gago2/initialize"
+	"github.com/MaxHalford/gago2/preset"
 )
 
-// Sphere function minimum is 0 reached in (0, ..., 0).
-// Any search domain is fine.
-func sphere(X []float64) float64 {
-	sum := 0.0
-	for _, x := range X {
-		sum += m.Pow(x, 2)
+// A Vector contains float64s.
+type Vector struct {
+	Values []float64
+}
+
+// Evaluate a Vector with the Sphere function (min of 0 in (0, ..., 0)).
+func (v Vector) Evaluate() float64 {
+	var sum float64
+	for _, x := range v.Values {
+		sum += math.Pow(x, 2)
 	}
 	return sum
 }
 
+// Mutate a Vector.
+func (v Vector) Mutate(rng *rand.Rand) { v.Values.Splice(rng) }
+
+// Crossover a Vector with another Vector.
+func (v Vector) Crossover(v2 interface{}, rng *rand.Rand) (gago2.Genome, gago2.Genome) {
+	return v, v2.(Vector)
+}
+
+// MakeVector returns a random vector
+func MakeVector(rng *rand.Rand) gago2.Genome {
+	return Vector{Values: initialize.UniformFloat64(5, rng, -10, 10)}
+}
+
 func main() {
-	// Instantiate a GA with 2 variables and the fitness function
-	var ga = presets.Float64(2, sphere)
-	ga.Initialize()
-	// Enhancement
-	for i := 0; i < 8; i++ {
-		ga.Enhance()
-		// Display the current best solution
-		fmt.Printf("The best obtained solution is %f\n", ga.Best.Fitness)
-	}
+	var ga = preset.SimAnn(MakeVector)
+	ga.Enhance()
+	fmt.Printf("Best -> %f\n", ga.Best.Fitness)
 }

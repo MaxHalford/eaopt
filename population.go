@@ -1,4 +1,4 @@
-package gago
+package gago2
 
 import (
 	"math/rand"
@@ -6,29 +6,23 @@ import (
 )
 
 // A Population contains individuals. Individuals mate within a population. Individuals can
-// migrate from one population to another.
+// migrate from one population to another. Each population has a random number generator to bypass
+// the global rand mutex.
 type Population struct {
 	Individuals Individuals
 	Duration    time.Duration
-	rng         *rand.Rand      // Each population has a random number generator to bypass the global rand mutex
-	ff          FitnessFunction // The fitness function is also added to each population for access practicality
+	rng         *rand.Rand
 }
 
 // Generate a new population.
-func makePopulation(nbIndis, nbGenes int, ff FitnessFunction, init Initializer) Population {
+func makePopulation(nbrIndis int, gm GenomeMaker) Population {
 	var (
-		src = rand.NewSource(time.Now().UnixNano())
-		rng = rand.New(src)
+		rng = makeRandomNumberGenerator()
 		pop = Population{
-			Individuals: makeIndividuals(nbIndis, nbGenes, rng),
+			Individuals: makeIndividuals(nbrIndis, gm, rng),
 			rng:         rng,
-			ff:          ff,
 		}
 	)
-	// Randomly initialize each individual's genome
-	for i := range pop.Individuals {
-		init.Apply(&pop.Individuals[i], pop.rng)
-	}
 	return pop
 }
 

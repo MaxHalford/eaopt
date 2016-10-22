@@ -1,9 +1,10 @@
-package gago
+package gago2
 
 import (
 	"errors"
 	"math"
 	"math/rand"
+	"time"
 )
 
 // Find where an element is in a slice.
@@ -43,7 +44,7 @@ func shuffleStrings(strings []string, rng *rand.Rand) []string {
 	return shuffled
 }
 
-// Find the strict minimum between two integers
+// Find the strict minimum between two ints.
 func min(a, b int) int {
 	if a <= b {
 		return a
@@ -112,4 +113,12 @@ func randomString(n int, rng *rand.Rand) string {
 		remain--
 	}
 	return string(b)
+}
+
+func makeRandomNumberGenerator() *rand.Rand {
+	var (
+		src = rand.NewSource(time.Now().UnixNano())
+		rng = rand.New(src)
+	)
+	return rng
 }

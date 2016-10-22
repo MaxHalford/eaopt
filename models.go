@@ -1,4 +1,4 @@
-package gago
+package gago2
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 
 // generateOffsprings is a DRY utility function. It also handles the case of
 // having to generate a non-even number of individuals.
-func generateOffsprings(n int, indis Individuals, sel Selector, cross Crossover, rng *rand.Rand) Individuals {
+func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) Individuals {
 	var (
 		offsprings = make(Individuals, n)
 		i          = 0
@@ -16,7 +16,7 @@ func generateOffsprings(n int, indis Individuals, sel Selector, cross Crossover,
 	for i < len(offsprings) {
 		var (
 			parents, _             = sel.Apply(2, indis, rng)
-			offspring1, offspring2 = cross.Apply(parents[0], parents[1], rng)
+			offspring1, offspring2 = parents[0].Crossover(parents[1], rng)
 		)
 		for _, offspring := range []Individual{offspring1, offspring2} {
 			if i < len(offsprings) {
@@ -38,10 +38,8 @@ type Model interface {
 
 // ModGenerational implements the generational model.
 type ModGenerational struct {
-	Selector  Selector
-	Crossover Crossover
-	Mutator   Mutator
-	MutRate   float64
+	Selector Selector
+	MutRate  float64
 }
 
 // Apply the generational model to a population.
@@ -51,12 +49,11 @@ func (mod ModGenerational) Apply(pop *Population) {
 		len(pop.Individuals),
 		pop.Individuals,
 		mod.Selector,
-		mod.Crossover,
 		pop.rng,
 	)
 	// Apply mutation to the offsprings
-	if mod.Mutator != nil {
-		offsprings.Mutate(mod.Mutator, mod.MutRate, pop.rng)
+	if mod.MutRate > 0 {
+		offsprings.Mutate(mod.MutRate, pop.rng)
 	}
 	// Replace the old population with the new one
 	pop.Individuals = offsprings
@@ -68,12 +65,8 @@ func (mod ModGenerational) Validate() error {
 	if mod.Selector == nil {
 		return errors.New("'Selector' cannot be nil")
 	}
-	// Check the crossover method presence
-	if mod.Crossover == nil {
-		return errors.New("'Crossover' cannot be nil")
-	}
-	// Check the mutation rate in the presence of a mutator
-	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
+	// Check the mutation rate
+	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
@@ -81,32 +74,30 @@ func (mod ModGenerational) Validate() error {
 
 // ModSteadyState implements the steady state model.
 type ModSteadyState struct {
-	Selector  Selector
-	Crossover Crossover
-	KeepBest  bool
-	Mutator   Mutator
-	MutRate   float64
+	Selector Selector
+	KeepBest bool
+	MutRate  float64
 }
 
 // Apply the steady state model to a population.
 func (mod ModSteadyState) Apply(pop *Population) {
 	var (
 		parents, indexes       = mod.Selector.Apply(2, pop.Individuals, pop.rng)
-		offspring1, offspring2 = mod.Crossover.Apply(parents[0], parents[1], pop.rng)
+		offspring1, offspring2 = parents[0].Crossover(parents[1], pop.rng)
 	)
 	// Apply mutation to the offsprings
-	if mod.Mutator != nil {
+	if mod.MutRate > 0 {
 		if pop.rng.Float64() < mod.MutRate {
-			mod.Mutator.Apply(&offspring1, pop.rng)
+			offspring1.Mutate(pop.rng)
 		}
 		if pop.rng.Float64() < mod.MutRate {
-			mod.Mutator.Apply(&offspring2, pop.rng)
+			offspring2.Mutate(pop.rng)
 		}
 	}
 	if mod.KeepBest {
 		// Replace the chosen parents with the best individuals out of the parents and the individuals
-		offspring1.Evaluate(pop.ff)
-		offspring2.Evaluate(pop.ff)
+		offspring1.Evaluate()
+		offspring2.Evaluate()
 		var indis = Individuals{parents[0], parents[1], offspring1, offspring2}
 		indis.Sort()
 		pop.Individuals[indexes[0]] = indis[0]
@@ -124,12 +115,8 @@ func (mod ModSteadyState) Validate() error {
 	if mod.Selector == nil {
 		return errors.New("'Selector' cannot be nil")
 	}
-	// Check the crossover method presence
-	if mod.Crossover == nil {
-		return errors.New("'Crossover' cannot be nil")
-	}
 	// Check the mutation rate in the presence of a mutator
-	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
+	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
@@ -139,9 +126,7 @@ func (mod ModSteadyState) Validate() error {
 type ModDownToSize struct {
 	NbrOffsprings int
 	SelectorA     Selector
-	Crossover     Crossover
 	SelectorB     Selector
-	Mutator       Mutator
 	MutRate       float64
 }
 
@@ -151,14 +136,13 @@ func (mod ModDownToSize) Apply(pop *Population) {
 		mod.NbrOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
-		mod.Crossover,
 		pop.rng,
 	)
 	// Apply mutation to the offsprings
-	if mod.Mutator != nil {
-		offsprings.Mutate(mod.Mutator, mod.MutRate, pop.rng)
+	if mod.MutRate > 0 {
+		offsprings.Mutate(mod.MutRate, pop.rng)
 	}
-	offsprings.Evaluate(pop.ff)
+	offsprings.Evaluate()
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size
@@ -177,16 +161,12 @@ func (mod ModDownToSize) Validate() error {
 	if mod.SelectorA == nil {
 		return errors.New("'SelectorA' cannot be nil")
 	}
-	// Check the crossover method presence
-	if mod.Crossover == nil {
-		return errors.New("'Crossover' cannot be nil")
-	}
 	// Check the second selection method presence
 	if mod.SelectorB == nil {
 		return errors.New("'SelectorB' cannot be nil")
 	}
 	// Check the mutation rate in the presence of a mutator
-	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
+	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
@@ -194,10 +174,8 @@ func (mod ModDownToSize) Validate() error {
 
 // ModRing implements the island ring model.
 type ModRing struct {
-	Crossover Crossover
-	Selector  Selector
-	Mutator   Mutator
-	MutRate   float64
+	Selector Selector
+	MutRate  float64
 }
 
 // Apply the ring model to a population.
@@ -205,19 +183,19 @@ func (mod ModRing) Apply(pop *Population) {
 	for i, indi := range pop.Individuals {
 		var (
 			neighbour              = pop.Individuals[i%len(pop.Individuals)]
-			offspring1, offspring2 = mod.Crossover.Apply(indi, neighbour, pop.rng)
+			offspring1, offspring2 = indi.Crossover(neighbour, pop.rng)
 		)
 		// Apply mutation to the offsprings
-		if mod.Mutator != nil {
+		if mod.MutRate > 0 {
 			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&offspring1, pop.rng)
+				offspring1.Mutate(pop.rng)
 			}
 			if pop.rng.Float64() < mod.MutRate {
-				mod.Mutator.Apply(&offspring2, pop.rng)
+				offspring2.Mutate(pop.rng)
 			}
 		}
-		offspring1.Evaluate(pop.ff)
-		offspring2.Evaluate(pop.ff)
+		offspring1.Evaluate()
+		offspring2.Evaluate()
 		// Select an individual out of the original individual and the offsprings
 		var selected, _ = mod.Selector.Apply(1, Individuals{indi, offspring1, offspring2}, pop.rng)
 		pop.Individuals[i] = selected[0]
@@ -226,27 +204,25 @@ func (mod ModRing) Apply(pop *Population) {
 
 // Validate the model to verify the parameters are coherent.
 func (mod ModRing) Validate() error {
-	// Check the crossover method presence
-	if mod.Crossover == nil {
-		return errors.New("'Crossover' cannot be nil")
-	}
 	// Check the selection method presence
 	if mod.Selector == nil {
 		return errors.New("'Selector' cannot be nil")
 	}
 	// Check the mutation rate in the presence of a mutator
-	if mod.Mutator != nil && (mod.MutRate < 0 || mod.MutRate > 1) {
+	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errors.New("'MutRate' should belong to the [0, 1] interval")
 	}
 	return nil
 }
 
-// ModSimAnn implements simulated annealing.
+// ModSimAnn implements simulated annealing. Enhancing a GA with the ModSimAnn
+// model only has to be done once for the simulated annealing to do a complete
+// run. Successive enhancements will simply reset the temperature and run the
+// simulated annealing again (which can be desirable).
 type ModSimAnn struct {
-	Mutator Mutator
-	T       float64 // Starting temperature
-	Tmin    float64 // Stopping temperature
-	Alpha   float64 // Decrease rate per iteration
+	T     float64 // Starting temperature
+	Tmin  float64 // Stopping temperature
+	Alpha float64 // Decrease rate per iteration
 }
 
 // Apply simulated annealing to a population.
@@ -255,10 +231,9 @@ func (mod ModSimAnn) Apply(pop *Population) {
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
 			// Generate a random neighbour through mutation
-			var neighbour = makeIndividual(len(indi.Genome), pop.rng)
-			neighbour.Genome = indi.Genome
-			mod.Mutator.Apply(&neighbour, pop.rng)
-			neighbour.Evaluate(pop.ff)
+			var neighbour = indi.DeepCopy()
+			neighbour.Mutate(pop.rng)
+			neighbour.Evaluate()
 			// Check if the neighbour is better or not
 			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
@@ -277,10 +252,6 @@ func (mod ModSimAnn) Apply(pop *Population) {
 
 // Validate the model to verify the parameters are coherent.
 func (mod ModSimAnn) Validate() error {
-	// Check the mutator method presence
-	if mod.Mutator == nil {
-		return errors.New("'Mutator' cannot be nil")
-	}
 	// Check the stopping temperature value
 	if mod.Tmin < 0 {
 		return errors.New("'Tmin' should be higher than 0")
@@ -302,7 +273,6 @@ type ModMutationOnly struct {
 	Selector      Selector
 	KeepParents   bool
 	NbrOffsprings int // Number of offsprings per parent
-	Mutator       Mutator
 }
 
 // Apply mutation only to a population.
@@ -326,9 +296,8 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 		}
 		for j := 0; j < mod.NbrOffsprings; j++ {
 			// Create a new individual and copy the parent's genome onto it
-			var offspring = makeIndividual(len(parent.Genome), pop.rng)
-			offspring.Genome = parent.Genome
-			mod.Mutator.Apply(&offspring, pop.rng)
+			var offspring = parent.DeepCopy()
+			offspring.Mutate(pop.rng)
 			offsprings[i] = offspring
 			i++
 		}
@@ -349,10 +318,6 @@ func (mod ModMutationOnly) Validate() error {
 	// Check the number of offsprings value
 	if mod.NbrOffsprings < 1 {
 		return errors.New("'NbrOffsprings' should be higher than 0")
-	}
-	// Check the mutator presence
-	if mod.Mutator == nil {
-		return errors.New("'Mutator' should be higher than 0")
 	}
 	return nil
 }
