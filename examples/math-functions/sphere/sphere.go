@@ -5,9 +5,9 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/MaxHalford/gago2"
-	"github.com/MaxHalford/gago2/initialize"
-	"github.com/MaxHalford/gago2/preset"
+	"github.com/MaxHalford/gago"
+	"github.com/MaxHalford/gago/initialize"
+	"github.com/MaxHalford/gago/preset"
 )
 
 // A Vector contains float64s.
@@ -25,16 +25,20 @@ func (v Vector) Evaluate() float64 {
 }
 
 // Mutate a Vector.
-func (v Vector) Mutate(rng *rand.Rand) { v.Values.Splice(rng) }
+func (v Vector) Mutate(rng *rand.Rand) {
+	v.Values.Splice(rng)
+}
 
 // Crossover a Vector with another Vector.
-func (v Vector) Crossover(v2 interface{}, rng *rand.Rand) (gago2.Genome, gago2.Genome) {
+func (v Vector) Crossover(v2 interface{}, rng *rand.Rand) (gago.Genome, gago.Genome) {
 	return v, v2.(Vector)
 }
 
 // MakeVector returns a random vector
-func MakeVector(rng *rand.Rand) gago2.Genome {
-	return Vector{Values: initialize.UniformFloat64(5, rng, -10, 10)}
+func MakeVector(rng *rand.Rand) gago.Genome {
+	return Vector{
+		Values: initialize.UniformFloat64(5, rng, -10, 10),
+	}
 }
 
 func main() {
