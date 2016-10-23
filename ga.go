@@ -1,4 +1,4 @@
-package gago2
+package gago
 
 import (
 	"errors"
