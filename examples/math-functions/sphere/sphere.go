@@ -7,6 +7,7 @@ import (
 
 	"github.com/MaxHalford/gago"
 	"github.com/MaxHalford/gago/initialize"
+	"github.com/MaxHalford/gago/mutate"
 	"github.com/MaxHalford/gago/preset"
 )
 
@@ -26,7 +27,7 @@ func (v Vector) Evaluate() float64 {
 
 // Mutate a Vector.
 func (v Vector) Mutate(rng *rand.Rand) {
-	v.Values.Splice(rng)
+	mutate.MutNormal(v.Values, rng, 1, 0.5)
 }
 
 // Crossover a Vector with another Vector.
@@ -43,6 +44,8 @@ func MakeVector(rng *rand.Rand) gago.Genome {
 
 func main() {
 	var ga = preset.SimAnn(MakeVector)
-	ga.Enhance()
+	for i := 0; i < 100; i++ {
+		ga.Enhance()
+	}
 	fmt.Printf("Best -> %f\n", ga.Best.Fitness)
 }
