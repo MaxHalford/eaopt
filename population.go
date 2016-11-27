@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-// A Population contains individuals. Individuals mate within a population. Individuals can
-// migrate from one population to another. Each population has a random number generator to bypass
-// the global rand mutex.
+// A Population contains individuals. Individuals mate within a population.
+// Individuals can migrate from one population to another. Each population has a
+// random number generator to bypass the global rand mutex.
 type Population struct {
 	Individuals Individuals
 	Duration    time.Duration
@@ -26,5 +26,5 @@ func makePopulation(nbrIndis int, gm GenomeMaker) Population {
 	return pop
 }
 
-// Populations type is necessary for migration and clusterting purposes.
+// Populations type is necessary for migration and clustering purposes.
 type Populations []Population

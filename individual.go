@@ -15,7 +15,7 @@ var EVALUATIONS = 0
 type Genome interface {
 	Evaluate() float64
 	Mutate(rng *rand.Rand)
-	Crossover(genome interface{}, rng *rand.Rand) (Genome, Genome)
+	Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
 }
 
 // A GenomeMaker is a method that generates a new Genome with random properties.
@@ -110,15 +110,13 @@ func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], in
 func (indis *Individuals) Sort() { sort.Sort(indis) }
 
 // Sample k unique individuals from a slice of n individuals.
-func (indis Individuals) sample(k int, rng *rand.Rand) ([]int, Individuals) {
-	var (
-		indexes, _ = randomInts(k, 0, len(indis), rng)
-		sample     = make(Individuals, k)
-	)
+func (indis Individuals) sample(k int, rng *rand.Rand) (sample Individuals, indexes []int) {
+	indexes = randomInts(k, 0, len(indis), rng)
+	sample = make(Individuals, k)
 	for i := 0; i < k; i++ {
 		sample[i] = indis[indexes[i]]
 	}
-	return indexes, sample
+	return
 }
 
 // Extract the fitness of a slice of individuals into a float64 slice.
