@@ -3,7 +3,6 @@ package gago
 import (
 	"math"
 	"math/rand"
-	"strings"
 	"testing"
 	"time"
 )
@@ -27,8 +26,10 @@ func TestGetIndex(t *testing.T) {
 }
 
 func TestGenerateWeights(t *testing.T) {
-	var sizes = []int{1, 30, 10000}
-	var limit = math.Pow(1, -10)
+	var (
+		sizes = []int{1, 30, 10000}
+		limit = math.Pow(1, -10)
+	)
 	for _, size := range sizes {
 		var weights = randomWeights(size)
 		// Test the length of the resulting slice
@@ -43,17 +44,6 @@ func TestGenerateWeights(t *testing.T) {
 		if math.Abs(sum-1.0) > limit {
 			t.Error("Sum problem with randomWeights")
 		}
-	}
-}
-
-func TestShuffleStrings(t *testing.T) {
-	var src = rand.NewSource(time.Now().UnixNano())
-	var rng = rand.New(src)
-	var strings = strings.Split("abcdefghijklmnopqrstuvwxyz", "")
-	var shuffled = shuffleStrings(strings, rng)
-	// Check the shuffled slice is different from the original one
-	if &strings == &shuffled {
-		t.Error("Problem with shuffleIndividuals")
 	}
 }
 
@@ -108,52 +98,31 @@ func TestRandomInts(t *testing.T) {
 		rng       = rand.New(src)
 		testCases = []struct {
 			k, min, max int
-			valid       bool
 		}{
-			{0, 0, 0, true},
-			{1, 0, 2, true},
-			{3, 0, 2, false},
+			{1, 0, 1},
+			{1, 0, 2},
+			{2, 0, 2},
 		}
 	)
-	for _, testCase := range testCases {
-		var ints, err = randomInts(testCase.k, testCase.min, testCase.max, rng)
-		// Check the parameters are coherent
-		if (err == nil) != testCase.valid {
-			t.Error("randomInts didn't detect invalid parameters")
+	for _, tc := range testCases {
+		var ints = randomInts(tc.k, tc.min, tc.max, rng)
+		// Check the number of generated integers
+		if len(ints) != tc.k {
+			t.Error("randomInts didn't generate the right number of integers")
 		}
-		if testCase.valid {
-			// Check the number of generated integers
-			if len(ints) != testCase.k {
-				t.Error("randomInts didn't generate the right number of integers")
-			}
-			// Check the bounds of each generated integer
-			for _, integer := range ints {
-				if integer < testCase.min || integer >= testCase.max {
-					t.Error("randomInts didn't generate integers in the desired range")
-				}
-			}
-			// Check the generated integers are unique
-			for i, a := range ints {
-				for j, b := range ints {
-					if i != j && a == b {
-						t.Error("randomInts didn't generate unique integers")
-					}
-				}
+		// Check the bounds of each generated integer
+		for _, integer := range ints {
+			if integer < tc.min || integer >= tc.max {
+				t.Error("randomInts didn't generate integers in the desired range")
 			}
 		}
-	}
-}
-
-func TestRandomString(t *testing.T) {
-	var (
-		src = rand.NewSource(time.Now().UnixNano())
-		rng = rand.New(src)
-		N   = []int{0, 1, 42}
-	)
-	for _, n := range N {
-		var str = randomString(n, rng)
-		if len(str) != n {
-			t.Error("randomString didn't generate a string of the right length")
+		// Check the generated integers are unique
+		for i, a := range ints {
+			for j, b := range ints {
+				if i != j && a == b {
+					t.Error("randomInts didn't generate unique integers")
+				}
+			}
 		}
 	}
 }

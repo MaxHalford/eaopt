@@ -1,7 +1,6 @@
 package gago
 
 import (
-	"errors"
 	"math"
 	"math/rand"
 	"time"
@@ -35,15 +34,6 @@ func randomWeights(size int) []float64 {
 	return weights
 }
 
-// Shuffle a slice of strings.
-func shuffleStrings(strings []string, rng *rand.Rand) []string {
-	var shuffled = make([]string, len(strings))
-	for i, j := range rng.Perm(len(strings)) {
-		shuffled[j] = strings[i]
-	}
-	return shuffled
-}
-
 // Find the strict minimum between two ints.
 func min(a, b int) int {
 	if a <= b {
@@ -72,53 +62,22 @@ func variance(slice []float64) float64 {
 }
 
 // Sample k unique integers in range [min, max) using reservoir sampling,
-// specifically Algorithm R. It can be proven by induction that each integer
-// has probability of 1/(max-min) to be selected.
-func randomInts(k, min, max int, rng *rand.Rand) ([]int, error) {
-	if max-min < k {
-		return []int{}, errors.New("k has to be superior or equak to max - min")
+// specifically Vitter's Algorithm R.
+func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
+	ints = make([]int, k)
+	for i := 0; i < k; i++ {
+		ints[i] = i + min
 	}
-	var ints = make([]int, k)
-	for i := min; i < min+k; i++ {
-		ints[i] = i
-	}
-	for i := min + k; i < max; i++ {
-		var j = rng.Intn(i)
+	for i := k; i < max-min; i++ {
+		var j = rng.Intn(i + 1)
 		if j < k {
-			ints[j] = i
+			ints[j] = i + min
 		}
 	}
-	return ints, nil
+	return
 }
 
-const (
-	letterBytes   = "abcdefghijklmnopqrstuvwxyz"
-	letterIdxBits = 6                    // 6 bits to represent a letter index
-	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
-)
-
-// Generate a random string of size n.
-func randomString(n int, rng *rand.Rand) string {
-	b := make([]byte, n)
-	for i, cache, remain := n-1, rng.Int63(), letterIdxMax; i >= 0; {
-		if remain == 0 {
-			cache, remain = rng.Int63(), letterIdxMax
-		}
-		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-			b[i] = letterBytes[idx]
-			i--
-		}
-		cache >>= letterIdxBits
-		remain--
-	}
-	return string(b)
-}
-
-func makeRandomNumberGenerator() *rand.Rand {
-	var (
-		src = rand.NewSource(time.Now().UnixNano())
-		rng = rand.New(src)
-	)
-	return rng
+func makeRandomNumberGenerator() (rng *rand.Rand) {
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	return
 }
