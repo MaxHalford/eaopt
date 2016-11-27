@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"math/rand"
 	"sync"
 	"time"
 )
@@ -9,25 +10,21 @@ import (
 // A Topology holds all the information relative to the size of a GA.
 type Topology struct {
 	NbrPopulations int // Number of populations
-	NbrClusters    int // Number of clusters each populations is split into before evolving
+	NbrClusters    int // Number of clusters each population is split into
 	NbrIndividuals int // Initial number of individuals in each population
 }
 
 // Validate the properties of a Topology.
 func (topo Topology) Validate() error {
-	// Check the number of clusters
-	if topo.NbrClusters < 0 {
-		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
-	}
-	// Check the number of individuals
-	if topo.NbrIndividuals < 2 {
-		return errors.New("'NbrIndividuals' should be higher or equal to 2")
-	}
-	// Check the number of populations
 	if topo.NbrPopulations < 1 {
 		return errors.New("'NbrPopulations' should be higher or equal to 1")
 	}
-	// No error
+	if topo.NbrClusters < 0 {
+		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
+	}
+	if topo.NbrIndividuals < 1 {
+		return errors.New("'NbrIndividuals' should be higher or equal to 1")
+	}
 	return nil
 }
 
@@ -37,14 +34,15 @@ type GA struct {
 	MakeGenome   GenomeMaker
 	Topology     Topology
 	Model        Model
-	MigFrequency int // Frequency at which migrations occur
 	Migrator     Migrator
+	MigFrequency int // Frequency at which migrations occur
 
 	// Fields that are generated at runtime
 	Best        Individual // Overall best individual (dummy initialization at the beginning)
 	Duration    time.Duration
 	Generations int
 	Populations Populations
+	rng         *rand.Rand
 }
 
 // Validate the parameters of a GA to ensure it will run correctly; some
@@ -80,11 +78,10 @@ func (ga GA) Validate() error {
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
-	// Reset the number of generations and the elapsed duration
-	ga.Generations = 0
 	ga.Duration = 0
-	// Create the populations
+	ga.Generations = 0
 	ga.Populations = make([]Population, ga.Topology.NbrPopulations)
+	ga.rng = makeRandomNumberGenerator()
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
@@ -105,7 +102,8 @@ func (ga *GA) Initialize() {
 }
 
 // Find the best individual in each population and then compare the best overall
-// individual to the current best individual.
+// individual to the current best individual. This method supposes that the
+// populations have been preemptively sorted by fitness incresingly.
 func (ga *GA) findBest() {
 	for _, pop := range ga.Populations {
 		var best = pop.Individuals[0]
@@ -126,7 +124,7 @@ func (ga *GA) Enhance() {
 	// populations, there is a migrator and the migration frequency divides the
 	// generation count
 	if ga.Topology.NbrPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
-		ga.Migrator.Apply(ga.Populations)
+		ga.Migrator.Apply(ga.Populations, ga.rng)
 	}
 	// Use a wait group to enhance the populations in parallel
 	var wg sync.WaitGroup
@@ -134,7 +132,7 @@ func (ga *GA) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// Apply clustering if a number of clusters has been given
+			// Apply clustering if a positive number of clusters has been speficied
 			if ga.Topology.NbrClusters > 0 {
 				var clusters = ga.Populations[j].cluster(ga.Topology.NbrClusters)
 				// Apply the evolution model to each cluster

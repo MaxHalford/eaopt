@@ -6,6 +6,11 @@ import (
 	"math/rand"
 )
 
+var (
+	errNilSelector    = errors.New("Selector cannot be nil")
+	errInvalidMutRate = errors.New("MutRate should be between 0 and 1")
+)
+
 // generateOffsprings is a DRY utility function. It also handles the case of
 // having to generate a non-even number of individuals.
 func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) Individuals {
@@ -28,9 +33,9 @@ func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) 
 	return offsprings
 }
 
-// A Model specifies a manner and a order to apply genetic operators to a
-// population at generation n in order for it obtain better individuals at
-// generation n+1.
+// A Model specifies a protocol for applying genetic operators to a
+// population at generation i in order for it obtain better individuals at
+// generation i+1.
 type Model interface {
 	Apply(pop *Population)
 	Validate() error
@@ -56,18 +61,18 @@ func (mod ModGenerational) Apply(pop *Population) {
 		offsprings.Mutate(mod.MutRate, pop.rng)
 	}
 	// Replace the old population with the new one
-	pop.Individuals = offsprings
+	copy(pop.Individuals, offsprings)
 }
 
 // Validate the model to verify the parameters are coherent.
 func (mod ModGenerational) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
-		return errors.New("'Selector' cannot be nil")
+		return errNilSelector
 	}
 	// Check the mutation rate
 	if mod.MutRate < 0 || mod.MutRate > 1 {
-		return errors.New("'MutRate' should belong to the [0, 1] interval")
+		return errInvalidMutRate
 	}
 	return nil
 }
@@ -113,11 +118,11 @@ func (mod ModSteadyState) Apply(pop *Population) {
 func (mod ModSteadyState) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
-		return errors.New("'Selector' cannot be nil")
+		return errNilSelector
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
-		return errors.New("'MutRate' should belong to the [0, 1] interval")
+		return errInvalidMutRate
 	}
 	return nil
 }
@@ -159,15 +164,15 @@ func (mod ModDownToSize) Validate() error {
 	}
 	// Check the first selection method presence
 	if mod.SelectorA == nil {
-		return errors.New("'SelectorA' cannot be nil")
+		return errNilSelector
 	}
 	// Check the second selection method presence
 	if mod.SelectorB == nil {
-		return errors.New("'SelectorB' cannot be nil")
+		return errNilSelector
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
-		return errors.New("'MutRate' should belong to the [0, 1] interval")
+		return errInvalidMutRate
 	}
 	return nil
 }
@@ -206,11 +211,11 @@ func (mod ModRing) Apply(pop *Population) {
 func (mod ModRing) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
-		return errors.New("'Selector' cannot be nil")
+		return errNilSelector
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
-		return errors.New("'MutRate' should belong to the [0, 1] interval")
+		return errInvalidMutRate
 	}
 	return nil
 }
@@ -218,7 +223,7 @@ func (mod ModRing) Validate() error {
 // ModSimAnn implements simulated annealing. Enhancing a GA with the ModSimAnn
 // model only has to be done once for the simulated annealing to do a complete
 // run. Successive enhancements will simply reset the temperature and run the
-// simulated annealing again (which can be desirable).
+// simulated annealing again (which can potentially stagnate).
 type ModSimAnn struct {
 	T     float64 // Starting temperature
 	Tmin  float64 // Stopping temperature
@@ -245,8 +250,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 				}
 			}
 		}
-		// Reduce the temperature
-		mod.T *= mod.Alpha
+		mod.T *= mod.Alpha // Reduce the temperature
 	}
 }
 
@@ -262,62 +266,42 @@ func (mod ModSimAnn) Validate() error {
 	}
 	// Check the decrease rate value
 	if mod.Alpha <= 0 || mod.Alpha >= 1 {
-		return errors.New("'MutRate' should belong to the (0, 1) interval")
+		return errInvalidMutRate
 	}
 	return nil
 }
 
-// ModMutationOnly implements the mutation only model.
+// ModMutationOnly implements the mutation only model. Each generation,
+// NbrChosen are chosen and are replaced with mutants. Mutants are obtained by
+// mutating the chosen. If Strict is set to true, then the mutants replace the
+// chosen individuals only if they have a lower fitness.
 type ModMutationOnly struct {
-	NbrParents    int
-	Selector      Selector
-	KeepParents   bool
-	NbrOffsprings int // Number of offsprings per parent
+	NbrChosen int // Number of individuals that are mutated each generation
+	Selector  Selector
+	Strict    bool
 }
 
 // Apply mutation only to a population.
 func (mod ModMutationOnly) Apply(pop *Population) {
-	var (
-		parents, _ = mod.Selector.Apply(mod.NbrParents, pop.Individuals, pop.rng)
-		offsprings Individuals
-		i          = 0
-	)
-	// The length of the new slice of individuals varies if the parents are kept or not
-	if mod.KeepParents {
-		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings+mod.NbrParents)
-	} else {
-		offsprings = make(Individuals, mod.NbrParents*mod.NbrOffsprings)
-	}
-	// Generate offsprings for each parent by copying the parent and then mutating it
-	for _, parent := range parents {
-		if mod.KeepParents {
-			offsprings[i] = parent
-			i++
-		}
-		for j := 0; j < mod.NbrOffsprings; j++ {
-			// Create a new individual and copy the parent's genome onto it
-			var offspring = parent.DeepCopy()
-			offspring.Mutate(pop.rng)
-			offsprings[i] = offspring
-			i++
+	var chosen, positions = mod.Selector.Apply(mod.NbrChosen, pop.Individuals, pop.rng)
+	for i, indi := range chosen {
+		var mutant = indi.DeepCopy()
+		mutant.Mutate(pop.rng)
+		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
+			pop.Individuals[positions[i]] = mutant
 		}
 	}
-	pop.Individuals = offsprings
 }
 
 // Validate the model to verify the parameters are coherent.
 func (mod ModMutationOnly) Validate() error {
-	// Check the number of parents value
-	if mod.NbrParents < 1 {
-		return errors.New("'NbrParents' should be higher than 0")
+	// Check the number of chosen individuals value
+	if mod.NbrChosen < 1 {
+		return errors.New("'NbrChosen' should be higher than 0")
 	}
 	// Check the selector presence
 	if mod.Selector == nil {
-		return errors.New("'Selector' cannot be nil")
-	}
-	// Check the number of offsprings value
-	if mod.NbrOffsprings < 1 {
-		return errors.New("'NbrOffsprings' should be higher than 0")
+		return errNilSelector
 	}
 	return nil
 }
