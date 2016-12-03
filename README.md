@@ -155,6 +155,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 - an indicator that the population is stagnating.
 
 
+<<<<<<< HEAD
 ## Features
 
 - Use different kinds of evolution strategies/models
@@ -162,6 +163,9 @@ This description is voluntarily vague as to how the genetic operators are applie
 - Advanced operators (speciation, migration, parallel populations) are implemented
 - Total control over what genetic operators are used
 - Genomes do not necessarily have to be slices/arrays
+=======
+Genetic algorithms are often a good solution to [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They usually perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently.
+>>>>>>> cab91fe8fe921fd534e7bb6d7d1caa7803bef38e
 
 
 ## Usage
@@ -345,7 +349,11 @@ func (n *Name) Mutate(rng *rand.Rand) {
 }
 ```
 
+<<<<<<< HEAD
 **When are genetic algorithms good to apply?**
+=======
+With gago it's possible to use clustering on top of all the rest. For the time, the only kind of clustering is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` clusters before applying an evolution model to each cluster. The `k` clusters are then merged into a new population of `n` individuals. This way, clusters don't interact with other clusters.
+>>>>>>> cab91fe8fe921fd534e7bb6d7d1caa7803bef38e
 
 Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
 
