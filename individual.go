@@ -21,9 +21,9 @@ type Genome interface {
 // A GenomeMaker is a method that generates a new Genome with random properties.
 type GenomeMaker func(rng *rand.Rand) Genome
 
-// An Individual represents a potential solution to a problem. The individual's
-// is defined by it's genome, which is a slice containing genes. Every gene is a
-// floating point numbers. The fitness is the individual's phenotype and is
+// An Individual represents a potential solution to a problem. Each individual
+// is defined by its genome, which is a slice containing genes. Every gene is a
+// floating point number. The fitness is the individual's phenotype and is
 // represented by a floating point number.
 type Individual struct {
 	Genome    Genome
