@@ -14,7 +14,7 @@ There are many genetic operators yet to be implemented. Feel free to send pull r
 ### Guidelines
 
 - Keep names short
-- Aim for 100 characters per line
+- Aim for 80 characters per line
 
 ### Variable declaration
 
@@ -40,6 +40,25 @@ var (
 var a = 1
 var b = 2
 var c = 3
+```
+
+### Variable declaration in returning functions
+
+Avoid declaring returning returning variables inside the function. They are already declared if they are named at the end of the first line of the function.
+
+```go
+// Good
+func lengthOfList(list []float64) length int {
+    length = len(list)
+    return
+}
+
+// Bad
+func lengthOfList(list []float64) int {
+    var length int
+    length = len(list)
+    return length
+}
 ```
 
 ## Naming convention

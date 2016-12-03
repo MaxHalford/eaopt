@@ -22,7 +22,6 @@ func (pop Population) cluster(k int) Populations {
 		pops[i] = Population{
 			Individuals: pop.Individuals[a:b],
 			rng:         pop.rng,
-			ff:          pop.ff,
 		}
 	}
 	return pops
