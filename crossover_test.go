@@ -1,50 +1,32 @@
 package gago
 
 import (
-	"math/rand"
+	"math"
 	"testing"
-	"time"
 )
 
-var crossovers = []struct {
-	crossover Crossover
-	init      Initializer
-}{
-	{CrossPoint{NbPoints: 2}, InitUniformF{-5.0, 5.0}},
-	{CrossUniformF{}, InitUniformF{-5.0, 5.0}},
-	{CrossPMX{}, InitUniqueS{[]string{"A", "B", "C", "D"}}},
-}
-
-func TestCrossovers(t *testing.T) {
+func TestCrossUniformFloat64(t *testing.T) {
 	var (
-		src      = rand.NewSource(time.Now().UnixNano())
-		rng      = rand.New(src)
-		nbIndis  = 5
-		nbGenes  = 4
-		selector = SelTournament{2}
+		rng    = makeRandomNumberGenerator()
+		p1     = MakeVector(rng).(Vector)
+		p2     = MakeVector(rng).(Vector)
+		o1, o2 = CrossUniformFloat64(p1, p2, rng)
 	)
-	for _, c := range crossovers {
-		var indis = makeIndividuals(nbIndis, nbGenes, rng)
-		// Assign genomes
-		for _, indi := range indis {
-			c.init.Apply(&indi, rng)
-		}
-		var (
-			parents, _             = selector.Apply(2, indis, rng)
-			offspring1, offspring2 = c.crossover.Apply(parents[0], parents[1], rng)
-			offsprings             = Individuals{offspring1, offspring2}
-		)
-		// Check the offspring has a valid genome
-		for _, offspring := range offsprings {
-			if len(offspring.Genome) != nbGenes {
-				t.Error("Crossover operator generated genome of invalid length")
-			}
-			// Check the offspring doesn't share a pointer with the original population
-			for _, indi := range indis {
-				if &offspring == &indi {
-					t.Error("The offspring shares a pointer with another individual")
-				}
-			}
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossUniform should not produce offsprings with different sizes")
+	}
+	// Check new values are contained in hyper-rectangle defined by parents
+	var (
+		bounded = func(x, lower, upper float64) bool { return x > lower && x < upper }
+		lower   float64
+		upper   float64
+	)
+	for i := 0; i < len(p1); i++ {
+		lower = math.Min(p1[i], p2[i])
+		upper = math.Max(p1[i], p2[i])
+		if !bounded(o1[i], lower, upper) || !bounded(o2[i], lower, upper) {
+			t.Error("New values are not contained in hyper-rectangle")
 		}
 	}
 }

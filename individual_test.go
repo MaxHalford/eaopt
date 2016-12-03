@@ -1,24 +1,125 @@
 package gago
 
 import (
-	"math/rand"
 	"reflect"
 	"testing"
-	"time"
 )
+
+func TestDeepCopy(t *testing.T) {
+	var (
+		genome = MakeVector(makeRandomNumberGenerator())
+		indi1  = MakeIndividual(genome)
+		indi2  = indi1.DeepCopy()
+	)
+	if &indi1 == &indi2 || &indi1.Genome == &indi2.Genome {
+		t.Error("Individual was not deep copied")
+	}
+}
+
+func TestEvaluate(t *testing.T) {
+	var (
+		genome = MakeVector(makeRandomNumberGenerator())
+		indi   = MakeIndividual(genome)
+	)
+	if indi.Evaluated {
+		t.Error("Individual shouldn't have Evaluated set to True")
+	}
+	indi.Evaluate()
+	if !indi.Evaluated {
+		t.Error("Individual should have Evaluated set to True")
+	}
+}
+
+func TestMutate(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		genome = MakeVector(rng)
+		indi   = MakeIndividual(genome)
+	)
+	indi.Evaluate()
+	indi.Mutate(rng)
+	if indi.Evaluated {
+		t.Error("Individual shouldn't have Evaluated set to True")
+	}
+}
+
+func TestCrossover(t *testing.T) {
+	var (
+		rng                    = makeRandomNumberGenerator()
+		indi1                  = MakeIndividual(MakeVector(rng))
+		indi2                  = MakeIndividual(MakeVector(rng))
+		offspring1, offspring2 = indi1.Crossover(indi2, rng)
+	)
+	if offspring1.Evaluated || offspring2.Evaluated {
+		t.Error("Offsprings shouldn't have Evaluated set to True")
+	}
+	if &offspring1 == &indi1 || &offspring1 == &indi2 || &offspring2 == &indi1 || &offspring2 == &indi2 {
+		t.Error("Offsprings shouldn't share pointers with parents")
+	}
+}
+
+func TestMakeIndividuals(t *testing.T) {
+	var rng = makeRandomNumberGenerator()
+	for _, n := range []int{1, 2, 42} {
+		var indis = makeIndividuals(n, MakeVector, rng)
+		if len(indis) != n {
+			t.Error("makeIndividuals didn't generate the right number of individuals")
+		}
+	}
+}
+
+func TestEvaluateIndividuals(t *testing.T) {
+	var indis = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
+	for _, indi := range indis {
+		if indi.Evaluated {
+			t.Error("Individual shouldn't have Evaluated set to True")
+		}
+	}
+	indis.Evaluate()
+	for _, indi := range indis {
+		if !indi.Evaluated {
+			t.Error("Individual should have Evaluated set to True")
+		}
+	}
+}
+
+func TestMutateIndividuals(t *testing.T) {
+	var (
+		rng   = makeRandomNumberGenerator()
+		indis = makeIndividuals(10, MakeVector, rng)
+	)
+	indis.Evaluate()
+	indis.Mutate(1, rng)
+	for _, indi := range indis {
+		if indi.Evaluated {
+			t.Error("Individual shouldn't have Evaluated set to True")
+		}
+	}
+}
+
+func TestIndividualsSort(t *testing.T) {
+	var indis = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
+	// Assign a fitness to each individual in decreasing order
+	for i := range indis {
+		indis[i].Fitness = float64(len(indis) - i)
+	}
+	indis.Sort()
+	// Check fitnesses are in increasing order
+	for i := 1; i < len(indis); i++ {
+		if indis[i-1].Fitness > indis[i].Fitness {
+			t.Error("Individuals are not sorted")
+		}
+	}
+}
 
 func TestIndividualsSample(t *testing.T) {
 	var (
-		src       = rand.NewSource(time.Now().UnixNano())
-		rng       = rand.New(src)
-		nbIndis   = 5
-		nbGenes   = 4
-		indis     = makeIndividuals(nbIndis, nbGenes, rng)
-		size      = 3
-		_, sample = indis.sample(size, rng)
+		rng        = makeRandomNumberGenerator()
+		indis      = makeIndividuals(10, MakeVector, rng)
+		sampleSize = 3
+		sample, _  = indis.sample(sampleSize, rng)
 	)
-	// Check the size of the sample
-	if len(sample) != size {
+	if len(sample) != sampleSize {
 		t.Error("Wrong sample size")
 	}
 	// Check the sampled individuals come from the original population
@@ -30,7 +131,7 @@ func TestIndividualsSample(t *testing.T) {
 			}
 		}
 		if exists == false {
-			t.Error("Problem with sampleIndividuals")
+			t.Error("Sampled individuals should come from the original population")
 		}
 	}
 	// Check the sampled individuals have new references
@@ -42,29 +143,7 @@ func TestIndividualsSample(t *testing.T) {
 			}
 		}
 		if referenced == true {
-			t.Error("Problem with sampleIndividuals")
-		}
-	}
-}
-
-func TestIndividualsSort(t *testing.T) {
-	var (
-		nbIndis = 5
-		nbGenes = 4
-		src     = rand.NewSource(time.Now().UnixNano())
-		rng     = rand.New(src)
-		indis   = makeIndividuals(nbIndis, nbGenes, rng)
-	)
-	// Assign fitness in decreasing order
-	for i := range indis {
-		indis[i].Fitness = float64(len(indis) - i)
-	}
-	// Sort
-	indis.Sort()
-	// Check fitnesses are in increasing order
-	for i := 1; i < len(indis); i++ {
-		if indis[i-1].Fitness > indis[i].Fitness {
-			t.Error("Individuals are not sorted")
+			t.Error("Sampled individuals shouln't share pointers with original population")
 		}
 	}
 }
@@ -72,9 +151,9 @@ func TestIndividualsSort(t *testing.T) {
 func TestGetFitnesses(t *testing.T) {
 	var (
 		indis = Individuals{
-			Individual{nil, 0.0, false, "a"},
-			Individual{nil, 1.0, false, "b"},
-			Individual{nil, 2.0, false, "c"},
+			Individual{nil, 0.0, false},
+			Individual{nil, 1.0, false},
+			Individual{nil, 2.0, false},
 		}
 		target    = []float64{0.0, 1.0, 2.0}
 		fitnesses = indis.getFitnesses()
@@ -92,15 +171,15 @@ func TestFitnessMean(t *testing.T) {
 		mean  float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false, "a"},
+			Individual{nil, 1.0, false},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false, "a"},
-			Individual{nil, 2.0, false, "b"},
+			Individual{nil, 1.0, false},
+			Individual{nil, 2.0, false},
 		}, 1.5},
 		{Individuals{
-			Individual{nil, -1.0, false, "a"},
-			Individual{nil, 1.0, false, "b"},
+			Individual{nil, -1.0, false},
+			Individual{nil, 1.0, false},
 		}, 0.0},
 	}
 	for _, testCase := range testCases {
@@ -116,15 +195,15 @@ func TestFitnessVariance(t *testing.T) {
 		variance float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false, "a"},
+			Individual{nil, 1.0, false},
 		}, 0.0},
 		{Individuals{
-			Individual{nil, -1.0, false, "a"},
-			Individual{nil, 1.0, false, "b"},
+			Individual{nil, -1.0, false},
+			Individual{nil, 1.0, false},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, -2.0, false, "a"},
-			Individual{nil, 2.0, false, "b"},
+			Individual{nil, -2.0, false},
+			Individual{nil, 2.0, false},
 		}, 4.0},
 	}
 	for _, testCase := range testCases {
