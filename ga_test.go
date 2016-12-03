@@ -6,56 +6,6 @@ import (
 	"time"
 )
 
-var (
-	ga             GA
-	nbrPopulations = 4
-	nbrIndividuals = 30
-	nbrClusters    = 2
-	nbrGenes       = 2
-	nbrGenerations = 10
-	initializer    = InitUniformF{
-		Lower: -1,
-		Upper: 1,
-	}
-	ff = Float64Function{
-		Image: func(X []float64) float64 {
-			var sum float64
-			for _, x := range X {
-				sum += x
-			}
-			return sum
-		},
-	}
-	model = ModGenerational{
-		Selector: SelTournament{
-			NbrParticipants: 3,
-		},
-		Crossover: CrossUniformF{},
-		Mutator: MutNormalF{
-			Rate: 0.5,
-			Std:  3,
-		},
-		MutRate: 0.5,
-	}
-	migrator     = MigShuffle{}
-	migFrequency = 10
-)
-
-func init() {
-	ga.Topology.NbrPopulations = nbrPopulations
-	ga.Topology.NbrIndividuals = nbrIndividuals
-	ga.Topology.NbrGenes = nbrGenes
-	ga.Initializer = initializer
-	ga.Ff = ff
-	ga.Model = model
-	ga.Migrator = migrator
-	ga.MigFrequency = migFrequency
-	ga.Initialize()
-	for i := 0; i < nbrGenerations; i++ {
-		ga.Enhance()
-	}
-}
-
 func TestValidationSuccess(t *testing.T) {
 	var err = ga.Validate()
 	if err != nil {
@@ -63,119 +13,67 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationModel(t *testing.T) {
-	// Check invalid model raises error
-	ga.Model = ModGenerational{}
+func TestValidationGenomeMaker(t *testing.T) {
+	var genomeMaker = ga.MakeGenome
+	ga.MakeGenome = nil
 	if ga.Validate() == nil {
-		t.Error("Invalid model didn't return an error")
+		t.Error("Nil GenomeMaker should return an error")
 	}
-	// Check no presence of model raises error
+	ga.MakeGenome = genomeMaker
+}
+
+func TestValidationNPopulations(t *testing.T) {
+	var nbrPopulations = ga.Topology.NPopulations
+	ga.Topology.NPopulations = -1
+	if ga.Topology.Validate() == nil {
+		t.Error("Invalid number of Populations should return an error")
+	}
+	ga.Topology.NPopulations = nbrPopulations
+}
+
+func TestValidationNClusters(t *testing.T) {
+	var nbrClusters = ga.Topology.NClusters
+	ga.Topology.NClusters = -1
+	if ga.Topology.Validate() == nil {
+		t.Error("Invalid number of Clusters should return an error")
+	}
+	ga.Topology.NClusters = nbrClusters
+}
+
+func TestValidationNIndividuals(t *testing.T) {
+	var nbrIndividuals = ga.Topology.NIndividuals
+	ga.Topology.NIndividuals = -1
+	if ga.Topology.Validate() == nil {
+		t.Error("Invalid number of Individuals should return an error")
+	}
+	ga.Topology.NIndividuals = nbrIndividuals
+}
+
+func TestValidationModel(t *testing.T) {
+	var model = ga.Model
 	ga.Model = nil
 	if ga.Validate() == nil {
-		t.Error("Nil model didn't return an error")
+		t.Error("Nil Model should return an error")
 	}
 	ga.Model = model
 }
 
-func TestValidationNbrClusters(t *testing.T) {
-	// Check invalid number of clusters raises error
-	ga.Topology.NbrClusters = -1
-	if ga.Validate() == nil {
-		t.Error("Invalid number of clusters didn't return an error")
-	}
-	ga.Topology.NbrClusters = nbrClusters
-}
-
-func TestValidationNbrGenes(t *testing.T) {
-	// Check invalid number of genes raises error
-	ga.Topology.NbrGenes = 0
-	if ga.Validate() == nil {
-		t.Error("Invalid number of genes didn't return an error")
-	}
-	ga.Topology.NbrGenes = nbrGenes
-}
-
-func TestValidationNbrIndividuals(t *testing.T) {
-	// Check invalid number of individuals raises error
-	ga.Topology.NbrIndividuals = 1
-	if ga.Validate() == nil {
-		t.Error("Invalid number of individuals didn't return an error")
-	}
-	ga.Topology.NbrIndividuals = nbrIndividuals
-}
-
-func TestValidationNbrPopulations(t *testing.T) {
-	// Check invalid number of population raises error
-	ga.Topology.NbrPopulations = 0
-	if ga.Validate() == nil {
-		t.Error("Invalid number of populations didn't return an error")
-	}
-	ga.Topology.NbrPopulations = nbrPopulations
-}
-
-func TestValidationFf(t *testing.T) {
-	// Check no presence of fitness function raises error
-	ga.Ff = nil
-	if ga.Validate() == nil {
-		t.Error("Nil fitness function didn't return an error")
-	}
-	ga.Ff = ff
-}
-
-func TestValidationInit(t *testing.T) {
-	// Check no presence of initializer raises error
-	ga.Initializer = nil
-	if ga.Validate() == nil {
-		t.Error("Nil initializer didn't return an error")
-	}
-	ga.Initializer = initializer
-}
-
 func TestValidationMigFrequency(t *testing.T) {
-	// Check invalid migration frequency raises error
+	var migFrequency = ga.MigFrequency
+	ga.Migrator = MigRing{}
 	ga.MigFrequency = 0
 	if ga.Validate() == nil {
-		t.Error("Invalid migration frequency didn't return an error")
+		t.Error("Invalid MigFrequency should return an error")
 	}
+	ga.Migrator = nil
 	ga.MigFrequency = migFrequency
 }
 
-func TestSizes(t *testing.T) {
-	// Number of Populations
-	if len(ga.Populations) != nbrPopulations {
-		t.Error("Wrong number of Populations")
-	}
-	// Number of individuals
-	for _, pop := range ga.Populations {
-		if len(pop.Individuals) != nbrIndividuals {
-			t.Error("Wrong number of individuals")
-		}
-	}
-	// Genome size
-	for _, pop := range ga.Populations {
-		for _, indi := range pop.Individuals {
-			if len(indi.Genome) != nbrGenes {
-				t.Error("Wrong genome size")
-			}
-		}
-	}
-}
-
-func TestGenerators(t *testing.T) {
-	for i := range ga.Populations {
-		for j := i + 1; j < len(ga.Populations); j++ {
-			if &ga.Populations[i].rng == &ga.Populations[j].rng {
-				t.Error("population share random number generators")
-			}
-		}
-	}
-}
-
-func TestSorted(t *testing.T) {
-	for _, pop := range ga.Populations {
-		for i := 0; i < len(pop.Individuals)-1; i++ {
-			if pop.Individuals[i].Fitness > pop.Individuals[i+1].Fitness {
-				t.Error("Individuals are not sorted in increasing order")
+func TestRandomNumberGenerators(t *testing.T) {
+	for i, pop1 := range ga.Populations {
+		for j, pop2 := range ga.Populations {
+			if i != j && &pop1.rng == &pop2.rng {
+				t.Error("Population should not share random number generators")
 			}
 		}
 	}
@@ -192,15 +90,21 @@ func TestBest(t *testing.T) {
 }
 
 func TestFindBest(t *testing.T) {
+	// Check sure the findBest method works as expected
+	var fitness = ga.Populations[0].Individuals[0].Fitness
 	ga.Populations[0].Individuals[0].Fitness = math.Inf(-1)
 	ga.findBest()
 	if ga.Best.Fitness != math.Inf(-1) {
 		t.Error("findBest didn't work")
 	}
+	ga.Populations[0].Individuals[0].Fitness = fitness
+	// Check the best individual doesn't a share a pointer with anyone
+	fitness = ga.Best.Fitness
 	ga.Best.Fitness = 42
 	if ga.Populations[0].Individuals[0].Fitness == 42 {
-		t.Error("Best individual is linked to an individual")
+		t.Error("Best individual shares a pointer with an individual in the populations")
 	}
+	ga.Best.Fitness = fitness
 }
 
 func TestGenerations(t *testing.T) {

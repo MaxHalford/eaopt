@@ -1,105 +1,52 @@
 package gago
 
-import (
-	"math/rand"
-	"testing"
-	"time"
-)
+import "testing"
 
-func TestTournament(t *testing.T) {
+func TestSelectionSize(t *testing.T) {
 	var (
-		src     = rand.NewSource(time.Now().UnixNano())
-		rng     = rand.New(src)
-		size    = 3
-		nbGenes = 2
-		indis   = make(Individuals, size)
-	)
-	for i := 0; i < size; i++ {
-		indis[i] = makeIndividual(nbGenes, rng)
-		indis[i].Fitness = float64(i)
-	}
-	var original = make([]Individual, len(indis))
-	copy(original, indis)
-	// All the individuals participate in the tournament
-	var (
-		selector  = SelTournament{size}
-		sample, _ = selector.Apply(size, indis, rng)
-	)
-	// Check the size of the sample
-	if len(sample) != size {
-		t.Error("Wrong sample size")
-	}
-	// Check the original population hasn't changed
-	for i := range indis {
-		if indis[i].Name != original[i].Name {
-			t.Error("Population has been modified")
+		rng       = makeRandomNumberGenerator()
+		indis     = makeIndividuals(30, MakeVector, rng)
+		selectors = []Selector{
+			SelTournament{
+				NParticipants: 3,
+			},
+			SelElitism{},
 		}
-	}
-	// Check the individual is from the initial population
-	if indis[0].Name != sample[0].Name {
-		t.Error("Problem with tournament selection")
+	)
+	for _, selector := range selectors {
+		for _, n := range []int{1, 2, 10, 30} {
+			var selected, _ = selector.Apply(n, indis, rng)
+			if len(selected) != n {
+				t.Error("Selector didn't select the expected number of individuals")
+			}
+		}
 	}
 }
 
-func TestElitism(t *testing.T) {
+func TestSelElitism(t *testing.T) {
 	var (
-		src     = rand.NewSource(time.Now().UnixNano())
-		rng     = rand.New(src)
-		nbGenes = 2
-		size    = 3
-		indis   = makeIndividuals(size, nbGenes, rng)
+		rng      = makeRandomNumberGenerator()
+		indis    = makeIndividuals(30, MakeVector, rng)
+		selector = SelElitism{}
 	)
-	for i := 0; i < size; i++ {
-		indis[i] = makeIndividual(nbGenes, rng)
-		indis[i].Fitness = float64(i)
-	}
-	var original = make([]Individual, len(indis))
-	copy(original, indis)
-	var (
-		selector  = SelElitism{}
-		sample, _ = selector.Apply(size, indis, rng)
-	)
-	// Check the size of the sample
-	if len(sample) != size {
-		t.Error("Wrong sample size")
-	}
-	// Check the original population hasn't changed
-	for i := range indis {
-		if indis[i].Name != original[i].Name {
-			t.Error("Population has been modified")
+	for _, n := range []int{1, 2, 10, 30} {
+		var _, indexes = selector.Apply(n, indis, rng)
+		for i, index := range indexes {
+			if index != i {
+				t.Error("SelElitism didn't select the expected individuals")
+			}
 		}
-	}
-	// Check the individual is from the initial population
-	if indis[0].Name != sample[0].Name {
-		t.Error("Problem with elitism selection")
 	}
 }
 
-func TestTournamentAndElitism(t *testing.T) {
+func TestSelTournament(t *testing.T) {
 	var (
-		src     = rand.NewSource(time.Now().UnixNano())
-		rng     = rand.New(src)
-		nbGenes = 2
-		size    = 3
-		indis   = makeIndividuals(size, nbGenes, rng)
+		rng        = makeRandomNumberGenerator()
+		indis      = makeIndividuals(30, MakeVector, rng)
+		sel        = SelTournament{len(indis)}
+		_, indexes = sel.Apply(1, indis, rng)
 	)
-	for i := 0; i < size; i++ {
-		indis[i] = makeIndividual(nbGenes, rng)
-		indis[i].Fitness = float64(i)
-	}
-	var original = make([]Individual, len(indis))
-	copy(original, indis)
-	// All the individuals participate in the tournament
-	var (
-		elitism    = SelElitism{}
-		tournament = SelTournament{size}
-		elite, _   = elitism.Apply(size, indis, rng)
-		tourney, _ = tournament.Apply(size, indis, rng)
-	)
-	elite.Sort()
-	tourney.Sort()
-	// Check the individual is from the initial population
-	if elite[0].Fitness != tourney[0].Fitness {
-		t.Error("Elitism and full tournament selection differed")
+	if indexes[0] != 0 {
+		t.Error("Full SelTournament didn't select the best individual")
 	}
 }
