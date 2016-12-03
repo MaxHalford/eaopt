@@ -8,7 +8,7 @@ func TestSelectionSize(t *testing.T) {
 		indis     = makeIndividuals(30, MakeVector, rng)
 		selectors = []Selector{
 			SelTournament{
-				NbrParticipants: 3,
+				NParticipants: 3,
 			},
 			SelElitism{},
 		}

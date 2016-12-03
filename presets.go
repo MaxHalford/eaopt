@@ -5,12 +5,12 @@ func Generational(MakeGenome GenomeMaker) GA {
 	var ga = GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
-			NbrPopulations: 2,
-			NbrIndividuals: 50,
+			NPopulations: 2,
+			NIndividuals: 50,
 		},
 		Model: ModGenerational{
 			Selector: SelTournament{
-				NbrParticipants: 3,
+				NParticipants: 3,
 			},
 			MutRate: 0.5,
 		},
@@ -25,8 +25,8 @@ func SimulatedAnnealing(MakeGenome GenomeMaker) GA {
 	var ga = GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
-			NbrPopulations: 1,
-			NbrIndividuals: 1,
+			NPopulations: 1,
+			NIndividuals: 1,
 		},
 		Model: ModSimAnn{
 			T:     100,  // Starting temperature
@@ -44,13 +44,13 @@ func HillClimbing(MakeGenome GenomeMaker) GA {
 	var ga = GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
-			NbrPopulations: 1,
-			NbrIndividuals: 1,
+			NPopulations: 1,
+			NIndividuals: 1,
 		},
 		Model: ModMutationOnly{
-			NbrChosen: 1,
-			Selector:  SelElitism{},
-			Strict:    true,
+			NChosen:  1,
+			Selector: SelElitism{},
+			Strict:   true,
 		},
 	}
 	ga.Initialize()

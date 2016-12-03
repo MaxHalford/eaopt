@@ -129,16 +129,16 @@ func (mod ModSteadyState) Validate() error {
 
 // ModDownToSize implements the select down to size model.
 type ModDownToSize struct {
-	NbrOffsprings int
-	SelectorA     Selector
-	SelectorB     Selector
-	MutRate       float64
+	NOffsprings int
+	SelectorA   Selector
+	SelectorB   Selector
+	MutRate     float64
 }
 
 // Apply the steady state model to a population.
 func (mod ModDownToSize) Apply(pop *Population) {
 	var offsprings = generateOffsprings(
-		mod.NbrOffsprings,
+		mod.NOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
 		pop.rng,
@@ -159,8 +159,8 @@ func (mod ModDownToSize) Apply(pop *Population) {
 // Validate the model to verify the parameters are coherent.
 func (mod ModDownToSize) Validate() error {
 	// Check the number of offsprings value
-	if mod.NbrOffsprings <= 0 {
-		return errors.New("'NbrOffsprings' has to higher than 0")
+	if mod.NOffsprings <= 0 {
+		return errors.New("'NOffsprings' has to higher than 0")
 	}
 	// Check the first selection method presence
 	if mod.SelectorA == nil {
@@ -272,21 +272,22 @@ func (mod ModSimAnn) Validate() error {
 }
 
 // ModMutationOnly implements the mutation only model. Each generation,
-// NbrChosen are chosen and are replaced with mutants. Mutants are obtained by
+// NChosen are chosen and are replaced with mutants. Mutants are obtained by
 // mutating the chosen. If Strict is set to true, then the mutants replace the
 // chosen individuals only if they have a lower fitness.
 type ModMutationOnly struct {
-	NbrChosen int // Number of individuals that are mutated each generation
-	Selector  Selector
-	Strict    bool
+	NChosen  int // Number of individuals that are mutated each generation
+	Selector Selector
+	Strict   bool
 }
 
 // Apply mutation only to a population.
 func (mod ModMutationOnly) Apply(pop *Population) {
-	var chosen, positions = mod.Selector.Apply(mod.NbrChosen, pop.Individuals, pop.rng)
+	var chosen, positions = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
 	for i, indi := range chosen {
 		var mutant = indi.DeepCopy()
 		mutant.Mutate(pop.rng)
+		mutant.Evaluate()
 		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
 			pop.Individuals[positions[i]] = mutant
 		}
@@ -296,8 +297,8 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 // Validate the model to verify the parameters are coherent.
 func (mod ModMutationOnly) Validate() error {
 	// Check the number of chosen individuals value
-	if mod.NbrChosen < 1 {
-		return errors.New("'NbrChosen' should be higher than 0")
+	if mod.NChosen < 1 {
+		return errors.New("'NChosen' should be higher than 0")
 	}
 	// Check the selector presence
 	if mod.Selector == nil {
