@@ -22,31 +22,31 @@ func TestValidationGenomeMaker(t *testing.T) {
 	ga.MakeGenome = genomeMaker
 }
 
-func TestValidationNbrPopulations(t *testing.T) {
-	var nbrPopulations = ga.Topology.NbrPopulations
-	ga.Topology.NbrPopulations = -1
+func TestValidationNPopulations(t *testing.T) {
+	var nbrPopulations = ga.Topology.NPopulations
+	ga.Topology.NPopulations = -1
 	if ga.Topology.Validate() == nil {
 		t.Error("Invalid number of Populations should return an error")
 	}
-	ga.Topology.NbrPopulations = nbrPopulations
+	ga.Topology.NPopulations = nbrPopulations
 }
 
-func TestValidationNbrClusters(t *testing.T) {
-	var nbrClusters = ga.Topology.NbrClusters
-	ga.Topology.NbrClusters = -1
+func TestValidationNClusters(t *testing.T) {
+	var nbrClusters = ga.Topology.NClusters
+	ga.Topology.NClusters = -1
 	if ga.Topology.Validate() == nil {
 		t.Error("Invalid number of Clusters should return an error")
 	}
-	ga.Topology.NbrClusters = nbrClusters
+	ga.Topology.NClusters = nbrClusters
 }
 
-func TestValidationNbrIndividuals(t *testing.T) {
-	var nbrIndividuals = ga.Topology.NbrIndividuals
-	ga.Topology.NbrIndividuals = -1
+func TestValidationNIndividuals(t *testing.T) {
+	var nbrIndividuals = ga.Topology.NIndividuals
+	ga.Topology.NIndividuals = -1
 	if ga.Topology.Validate() == nil {
 		t.Error("Invalid number of Individuals should return an error")
 	}
-	ga.Topology.NbrIndividuals = nbrIndividuals
+	ga.Topology.NIndividuals = nbrIndividuals
 }
 
 func TestValidationModel(t *testing.T) {

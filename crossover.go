@@ -7,12 +7,12 @@ import (
 
 // Type specific mutations for slices
 
-// CrossUniform crossover combines two individuals (the parents) into one
+// CrossUniformFloat64 crossover combines two individuals (the parents) into one
 // (the offspring). Each parent's contribution to the Genome is determined by
 // the value of a probability p. Each offspring receives a proportion of both of
 // it's parents genomes. The new values are located in the hyper-rectangle
 // defined between both parent's position in Cartesian space.
-func CrossUniform(p1 []float64, p2 []float64, rng *rand.Rand) (o1 []float64, o2 []float64) {
+func CrossUniformFloat64(p1 []float64, p2 []float64, rng *rand.Rand) (o1 []float64, o2 []float64) {
 	var gSize = len(p1)
 	o1 = make([]float64, gSize)
 	o2 = make([]float64, gSize)

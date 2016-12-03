@@ -25,7 +25,7 @@ func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individua
 // tournament is the individual with the lowest fitness. The obtained
 // individuals are not necessarily unique.
 type SelTournament struct {
-	NbrParticipants int
+	NParticipants int
 }
 
 // Apply tournament selection.
@@ -33,7 +33,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (winner
 	winners = make(Individuals, n)
 	indexes = make([]int, n)
 	for i := range winners {
-		var sample, roundIndexes = indis.sample(sel.NbrParticipants, rng)
+		var sample, roundIndexes = indis.sample(sel.NParticipants, rng)
 		sample.Sort()
 		indexes[i] = roundIndexes[0]
 		winners[i] = sample[0]

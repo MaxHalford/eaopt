@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestCrossUniform(t *testing.T) {
+func TestCrossUniformFloat64(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		p1     = MakeVector(rng).(Vector)
 		p2     = MakeVector(rng).(Vector)
-		o1, o2 = CrossUniform(p1, p2, rng)
+		o1, o2 = CrossUniformFloat64(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {

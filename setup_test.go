@@ -24,7 +24,7 @@ func (X Vector) Evaluate() float64 {
 }
 
 func (X Vector) Mutate(rng *rand.Rand) {
-	MutNormal(X, rng, 0.5)
+	MutNormalFloat64(X, rng, 0.5)
 }
 
 func (X Vector) Crossover(Y Genome, rng *rand.Rand) (Genome, Genome) {

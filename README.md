@@ -1,12 +1,16 @@
 <div align="center">
   <!-- Logo -->
-  <img src="img/logo.png" alt="logo"/>
+  <img src="https://docs.google.com/drawings/d/e/2PACX-1vRzNhZcghWl-xRaynEAQn4moZeyh6pmD8helS099eJ7V_TRGM9dE6e0T5IF9bOG7S4K62CKZtSUpans/pub?w=477&h=307" alt="logo"/>
 </div>
 
 <div align="center">
-  <!-- Go awesome -->
-  <a href="https://github.com/sindresorhus/awesome">
-    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="go_awesome" />
+  <!-- Awesome Go -->
+  <a href="https://github.com/avelino/awesome-go">
+    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="awesome_go" />
+  </a>
+  <!-- Awesome Machine Learning -->
+  <a href="https://github.com/josephmisiti/awesome-machine-learning">
+    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="awesome_ml" />
   </a>
 </div>
 
@@ -37,7 +41,7 @@
 
 <br/>
 
-<div align="center">gago is an extensive toolkit for implementing genetic algorithms</div>
+<div align="center">An extensive toolkit for implementing genetic algorithms</div>
 
 <br/>
 
@@ -120,7 +124,7 @@ func main() {
 
 ## Background
 
-There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the GAs are composed of many nuts and bolts. **There isn't a single genetic algorithm**. `gago` is intented to be a framework where one can run many kinds of genetic algorithms, with different evolution models and genetic operators.
+There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single genetic algorithm**. `gago` is intented to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
 
 ### Terminology
 
@@ -144,8 +148,6 @@ In a nutshell, a GA solves an optimization problem by doing the following:
 4. Apply genetic operators following a model.
 5. Repeat from step 2 until the stopping criterion is not satisfied.
 
-![overview](img/overview.png)
-
 This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a **model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criterions include
 
 - a fixed number of generations,
@@ -155,64 +157,89 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Features
 
-- Use different kinds of evolution strategies/models.
-- Out-of-the-box genetic operators are available.
-- Advanced operators (speciation, migration, parallel populations) are implemented.
-- Implement your own genetic operators if necessary.
-- Genomes do not necessarily have to be slices/arrays.
+- Use different kinds of evolution strategies/models
+- Out-of-the-box genetic operators are available
+- Advanced operators (speciation, migration, parallel populations) are implemented
+- Total control over what genetic operators are used
+- Genomes do not necessarily have to be slices/arrays
 
 
 ## Usage
 
-TO REDO
+The two requirements for using gago are
 
-`gago` makes it easy to work with complex genetic algorithms (GAs). Indeed GAs can be complex if one wants to use exotic operators such as migration or speciation, or even both at the same time. To use `gago`, one has to build a `GA` object that suits a particular problem. The `GA` is built by defining the following list of attributes. For the sake of example we can illustrate each attribute by applying a `GA` to the [travelling salesman problem (TSP)](https://www.wikiwand.com/en/Travelling_salesman_problem).
+- Implement the `Genome` interface.
+- Instantiate a `GA` struct.
 
-1. `Ff`: Define the fitness that has to be optimized. One issue that arises is the type of the entry parameters. To avoid having the user to mess with `gago` internal types, a transition function has to be used to convert a slice of interfaces `[]interface` to the type used by the fitness function; whatever the problem the output has to a `float64`. Some transition functions [already exist](fitness.go). For the TSP the fitness function would take as input a list of strings and would calculate the total distance between each point by matching point to a point in space with a lookup table.
-2. `Initializer`: Define a function that can generate new individuals. This function will populate the initial population(s) when the GA is initialized. Again, some good-to-go initializers [already exist](initializing.go). For the TSP the `Initializer` would generate a list of strings in a random order.
-3. `Topology`: Choose how many populations|clusters|individuals|genes will be used. The number of clusters is optional because it means that speciation will be used. All the other numbers are required. The number of genes is usually determined from the problem. For the TSP the number of genes would be the number of points the travelling salesman has to go through.
-4. `Model`: Choose how the individuals will evolve. This is where `gago` shines because different evolution models can be tried out without having to modify the previous parameters. Moreover, not many packages allow the use of different evolution models.
+The `Genome` interface is used define the logic that is specific to your problem; logic that gago doesn't know about. For example this is where you will define an `Evaluate()` method for evaluating a particular problem. The `GA` struct contains context-agnostic information. For example this is where you can choose the number of individuals in a population (which is a separate concern from your particular problem).
 
-- If you want to use migration, simply specify the `Migrator` and the `MigFrequency` attributes. The `Migrator` will shuffle the populations every `MigFrequency` generations.
-- Feel free to check out the [examples folder](examples/) and the [presets](presets/) folder to get a better idea of how `gago` works!
-- Please refer to [godoc](https://godoc.org/github.com/MaxHalford/gago) for specific information about the available genetic operators (mutation, crossover, selection, speciation, migration).
+### Implementing the Genome interface
+
+Let's have a look at the `Genome` interface.
+
+```go
+type Genome interface {
+    Evaluate() float64
+    Mutate(rng *rand.Rand)
+    Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
+}
+```
+
+The `Evaluate()` method assigns a score to a given genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice (which is a common representation). The `Evaluate()` method is *your* problem to deal with, gago only needs it's output to be able to function.
+
+The `Mutate(rng *rand.Rand)` method is where you can mutate a solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use to not reinvent the wheel; this is what is being done in most of the provided examples.
+
+The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces two new individuals (called offsprings) by applying some kind of mixture between the parent's attributes. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is an non-genericity thing specific to Go; it's easier to convince youself by checking out the examples.
+
+Once you have implemented the `Genome` you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
+
+### Instanciating a GA struct
+
+Let's have a look at the GA struct.
+
+```go
+type GA struct {
+    // Fields that are provided by the user
+    MakeGenome   GenomeMaker
+    Topology     Topology
+    Model        Model
+    Migrator     Migrator
+    MigFrequency int // Frequency at which migrations occur
+
+    // Fields that are generated at runtime
+    Best        Individual // Overall best individual (dummy initialization at the beginning)
+    Duration    time.Duration
+    Generations int
+    Populations Populations
+    rng         *rand.Rand
+}
+```
+
+You have to fill in the first 5 attributes, the rest are filled by called the `GA`'s `Init()` method.
+
+- `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
+- `Topology` is a struct which tells gago how many populations (`NPopulations`), clusters (`NClusters`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of clusters.
+- `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
+- `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
+
+Essentially only `MakeGenome`, `Topology` and `Model` are required to run a GA with gago.
+
+
+### Running a GA
+
+Once you have implemented the `Genome` interface and instanciated a `GA` struct you are good to go. You can call the `GA`'s `Enhance()` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Enhance()` method multiple by using a loop or by imposing a time limit.
+
+At any time you have access to the `GA`'s `Best` field which is an internal represention of your genome. The `Best` field itself contains a `Fitness` field and a `Genome` field respectively indicating the best obtained solution and the parameters of that solution.
 
 ### Models
 
-`gago` is generic enough so as to make it possible to easy use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the underlying operators. In a nutshell, an evolution model attemps to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
+`gago` makes it easy to use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the underlying operators. In a nutshell, an evolution model attemps to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
 
 #### Generational model
 
 The generational model is one the, if not the most, popular models. Simply put it generates *n* offsprings from a population of size *n* and replaces the population with the offsprings. The offsprings are generated by selecting 2 individuals from the population and applying a crossover method to the selected individuals until the *n* offsprings have been generated. The newly generated offsprings are then optionally mutated before replacing the original population. Crossover generates two new individuals, thus if the population size isn't an even number then the second individual from the last crossover (individual *n+1*) won't be included in the new population.
 
-##### Diagram
-
-![generational](img/models/generational.png)
-
-##### Pseudocode
-
-```
-offsprings = ()
-while size of offspring < size of population:
-    parent1, parent2 = select(population, 2)
-    offspring1, offspring2 = crossover(parent1, parent2)
-    add offspring1 and offspring2 to offsprings
-
-for each individual of offsprings:
-    if rand() < mutationRate:
-        mutate(individual)
-
-replace population with offsprings
-```
-
-##### Parameters
-
-| Parameter       | Presence |
-|-----------------|----------|
-| Selector        | Required |
-| Crossover       | Required |
-| Mutator         | Optional |
-| Mutation rate   | Optional |
+![generational](https://docs.google.com/drawings/d/e/2PACX-1vQrkFXTHkak2GiRpDarsEIDHnsFWqXd9A98Cq2UUIR1keyMSU8NUE8af7_87KiQnmCKKBEb0IiQVsZM/pub?w=960&h=720)
 
 ---
 
@@ -220,109 +247,23 @@ replace population with offsprings
 
 The steady state model differs from the generational model in that the entire population isn't replaced between each generations. Instead of adding the children of the selected parents into the next generation, the 2 best individuals out of the two parents and two children are added back into the population so that the population size remains constant. However, one may also replace the parents with the children regardless of their fitness. This method has the advantage of not having to evaluate the newly generated offsprings. Whatsmore, crossover often generates individuals who are sub-par but who have a lot of potential; giving individuals generated from crossover a chance can be beneficial on the long run.
 
-##### Diagram
-
-![steady-state](img/models/steady-state.png)
-
-##### Pseudocode
-
-```
-parent1, parent2 = select(population, 2)
-offspring1, offspring2 = crossover(parents)
-
-for each offspring:
-    if rand() < mutationRate:
-        mutate(offspring)
-
-if keepBest:
-    evaluate(offspring1)
-    evaluate(offspring2)
-    best1, best2 = selectBest(parent1, parent2, offspring1, offspring2)
-    replace parent1 with best1
-    replace parent1 with best2
-else:
-    replace parent1 with offspring1
-    replace parent1 with offspring2
-```
-
-##### Parameters
-
-| Parameter       | Presence |
-|-----------------|----------|
-| Selector        | Required |
-| Crossover       | Required |
-| KeepBest        | Required |
-| Mutator         | Optional |
-| Mutation rate   | Optional |
+![steady-state](https://docs.google.com/drawings/d/e/2PACX-1vTTk7b1QS67CZTr7-ksBMlk_cIDhm2YMZjemmrhXbLei5_VgvXCsINCLu8uia3ea6Ouj9I3V5HcZUwS/pub?w=962&h=499)
 
 ---
 
-#### Select down to size
+#### Select down to size model
 
-The select down to size method uses two selection rounds. The first one is classic and picks parents to generate new individuals with crossover. However, the offsprings are then added to the original population and a second selection round occurs to determine which individuals will survive to the next generation. Formally *m* offsprings are generated from a population of *n*, the *n+m* individuals are then "selected down to size" so that there only remains *n* individuals. Finally the *n* newly selected individuals may be mutated.
+The select down to size model uses two selection rounds. The first one is similar to the one used in the generational model. Parents are selected to generate new individuals through crossover. However, the offsprings are then merged with the original population and a second selection round occurs to determine which individuals will survive to the next generation. Formally *m* offsprings are generated from a population of *n*, the *n+m* individuals are then "selected down to size" so that there only remains *n* individuals.
 
-##### Diagram
-
-![select-down-to-size](img/models/select-down-to-size.png)
-
-##### Pseudocode
-
-```
-offsprings = generateOffsprings(m, individuals, selectorA, crossover)
-
-for each offspring:
-    if rand() < mutationRate:
-        mutate(offspring)
-    evaluate(offspring)
-
-offsprings = merge(offsprings, individuals)
-
-individuals = select(len(individuals), offsprings, selectorB)
-```
-
-##### Parameters
-
-| Parameter       | Presence |
-|-----------------|----------|
-| NbrOffsprings   | Required |
-| SelectorA       | Required |
-| Crossover       | Required |
-| SelectorB       | Required |
-| Mutator         | Optional |
-| Mutation rate   | Optional |
+![select-down-to-size](https://docs.google.com/drawings/d/e/2PACX-1vSyXQLPkWOOffKfnTRcdwrKvHTN9rWvdqGVT1fC6vcXGJAQPzxQVmauYLhSd2Xh74vQMhBEnhrSt1od/pub?w=969&h=946)
 
 ---
 
 #### Ring model
 
-In the ring model, each individual crosses over with its neighbor in a one-directional ring topology. One of the individuals out of offsprings or the original individual is selected to replace the original individual. Formally, an individual at position *i* will crossover with it's neighbour at position *i+1* and generates 2 offsprings. The last individual is connected to the first individual.
+In the ring model, crossovers are applied to neighbours in a one-directional ring topology. Two by the two neighbours generate 2 offsprings. The best out of the 4 individuals (2 parents + 2 offsprings) replaces the first neighbour.
 
-##### Diagram
-
-![ring](img/models/ring.png)
-
-##### Pseudocode
-
-```
-foreach i, individual in individuals:
-    neighbour = individuals[i % len(individuals)]
-    offspring1, offspring2 = crossover(individual, neighbour)
-    selected = select(individual, offspring1, offspring2)
-    individuals[i] = selected
-
-for each individual of individuals:
-    if rand() < mutationRate:
-        mutate(individual)
-```
-
-##### Parameters
-
-| Parameter       | Presence |
-|-----------------|----------|
-| Selector        | Required |
-| Crossover       | Required |
-| Mutator         | Optional |
-| Mutation rate   | Optional |
+![ring](https://docs.google.com/drawings/d/e/2PACX-1vTCsgqnEXj4KCn_C7IxHZXSw9XMP3RK_YeW5AoVKUSRHzq6CIFlp7fbBA-DK9mtFV330kROwrEsP6tj/pub?w=960&h=625)
 
 ---
 
@@ -330,70 +271,18 @@ for each individual of individuals:
 
 Although [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) isn't a genetic algorithm, it can nonetheless be implemented with gago. A mutator is the only necessary operator. Other than that a starting temperature, a stopping temperature and a decrease rate have to be provided. Effectively a single simulated annealing is run for each individual in the population.
 
-!!! note "Note"
-    The temperature evolution is relative to one single generation. In order to mimic the original simulated annealing algorithm, one would the number of individuals to 1 and would run the algorithm for only 1 generation. However, nothing stops you from running many simulated annealings and to repeat them over many generations.
-
-##### Pseudocode
-
-```
-while T > T_min:
-    foreach i, individual in individuals:
-        neighbour = mutate(individual)
-        if neighbour.fitness < individual.fitness:
-            individuals[i] = neighbour
-        else:
-            ap = exp((neighbour.fitness - individual.fitness) / T)
-            if rand() < ap:
-                individuals[i] = neighbour
-    T = T * alpha
-```
-
-##### Parameters
-
-| Parameter                     | Presence |
-|-------------------------------|----------|
-| Mutator                       | Required |
-| Starting temperature (T)      | Required |
-| Stopping temperature (Tmin)   | Required |
-| Decrease rate (Alpha)         | Required |
+The temperature evolution is relative to one single generation. In order to mimic the original simulated annealing algorithm, one would the number of individuals to 1 and would run the algorithm for only 1 generation. However, nothing stops you from running many simulated annealings and to repeat them over many generations.
 
 ---
 
 #### Mutation only
 
-Although [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) isn't a genetic algorithm, it can nonetheless be implemented with gago. A mutator is the only necessary operator. Other than that a starting temperature, a stopping temperature and a decrease rate have to be provided. Effectively a single simulated annealing is run for each individual in the population.
-
-##### Pseudocode
-
-```
-parents = select(nbr_parents, individuals)
-offsprings = []
-i = 0
-
-foreach parent of parents:
-    if keep_parents:
-        offsprings[i] = parent
-        i++
-    for j in 0 to nbr_offsprings:
-        offsprings[j] = mutate(parent)
-        i++
-
-individuals = offsprings
-```
-
-##### Parameters
-
-| Parameter                     | Presence |
-|-------------------------------|----------|
-| NbrParents                    | Required |
-| Selector                      | Required |
-| KeepParents                   | Required |
-| NbrOffsprings                 | Required |
-| Mutator                       | Required |
+It's possible to run a GA without crossover simply by mutating individuals. Essentially this boils down to doing [hill climbing](https://www.wikiwand.com/en/Hill_climbing) because there is not interaction between individuals. Indeed taking a step in hill climbing is equivalent to mutation for genetic algorithms. What's nice is that by using a population of size n you are essentially running multiple independent hill climbs.
 
 
 ### Multiple populations and migration
 
+TO DO.
 
 ### Clustering
 
@@ -410,18 +299,26 @@ With gago it's possible to use clustering on top of all the rest. For the time, 
 
 ### Presets
 
+Some prefilled GA instances are available to get started as fast as possible. They are available in the [presets](presets.go) file. These instances also serve as example instanciations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
 
+## A note on parallelism
+
+Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run indepently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
+
+One approach I considered was to run the individual operations in parallel. Basically a parallel loop would apply all the necessary operations to a set of individuals. First of all this isn't as simple as it seems, the prime issue being the [race condition](https://www.wikiwand.com/en/Embarrassingly_parallel) that can occur when applying crossover. Moreover the initialization overhead was relatively too large, mainly because mutation and evaluation can be *too* fast for a thread to be viable.
+
+The current approach is to run the populations in parallel. This works very nicely because the only non-parallel operation is migration; all the other operations are population specific and no communication between populations has to be made. Basically if you have n cores, then running a GA with n populations will take the same time as running it for 1.
 
 ## FAQ
 
 **What if I don't want to use crossover?**
 
-Alas you still have to implement the `Genome` interface. You can however provide a blank `Crossover` method which will only serve to implement the interface.
+Alas you still have to implement the `Genome` interface. You can however provide a blank `Crossover` method just to satisfy the interface.
 
 ```go
 type Vector []float64
 
-func (X Vector) Crossover(Y interface{}, rng *rand.Rand) (gago.Genome, gago.Genome) {
+func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
     return X, Y.(Vector)
 }
 ```

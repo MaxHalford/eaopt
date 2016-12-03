@@ -4,11 +4,11 @@ import "math/rand"
 
 // Type specific mutations for slices
 
-// MutNormal modifies a float64 gene if a coin toss is under a defined mutation
-// rate. The new gene value is a random value sampled from a normal distribution
-// centered on the gene's current value and with a standard deviation
-// proportional to the current value. It does so for each gene.
-func MutNormal(genome []float64, rng *rand.Rand, rate float64) {
+// MutNormalFloat64 modifies a float64 gene if a coin toss is under a defined
+// mutation rate. The new gene value is a random value sampled from a normal
+// distribution centered on the gene's current value and with a standard
+// deviation proportional to the current value. It does so for each gene.
+func MutNormalFloat64(genome []float64, rng *rand.Rand, rate float64) {
 	for i := range genome {
 		// Flip a coin and decide to mutate or not
 		if rng.Float64() < rate {
@@ -17,9 +17,9 @@ func MutNormal(genome []float64, rng *rand.Rand, rate float64) {
 	}
 }
 
-// MutUniform replaces picks a gene at random and replaces it with a random
+// MutUniformString replaces picks a gene at random and replaces it with a random
 // from a corpus, n times.
-func MutUniform(genome []string, corpus []string, n int, rng *rand.Rand) {
+func MutUniformString(genome []string, corpus []string, n int, rng *rand.Rand) {
 	for i := 0; i < n; i++ {
 		var (
 			element = corpus[rng.Intn(len(corpus))]
