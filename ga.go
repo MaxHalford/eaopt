@@ -9,21 +9,21 @@ import (
 
 // A Topology holds all the information relative to the size of a GA.
 type Topology struct {
-	NbrPopulations int // Number of populations
-	NbrClusters    int // Number of clusters each population is split into
-	NbrIndividuals int // Initial number of individuals in each population
+	NPopulations int // Number of populations
+	NClusters    int // Number of clusters each population is split into
+	NIndividuals int // Initial number of individuals in each population
 }
 
 // Validate the properties of a Topology.
 func (topo Topology) Validate() error {
-	if topo.NbrPopulations < 1 {
-		return errors.New("'NbrPopulations' should be higher or equal to 1")
+	if topo.NPopulations < 1 {
+		return errors.New("'NPopulations' should be higher or equal to 1")
 	}
-	if topo.NbrClusters < 0 {
-		return errors.New("'NbrClusters' should be higher or equal to 1 if provided")
+	if topo.NClusters < 0 {
+		return errors.New("'NClusters' should be higher or equal to 1 if provided")
 	}
-	if topo.NbrIndividuals < 1 {
-		return errors.New("'NbrIndividuals' should be higher or equal to 1")
+	if topo.NIndividuals < 1 {
+		return errors.New("'NIndividuals' should be higher or equal to 1")
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func (ga GA) Validate() error {
 func (ga *GA) Initialize() {
 	ga.Duration = 0
 	ga.Generations = 0
-	ga.Populations = make([]Population, ga.Topology.NbrPopulations)
+	ga.Populations = make([]Population, ga.Topology.NPopulations)
 	ga.rng = makeRandomNumberGenerator()
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
@@ -88,7 +88,7 @@ func (ga *GA) Initialize() {
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(ga.Topology.NbrIndividuals, ga.MakeGenome)
+			ga.Populations[j] = makePopulation(ga.Topology.NIndividuals, ga.MakeGenome)
 			// Evaluate it's individuals
 			ga.Populations[j].Individuals.Evaluate()
 			// Sort it's individuals
@@ -123,7 +123,7 @@ func (ga *GA) Enhance() {
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
 	// generation count
-	if ga.Topology.NbrPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+	if ga.Topology.NPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations, ga.rng)
 	}
 	// Use a wait group to enhance the populations in parallel
@@ -133,8 +133,8 @@ func (ga *GA) Enhance() {
 		go func(j int) {
 			defer wg.Done()
 			// Apply clustering if a positive number of clusters has been speficied
-			if ga.Topology.NbrClusters > 0 {
-				var clusters = ga.Populations[j].cluster(ga.Topology.NbrClusters)
+			if ga.Topology.NClusters > 0 {
+				var clusters = ga.Populations[j].cluster(ga.Topology.NClusters)
 				// Apply the evolution model to each cluster
 				for k := range clusters {
 					ga.Model.Apply(&clusters[k])

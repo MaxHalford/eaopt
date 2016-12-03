@@ -57,7 +57,7 @@ func TestClusteringMerge(t *testing.T) {
 func TestClusteringEnhancement(t *testing.T) {
 	var ga2 = ga
 	for _, n := range []int{1, 3, 10} {
-		ga2.Topology.NbrClusters = n
+		ga2.Topology.NClusters = n
 		ga2.Initialize()
 		var best = ga.Best
 		ga2.Enhance()

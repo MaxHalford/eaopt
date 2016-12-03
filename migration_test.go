@@ -7,7 +7,7 @@ func TestMigSizes(t *testing.T) {
 		rng       = makeRandomNumberGenerator()
 		migrators = []Migrator{
 			MigRing{
-				NbrMigrants: 5,
+				NMigrants: 5,
 			},
 		}
 	)
