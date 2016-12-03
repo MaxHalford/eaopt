@@ -18,10 +18,10 @@ var models = []Model{
 		MutRate:  0.2,
 	},
 	ModDownToSize{
-		NbrOffsprings: 5,
-		SelectorA:     SelTournament{1},
-		SelectorB:     SelElitism{},
-		MutRate:       0.2,
+		NOffsprings: 5,
+		SelectorA:   SelTournament{1},
+		SelectorB:   SelElitism{},
+		MutRate:     0.2,
 	},
 	ModRing{
 		Selector: SelTournament{1},
@@ -33,14 +33,14 @@ var models = []Model{
 		Alpha: 0.3,
 	},
 	ModMutationOnly{
-		NbrChosen: 3,
-		Selector:  SelTournament{1},
-		Strict:    false,
+		NChosen:  3,
+		Selector: SelTournament{1},
+		Strict:   false,
 	},
 	ModMutationOnly{
-		NbrChosen: 3,
-		Selector:  SelTournament{1},
-		Strict:    true,
+		NChosen:  3,
+		Selector: SelTournament{1},
+		Strict:   true,
 	},
 }
 
