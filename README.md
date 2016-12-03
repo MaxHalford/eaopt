@@ -45,6 +45,25 @@
 
 <br/>
 
+**Table of Contents**
+  - [Example](#example)
+  - [Background](#background)
+    - [Terminology](#terminology)
+    - [Methodology](#methodology)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [Implementing the Genome interface](#implementing-the-genome-interface)
+    - [Instanciating a GA struct](#instanciating-a-ga-struct)
+    - [Running a GA](#running-a-ga)
+    - [Models](#models)
+    - [Multiple populations and migration](#multiple-populations-and-migration)
+    - [Clustering](#clustering)
+    - [Presets](#presets)
+  - [A note on parallelism](#a-note-on-parallelism)
+  - [FAQ](#faq)
+  - [Alternatives](#alternatives)
+  - [License](#license)
+
 ## Example
 
 The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html).
@@ -293,11 +312,13 @@ Using clustering/speciation with genetic algorithms became "popular" when they w
 
 With gago it's possible to use clustering on top of all the rest. For the time, the only kind of clustering is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` clusters before applying an evolution model to each cluster. The `k` clusters are then merged into a new population of `n` individuals. This way, clusters don't interact with other clusters.
 
-![clustering](https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645)
+<div align="center">
+  <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="clustering" />
+</div>
 
 ### Presets
 
-Some prefilled GA instances are available to get started as fast as possible. They are available in the [presets](presets.go) file. These instances also serve as example instanciations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
+Some prefilled GA instances are available to get started as fast as possible. They are available in the [presets.go](presets.go) file. These instances also serve as example instanciations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
 
 ## A note on parallelism
 
