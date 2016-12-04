@@ -31,7 +31,7 @@ func (X Strings) Evaluate() (mismatches float64) {
 // Mutate a slice of strings by replacing it's elements by random characters
 // contained in  a corpus.
 func (X Strings) Mutate(rng *rand.Rand) {
-	gago.MutUniform(X, corpus, 3, rng)
+	gago.MutUniformString(X, corpus, 3, rng)
 }
 
 // Crossover a slice of strings with another by applying 2-point crossover.
