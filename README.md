@@ -22,7 +22,7 @@
     <img src="https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square" alt="godoc" />
   </a>
   <!-- Build status -->
-  <a href="https://img.shields.io/travis/MaxHalford/gago">
+  <a href="https://travis-ci.org/MaxHalford/gago">
     <img src="https://img.shields.io/travis/MaxHalford/gago.svg?style=flat-square" alt="build_status" />
   </a>
   <!-- Test coverage -->

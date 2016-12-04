@@ -148,7 +148,7 @@ var (
 			Strict:   false,
 		},
 		ModMutationOnly{
-			NChosen:  -1,
+			NChosen:  3,
 			Selector: SelTournament{0},
 			Strict:   false,
 		},
