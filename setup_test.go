@@ -3,11 +3,26 @@ package gago
 import "math/rand"
 
 var (
-	ga             = Generational(MakeVector)
+	ga = GA{
+		MakeGenome: MakeVector,
+		Topology: Topology{
+			NPopulations: 2,
+			NIndividuals: 50,
+		},
+		Model: ModGenerational{
+			Selector: SelTournament{
+				NParticipants: 3,
+			},
+			MutRate: 0.5,
+		},
+		Migrator:     MigRing{10},
+		MigFrequency: 3,
+	}
 	nbrGenerations = 5 // Initial number of generations to enhance
 )
 
 func init() {
+	ga.Initialize()
 	for i := 0; i < nbrGenerations; i++ {
 		ga.Enhance()
 	}
