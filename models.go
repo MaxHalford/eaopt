@@ -70,6 +70,11 @@ func (mod ModGenerational) Validate() error {
 	if mod.Selector == nil {
 		return errNilSelector
 	}
+	// Check the selection method parameters
+	var errSelector = mod.Selector.Validate()
+	if errSelector != nil {
+		return errSelector
+	}
 	// Check the mutation rate
 	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errInvalidMutRate
@@ -120,6 +125,11 @@ func (mod ModSteadyState) Validate() error {
 	if mod.Selector == nil {
 		return errNilSelector
 	}
+	// Check the selection method parameters
+	var errSelector = mod.Selector.Validate()
+	if errSelector != nil {
+		return errSelector
+	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errInvalidMutRate
@@ -166,9 +176,19 @@ func (mod ModDownToSize) Validate() error {
 	if mod.SelectorA == nil {
 		return errNilSelector
 	}
+	// Check the first selection method parameters
+	var errSelectorA = mod.SelectorA.Validate()
+	if errSelectorA != nil {
+		return errSelectorA
+	}
 	// Check the second selection method presence
 	if mod.SelectorB == nil {
 		return errNilSelector
+	}
+	// Check the second selection method parameters
+	var errSelectorB = mod.SelectorB.Validate()
+	if errSelectorB != nil {
+		return errSelectorB
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
@@ -212,6 +232,11 @@ func (mod ModRing) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
 		return errNilSelector
+	}
+	// Check the selection method parameters
+	var errSelector = mod.Selector.Validate()
+	if errSelector != nil {
+		return errSelector
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
@@ -303,6 +328,11 @@ func (mod ModMutationOnly) Validate() error {
 	// Check the selector presence
 	if mod.Selector == nil {
 		return errNilSelector
+	}
+	// Check the selection method parameters
+	var errSelector = mod.Selector.Validate()
+	if errSelector != nil {
+		return errSelector
 	}
 	return nil
 }

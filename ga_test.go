@@ -25,7 +25,7 @@ func TestValidationGenomeMaker(t *testing.T) {
 func TestValidationNPopulations(t *testing.T) {
 	var nbrPopulations = ga.Topology.NPopulations
 	ga.Topology.NPopulations = -1
-	if ga.Topology.Validate() == nil {
+	if ga.Validate() == nil {
 		t.Error("Invalid number of Populations should return an error")
 	}
 	ga.Topology.NPopulations = nbrPopulations
@@ -34,7 +34,7 @@ func TestValidationNPopulations(t *testing.T) {
 func TestValidationNClusters(t *testing.T) {
 	var nbrClusters = ga.Topology.NClusters
 	ga.Topology.NClusters = -1
-	if ga.Topology.Validate() == nil {
+	if ga.Validate() == nil {
 		t.Error("Invalid number of Clusters should return an error")
 	}
 	ga.Topology.NClusters = nbrClusters
@@ -43,7 +43,7 @@ func TestValidationNClusters(t *testing.T) {
 func TestValidationNIndividuals(t *testing.T) {
 	var nbrIndividuals = ga.Topology.NIndividuals
 	ga.Topology.NIndividuals = -1
-	if ga.Topology.Validate() == nil {
+	if ga.Validate() == nil {
 		t.Error("Invalid number of Individuals should return an error")
 	}
 	ga.Topology.NIndividuals = nbrIndividuals
@@ -51,9 +51,20 @@ func TestValidationNIndividuals(t *testing.T) {
 
 func TestValidationModel(t *testing.T) {
 	var model = ga.Model
+	// Check nil model raises error
 	ga.Model = nil
 	if ga.Validate() == nil {
 		t.Error("Nil Model should return an error")
+	}
+	// Check invalid model raises error
+	ga.Model = ModGenerational{
+		Selector: SelTournament{
+			NParticipants: 3,
+		},
+		MutRate: -1,
+	}
+	if ga.Validate() == nil {
+		t.Error("Invalid Model should return an error")
 	}
 	ga.Model = model
 }

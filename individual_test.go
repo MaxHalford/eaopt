@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDeepCopy(t *testing.T) {
+func TestDeepCopyIndividual(t *testing.T) {
 	var (
 		genome = MakeVector(makeRandomNumberGenerator())
 		indi1  = MakeIndividual(genome)
@@ -16,7 +16,7 @@ func TestDeepCopy(t *testing.T) {
 	}
 }
 
-func TestEvaluate(t *testing.T) {
+func TestEvaluateIndividual(t *testing.T) {
 	var (
 		genome = MakeVector(makeRandomNumberGenerator())
 		indi   = MakeIndividual(genome)
@@ -30,7 +30,7 @@ func TestEvaluate(t *testing.T) {
 	}
 }
 
-func TestMutate(t *testing.T) {
+func TestMutateIndividual(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		genome = MakeVector(rng)
@@ -43,7 +43,7 @@ func TestMutate(t *testing.T) {
 	}
 }
 
-func TestCrossover(t *testing.T) {
+func TestCrossoverIndividual(t *testing.T) {
 	var (
 		rng                    = makeRandomNumberGenerator()
 		indi1                  = MakeIndividual(MakeVector(rng))
@@ -182,8 +182,8 @@ func TestFitnessMean(t *testing.T) {
 			Individual{nil, 1.0, false},
 		}, 0.0},
 	}
-	for _, testCase := range testCases {
-		if testCase.indis.FitnessMean() != testCase.mean {
+	for _, test := range testCases {
+		if test.indis.FitnessMean() != test.mean {
 			t.Error("FitnessMean didn't work as expected")
 		}
 	}
@@ -206,8 +206,8 @@ func TestFitnessVariance(t *testing.T) {
 			Individual{nil, 2.0, false},
 		}, 4.0},
 	}
-	for _, testCase := range testCases {
-		if testCase.indis.FitnessVar() != testCase.variance {
+	for _, test := range testCases {
+		if test.indis.FitnessVar() != test.variance {
 			t.Error("FitnessVar didn't work as expected")
 		}
 	}

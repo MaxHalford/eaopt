@@ -6,14 +6,23 @@ import (
 	"time"
 )
 
+func elementInSlice(element interface{}, slice []interface{}) bool {
+	for _, v := range slice {
+		if v == element {
+			return true
+		}
+	}
+	return false
+}
+
 // Find where an element is in a slice.
-func getIndex(element interface{}, array []interface{}) int {
-	for i, v := range array {
+func getIndex(element interface{}, slice []interface{}) int {
+	for i, v := range slice {
 		if v == element {
 			return i
 		}
 	}
-	// Element not in array
+	// Element not in slice
 	return -1
 }
 
