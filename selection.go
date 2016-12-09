@@ -29,25 +29,27 @@ func (sel SelElitism) Validate() error {
 	return nil
 }
 
-// SelTournament selection chooses an individual through tournament selection.
-// The tournament is composed of randomly chosen individuals. The winner of the
-// tournament is the individual with the lowest fitness. The obtained
+// SelTournament samples individuals through tournament selection. The
+// tournament is composed of randomly chosen individuals. The winner of the
+// tournament is the chosen individual with the lowest fitness. The obtained
 // individuals are not necessarily unique.
 type SelTournament struct {
 	NParticipants int
 }
 
 // Apply tournament selection.
-func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (winners Individuals, indexes []int) {
-	winners = make(Individuals, n)
-	indexes = make([]int, n)
-	for i := range winners {
+func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
+	var (
+		selected = make(Individuals, n)
+		indexes  = make([]int, n)
+	)
+	for i := range selected {
 		var sample, roundIndexes = indis.sample(sel.NParticipants, rng)
 		sample.Sort()
 		indexes[i] = roundIndexes[0]
-		winners[i] = sample[0]
+		selected[i] = sample[0]
 	}
-	return
+	return selected, indexes
 }
 
 // Validate tournament selection parameters.
@@ -55,5 +57,53 @@ func (sel SelTournament) Validate() error {
 	if sel.NParticipants < 1 {
 		return errors.New("NParticipants should be higher than 0")
 	}
+	return nil
+}
+
+// SelRoulette samples individuals through roulette wheel selection (also known
+// as fitness proportionate selection).
+type SelRoulette struct{}
+
+func getWeights(fitnesses []float64) []float64 {
+	var (
+		n       = len(fitnesses)
+		weights = make([]float64, len(fitnesses))
+	)
+	for i, v := range fitnesses {
+		weights[i] = fitnesses[n-1] - v
+	}
+	return cumsum(divide(weights, sum(weights)))
+}
+
+// Spin finds the index
+func spin(value float64, wheel []float64) int {
+	for i, v := range wheel {
+		if value < v {
+			return i
+		}
+	}
+	return -1
+}
+
+// Apply roulette wheel selection.
+func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
+	var (
+		selected = make(Individuals, n)
+		indexes  = make([]int, n)
+		weights  = getWeights(indis.getFitnesses())
+	)
+	for i := range selected {
+		var (
+			index  = spin(rand.Float64(), weights)
+			winner = indis[index]
+		)
+		indexes[i] = index
+		selected[i] = winner
+	}
+	return selected, indexes
+}
+
+// Validate roulette wheel selection parameters.
+func (sel SelRoulette) Validate() error {
 	return nil
 }

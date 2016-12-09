@@ -84,9 +84,25 @@ func TestMin(t *testing.T) {
 	}
 }
 
+func TestSum(t *testing.T) {
+	var testCases = []struct {
+		floats []float64
+		total  float64
+	}{
+		{[]float64{1, 2, 3}, 6},
+		{[]float64{-1, 1}, 0},
+		{[]float64{1.42, 42.1}, 43.52},
+	}
+	for _, test := range testCases {
+		if sum(test.floats) != test.total {
+			t.Error("sum didn't work as expected")
+		}
+	}
+}
+
 func TestMean(t *testing.T) {
 	var testCases = []struct {
-		values []float64
+		floats []float64
 		mean   float64
 	}{
 		{[]float64{1.0}, 1.0},
@@ -94,7 +110,7 @@ func TestMean(t *testing.T) {
 		{[]float64{-1.0, 1.0}, 0.0},
 	}
 	for _, test := range testCases {
-		if mean(test.values) != test.mean {
+		if mean(test.floats) != test.mean {
 			t.Error("mean didn't work as expected")
 		}
 	}
@@ -102,7 +118,7 @@ func TestMean(t *testing.T) {
 
 func TestVariance(t *testing.T) {
 	var testCases = []struct {
-		values   []float64
+		floats   []float64
 		variance float64
 	}{
 		{[]float64{1.0}, 0.0},
@@ -110,8 +126,66 @@ func TestVariance(t *testing.T) {
 		{[]float64{-2.0, 2.0}, 4.0},
 	}
 	for _, test := range testCases {
-		if variance(test.values) != test.variance {
+		if variance(test.floats) != test.variance {
 			t.Error("variance didn't work as expected")
+		}
+	}
+}
+
+func TestDivide(t *testing.T) {
+	var testCases = []struct {
+		floats  []float64
+		value   float64
+		divided []float64
+	}{
+		{[]float64{1, 1}, 1, []float64{1, 1}},
+		{[]float64{1, 1}, 2, []float64{0.5, 0.5}},
+		{[]float64{42, -42}, 21, []float64{2, -2}},
+	}
+	for _, test := range testCases {
+		var divided = divide(test.floats, test.value)
+		for i := range divided {
+			if divided[i] != test.divided[i] {
+				t.Error("divided didn't work as expected")
+			}
+		}
+	}
+}
+
+func TestAdd(t *testing.T) {
+	var testCases = []struct {
+		floats []float64
+		value  float64
+		added  []float64
+	}{
+		{[]float64{1, 1}, 1, []float64{2, 2}},
+		{[]float64{1, 1}, -1, []float64{0, 0}},
+		{[]float64{42, -42}, 21, []float64{63, -21}},
+	}
+	for _, test := range testCases {
+		var added = add(test.floats, test.value)
+		for i := range added {
+			if added[i] != test.added[i] {
+				t.Error("add didn't work as expected")
+			}
+		}
+	}
+}
+
+func TestCumsum(t *testing.T) {
+	var testCases = []struct {
+		floats []float64
+		summed []float64
+	}{
+		{[]float64{0.1, 0.2, 0.3, 0.4}, []float64{0.1, 0.3, 0.6, 1}},
+		{[]float64{-1, 0, 1}, []float64{-1, -1, 0}},
+	}
+	for _, test := range testCases {
+		var summed = cumsum(test.floats)
+		for i := range summed {
+			if summed[i] != test.summed[i] {
+				t.Error("cumsum didn't work as expected")
+			}
 		}
 	}
 }
