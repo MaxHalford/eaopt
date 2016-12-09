@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Check whether a slice contains a given element or not.
 func elementInSlice(element interface{}, slice []interface{}) bool {
 	for _, v := range slice {
 		if v == element {
@@ -26,21 +27,46 @@ func getIndex(element interface{}, slice []interface{}) int {
 	return -1
 }
 
+// Divide each element in a float64 slice by a given value.
+func divide(floats []float64, value float64) []float64 {
+	var divided = make([]float64, len(floats))
+	for i, v := range floats {
+		divided[i] = v / value
+	}
+	return divided
+}
+
+// Add a value to each element in a float64 slice.
+func add(floats []float64, value float64) []float64 {
+	var added = make([]float64, len(floats))
+	for i, v := range floats {
+		added[i] = v + value
+	}
+	return added
+}
+
+// Compute the cumulative sum of a float64 slice.
+func cumsum(floats []float64) []float64 {
+	var summed []float64
+	copy(summed, floats)
+	for i := 1; i < len(summed); i++ {
+		summed[i] += summed[i-1]
+	}
+	return summed
+}
+
 // Generate random weights that sum up to 1.
 func randomWeights(size int) []float64 {
-	var weights = make([]float64, size)
-	// Sum of the weights
-	var total float64
-	// Assign a weight to each individual
+	var (
+		weights = make([]float64, size)
+		total   float64
+	)
 	for i := range weights {
 		weights[i] = rand.Float64()
 		total += weights[i]
 	}
-	// Normalize the weights
-	for i := range weights {
-		weights[i] /= total
-	}
-	return weights
+	var normalized = divide(weights, total)
+	return normalized
 }
 
 // Find the strict minimum between two ints.
@@ -51,23 +77,26 @@ func min(a, b int) int {
 	return b
 }
 
-// Compute the mean of a slice of a float64 slice.
-func mean(slice []float64) float64 {
-	var sum float64
-	for _, v := range slice {
+// Compute the sum  of a float64 slice.
+func sum(floats []float64) (sum float64) {
+	for _, v := range floats {
 		sum += v
 	}
-	return sum / float64(len(slice))
+	return
+}
+
+// Compute the mean of a float64 slice.
+func mean(floats []float64) float64 {
+	return sum(floats) / float64(len(floats))
 }
 
 // Compute the variance of a float64 slice.
-func variance(slice []float64) float64 {
-	// Compute the squares
-	var squares = make([]float64, len(slice))
-	for i, v := range slice {
+func variance(floats []float64) float64 {
+	var squares = make([]float64, len(floats))
+	for i, v := range floats {
 		squares[i] = math.Pow(v, 2)
 	}
-	return mean(squares) - math.Pow(mean(slice), 2)
+	return mean(squares) - math.Pow(mean(floats), 2)
 }
 
 // Sample k unique integers in range [min, max) using reservoir sampling,

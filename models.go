@@ -264,15 +264,9 @@ func (mod ModSimAnn) Apply(pop *Population) {
 			var neighbour = indi.DeepCopy()
 			neighbour.Mutate(pop.rng)
 			neighbour.Evaluate()
-			// Check if the neighbour is better or not
-			if neighbour.Fitness < indi.Fitness {
+			var change = neighbour.Fitness - indi.Fitness
+			if change > 0 || math.Exp(change/mod.T) > pop.rng.Float64() {
 				pop.Individuals[i] = neighbour
-			} else {
-				// Compute the expectance probability
-				var ap = math.Exp((indi.Fitness - neighbour.Fitness) / mod.T)
-				if pop.rng.Float64() < ap {
-					pop.Individuals[i] = neighbour
-				}
 			}
 		}
 		mod.T *= mod.Alpha // Reduce the temperature
