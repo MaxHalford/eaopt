@@ -152,26 +152,6 @@ func TestDivide(t *testing.T) {
 	}
 }
 
-func TestAdd(t *testing.T) {
-	var testCases = []struct {
-		floats []float64
-		value  float64
-		added  []float64
-	}{
-		{[]float64{1, 1}, 1, []float64{2, 2}},
-		{[]float64{1, 1}, -1, []float64{0, 0}},
-		{[]float64{42, -42}, 21, []float64{63, -21}},
-	}
-	for _, test := range testCases {
-		var added = add(test.floats, test.value)
-		for i := range added {
-			if added[i] != test.added[i] {
-				t.Error("add didn't work as expected")
-			}
-		}
-	}
-}
-
 func TestCumsum(t *testing.T) {
 	var testCases = []struct {
 		floats []float64

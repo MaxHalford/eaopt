@@ -36,15 +36,6 @@ func divide(floats []float64, value float64) []float64 {
 	return divided
 }
 
-// Add a value to each element in a float64 slice.
-func add(floats []float64, value float64) []float64 {
-	var added = make([]float64, len(floats))
-	for i, v := range floats {
-		added[i] = v + value
-	}
-	return added
-}
-
 // Compute the cumulative sum of a float64 slice.
 func cumsum(floats []float64) []float64 {
 	var summed []float64
