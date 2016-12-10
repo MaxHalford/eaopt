@@ -38,7 +38,7 @@ func divide(floats []float64, value float64) []float64 {
 
 // Compute the cumulative sum of a float64 slice.
 func cumsum(floats []float64) []float64 {
-	var summed []float64
+	var summed = make([]float64, len(floats))
 	copy(summed, floats)
 	for i := 1; i < len(summed); i++ {
 		summed[i] += summed[i-1]
