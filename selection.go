@@ -67,7 +67,7 @@ type SelRoulette struct{}
 func getWeights(fitnesses []float64) []float64 {
 	var (
 		n       = len(fitnesses)
-		weights = make([]float64, len(fitnesses))
+		weights = make([]float64, n)
 	)
 	for i, v := range fitnesses {
 		weights[i] = fitnesses[n-1] - v
