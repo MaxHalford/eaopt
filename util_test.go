@@ -157,7 +157,7 @@ func TestCumsum(t *testing.T) {
 		floats []float64
 		summed []float64
 	}{
-		{[]float64{0.1, 0.2, 0.3, 0.4}, []float64{0.1, 0.3, 0.6, 1}},
+		{[]float64{1, 2, 3, 4}, []float64{1, 3, 6, 10}},
 		{[]float64{-1, 0, 1}, []float64{-1, -1, 0}},
 	}
 	for _, test := range testCases {

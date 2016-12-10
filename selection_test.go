@@ -1,6 +1,9 @@
 package gago
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestSelectionSize(t *testing.T) {
 	var (
@@ -29,6 +32,7 @@ func TestSelElitism(t *testing.T) {
 		indis    = makeIndividuals(30, MakeVector, rng)
 		selector = SelElitism{}
 	)
+	indis.Evaluate()
 	for _, n := range []int{1, 2, 10, 30} {
 		var _, indexes = selector.Apply(n, indis, rng)
 		for i, index := range indexes {
@@ -46,6 +50,7 @@ func TestSelTournament(t *testing.T) {
 		sel        = SelTournament{len(indis)}
 		_, indexes = sel.Apply(1, indis, rng)
 	)
+	indis.Evaluate()
 	if indexes[0] != 0 {
 		t.Error("Full SelTournament didn't select the best individual")
 	}
@@ -56,14 +61,14 @@ func TestGetWeights(t *testing.T) {
 		fitnesses []float64
 		weights   []float64
 	}{
-		{[]float64{-10, -8, -5}, []float64{5 / 8, 1, 1}},
-		{[]float64{-2, 0, 2, 3}, []float64{5 / 9, 8 / 9, 1, 1}},
-		{[]float64{1, 2, 3, 4}, []float64{0.1, 0.3, 0.6, 1}},
+		{[]float64{-10, -8, -5}, []float64{5.0 / 8, 1, 1}},
+		{[]float64{-2, 0, 2, 3}, []float64{5.0 / 9, 8.0 / 9, 1, 1}},
 	}
 	for _, test := range testCases {
 		var weights = getWeights(test.fitnesses)
 		for i := range weights {
 			if weights[i] != test.weights[i] {
+				fmt.Println(weights[i], test.weights[i])
 				t.Error("getWeights didn't work as expected")
 			}
 		}
@@ -79,6 +84,7 @@ func TestSpin(t *testing.T) {
 		{0.1, []float64{0.3, 0.7, 1}, 0},
 		{0.3, []float64{0.3, 0.7, 1}, 1},
 		{0.8, []float64{0.3, 0.7, 1}, 2},
+		{1, []float64{0.3, 0.7, 1}, -1},
 	}
 	for _, test := range testCases {
 		var index = spin(test.value, test.wheel)
@@ -92,8 +98,9 @@ func TestSelRoulette(t *testing.T) {
 	var (
 		rng   = makeRandomNumberGenerator()
 		indis = makeIndividuals(30, MakeVector, rng)
-		sel   = SelTournament{len(indis)}
+		sel   = SelRoulette{}
 	)
+	indis.Evaluate()
 	for _, n := range []int{0, 1, 10, 30} {
 		var selected, _ = sel.Apply(n, indis, rng)
 		if len(selected) != n {
