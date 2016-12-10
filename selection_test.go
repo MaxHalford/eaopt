@@ -5,6 +5,19 @@ import (
 	"testing"
 )
 
+var (
+	validSelectors = []Selector{
+		SelElitism{},
+		SelTournament{1},
+		SelTournament{3},
+		SelRoulette{},
+	}
+	invalidSelectors = []Selector{
+		SelTournament{0},
+		SelTournament{-1},
+	}
+)
+
 func TestSelectionSize(t *testing.T) {
 	var (
 		rng       = makeRandomNumberGenerator()
@@ -105,6 +118,23 @@ func TestSelRoulette(t *testing.T) {
 		var selected, _ = sel.Apply(n, indis, rng)
 		if len(selected) != n {
 			t.Error("SelRoulette didn't select the right number of individuals")
+		}
+	}
+}
+
+// TestSelectorsValidate checks that each selector's Validate method doesn't
+// return an error in case of a valid model and vice-versa
+func TestSelectorsValidate(t *testing.T) {
+	// Check valid selectors do not raise an error
+	for _, sel := range validSelectors {
+		if sel.Validate() != nil {
+			t.Error("The selector validation should not have raised an error")
+		}
+	}
+	// Check invalid selectors raise an error
+	for _, sel := range invalidSelectors {
+		if sel.Validate() == nil {
+			t.Error("The selector validation should have raised error")
 		}
 	}
 }
