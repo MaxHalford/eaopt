@@ -264,9 +264,12 @@ func (mod ModSimAnn) Apply(pop *Population) {
 			var neighbour = indi.DeepCopy()
 			neighbour.Mutate(pop.rng)
 			neighbour.Evaluate()
-			var change = neighbour.Fitness - indi.Fitness
-			if change > 0 || math.Exp(change/mod.T) > pop.rng.Float64() {
+			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
+			} else {
+				if math.Exp((indi.Fitness-neighbour.Fitness)/mod.T) > pop.rng.Float64() {
+					pop.Individuals[i] = neighbour
+				}
 			}
 		}
 		mod.T *= mod.Alpha // Reduce the temperature
