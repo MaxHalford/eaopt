@@ -94,10 +94,10 @@ func (X Vector) Evaluate() float64 {
     return -numerator / denominator
 }
 
-// Mutate a Vector by applying by resampling each element from a normal
-// distribution with probability 0.8.
+// Mutate a Vector by resampling each element from a normal distribution with
+// probability 0.8.
 func (X Vector) Mutate(rng *rand.Rand) {
-    gago.MutNormal(X, rng, 0.8)
+    gago.MutNormal(X, 0.8, rng)
 }
 
 // Crossover a Vector with another Vector by applying 1-point crossover.
@@ -297,11 +297,6 @@ The temperature evolution is relative to one single generation. In order to mimi
 
 It's possible to run a GA without crossover simply by mutating individuals. Essentially this boils down to doing [hill climbing](https://www.wikiwand.com/en/Hill_climbing) because there is not interaction between individuals. Indeed taking a step in hill climbing is equivalent to mutation for genetic algorithms. What's nice is that by using a population of size n you are essentially running multiple independent hill climbs.
 
-
-### Multiple populations and migration
-
-TO DO.
-
 ### Clustering
 
 Clusters, also called speciation in the litterature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each clusters are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the litterature, clustering is also called *speciation*.
@@ -314,6 +309,20 @@ With gago it's possible to use clustering on top of all the rest. For the time, 
 
 <div align="center">
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="clustering" />
+</div>
+
+### Multiple populations and migration
+
+Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In gago a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `Topology` field.
+
+If `Migrator` and `MigFrequency` are not provided the populations will be run independently, in parallel. However, if they are provided then at every generation number that divides `MigFrequency` individuals will be exchanged between the populations following the `Migrator` protocol.
+
+Using multi-populations can be an easy way to gain in diversity. Moreover, not using multi-populations on a multi-core architecture is a waste of resources.
+
+With gago you can use multi-populations and speciation at the same time. The following flowchart shows what that would look like.
+
+<div align="center">
+  <img src="https://docs.google.com/drawings/d/14VVpTkWquhrcG_oQ61hvZgjKlYWZs_UZRVnL22HFYKM/pub?w=1052&h=607" alt="multi-population_and_clustering" />
 </div>
 
 ### Presets
