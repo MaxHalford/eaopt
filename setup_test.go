@@ -43,7 +43,7 @@ func (X Vector) Mutate(rng *rand.Rand) {
 }
 
 func (X Vector) Crossover(Y Genome, rng *rand.Rand) (Genome, Genome) {
-	var o1, o2 = CrossNPointFloat64(X, Y.(Vector), 2, rng)
+	var o1, o2 = CrossGNXFloat64(X, Y.(Vector), 2, rng)
 	return Vector(o1), Vector(o2)
 }
 
