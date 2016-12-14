@@ -36,7 +36,7 @@ func (X Strings) Mutate(rng *rand.Rand) {
 
 // Crossover a slice of strings with another by applying 2-point crossover.
 func (X Strings) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-	var o1, o2 = gago.CrossNPointString(X, Y.(Strings), 2, rng)
+	var o1, o2 = gago.CrossGNXString(X, Y.(Strings), 2, rng)
 	return Strings(o1), Strings(o2)
 }
 
