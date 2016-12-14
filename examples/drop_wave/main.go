@@ -24,12 +24,12 @@ func (X Vector) Evaluate() float64 {
 // Mutate a Vector by applying by resampling each element from a normal
 // distribution with probability 0.8.
 func (X Vector) Mutate(rng *rand.Rand) {
-	gago.MutNormal(X, rng, 0.8)
+	gago.MutNormalFloat64(X, 0.8, rng)
 }
 
-// Crossover a Vector with another Vector by applying 1-point crossover.
+// Crossover a Vector with another Vector by applying 2-point crossover.
 func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-	var o1, o2 = gago.CrossNPointFloat64(X, Y.(Vector), 2, rng) // Returns two float64 slices
+	var o1, o2 = gago.CrossGNXFloat64(X, Y.(Vector), 2, rng) // Returns two float64 slices
 	return Vector(o1), Vector(o2)
 }
 

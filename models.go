@@ -11,8 +11,10 @@ var (
 	errInvalidMutRate = errors.New("MutRate should be between 0 and 1")
 )
 
-// generateOffsprings is a DRY utility function. It also handles the case of
-// having to generate a non-even number of individuals.
+// Two parents are selected from a pool of individuals, crossover is then
+// applied to generate two offsprings. The selection and crossover process is
+// repeated until n offsprings have been generated. If n is uneven then the
+// second offspring of the last crossover is discarded.
 func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) Individuals {
 	var (
 		offsprings = make(Individuals, n)
@@ -23,11 +25,13 @@ func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) 
 			parents, _             = sel.Apply(2, indis, rng)
 			offspring1, offspring2 = parents[0].Crossover(parents[1], rng)
 		)
-		for _, offspring := range []Individual{offspring1, offspring2} {
-			if i < len(offsprings) {
-				offsprings[i] = offspring
-				i++
-			}
+		if i < len(offsprings) {
+			offsprings[i] = offspring1
+			i++
+		}
+		if i < len(offsprings) {
+			offsprings[i] = offspring2
+			i++
 		}
 	}
 	return offsprings

@@ -97,12 +97,12 @@ func (X Vector) Evaluate() float64 {
 // Mutate a Vector by resampling each element from a normal distribution with
 // probability 0.8.
 func (X Vector) Mutate(rng *rand.Rand) {
-    gago.MutNormal(X, 0.8, rng)
+    gago.MutNormalFloat64(X, 0.8, rng)
 }
 
 // Crossover a Vector with another Vector by applying 1-point crossover.
 func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-    var o1, o2 = gago.CrossNPointFloat64(X, Y.(Vector), 1, rng) // Returns two float64 slices
+    var o1, o2 = gago.CrossGNXFloat64(X, Y.(Vector), 2, rng) // Returns two float64 slices
     return Vector(o1), Vector(o2)
 }
 
@@ -176,11 +176,10 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Features
 
-- Use different kinds of evolution strategies/models
-- Out-of-the-box genetic operators are available
-- Advanced operators (speciation, migration, parallel populations) are implemented
-- Total control over what genetic operators are used
-- Genomes do not necessarily have to be slices/arrays
+- Different evolution models available
+- Popular operators already implemented
+- Speciation/clustering
+- Multi-population GAs and migration
 
 ## Usage
 
