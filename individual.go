@@ -6,10 +6,6 @@ import (
 	"sort"
 )
 
-// EVALUATIONS tracks the total number of times the fitness function was
-// evaluated.
-var EVALUATIONS = 0
-
 // A Genome is an object that can have any number and kinds of properties. As
 // long as it can be evaluated, mutated and crossedover then it can evolved.
 type Genome interface {
@@ -21,10 +17,7 @@ type Genome interface {
 // A GenomeMaker is a method that generates a new Genome with random properties.
 type GenomeMaker func(rng *rand.Rand) Genome
 
-// An Individual represents a potential solution to a problem. Each individual
-// is defined by its genome, which is a slice containing genes. Every gene is a
-// floating point number. The fitness is the individual's phenotype and is
-// represented by a floating point number.
+// An Individual wraps a Genome and contains the fitness assigned to the Genome.
 type Individual struct {
 	Genome    Genome
 	Fitness   float64
@@ -48,9 +41,8 @@ func (indi Individual) DeepCopy() Individual {
 // Evaluate the fitness of an individual. Don't evaluate individuals that have
 // already been evaluated.
 func (indi *Individual) Evaluate() {
-	if indi.Evaluated == false {
+	if !indi.Evaluated {
 		indi.Fitness = indi.Genome.Evaluate()
-		EVALUATIONS++
 		indi.Evaluated = true
 	}
 }

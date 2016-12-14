@@ -31,7 +31,7 @@ func TestCrossUniformFloat64(t *testing.T) {
 	}
 }
 
-func TestNPointCrossover(t *testing.T) {
+func TestGNX(t *testing.T) {
 	var testCases = []struct {
 		p1      []int
 		p2      []int
@@ -40,6 +40,20 @@ func TestNPointCrossover(t *testing.T) {
 		o2      []int
 	}{
 		{
+			p1:      []int{1, 2, 3, 4, 5, 6, 7},
+			p2:      []int{7, 6, 5, 4, 3, 2, 1},
+			indexes: []int{2, 5},
+			o1:      []int{1, 2, 5, 4, 3, 6, 7},
+			o2:      []int{7, 6, 3, 4, 5, 2, 1},
+		},
+		{
+			p1:      []int{1, 2, 3},
+			p2:      []int{3, 2, 1},
+			indexes: []int{0},
+			o1:      []int{3, 2, 1},
+			o2:      []int{1, 2, 3},
+		},
+		{
 			p1:      []int{1, 2, 3},
 			p2:      []int{3, 2, 1},
 			indexes: []int{1},
@@ -47,17 +61,24 @@ func TestNPointCrossover(t *testing.T) {
 			o2:      []int{3, 2, 3},
 		},
 		{
-			p1:      []int{1, 2, 3, 4, 5, 6, 7},
-			p2:      []int{7, 6, 5, 4, 3, 2, 1},
-			indexes: []int{2, 5},
-			o1:      []int{1, 2, 5, 4, 3, 6, 7},
-			o2:      []int{7, 6, 3, 4, 5, 2, 1},
+			p1:      []int{1, 2, 3},
+			p2:      []int{3, 2, 1},
+			indexes: []int{2},
+			o1:      []int{1, 2, 1},
+			o2:      []int{3, 2, 3},
+		},
+		{
+			p1:      []int{1, 2, 3},
+			p2:      []int{3, 2, 1},
+			indexes: []int{3},
+			o1:      []int{1, 2, 3},
+			o2:      []int{3, 2, 1},
 		},
 	}
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = nPointCrossover(uncastInts(test.p1), uncastInts(test.p2), test.indexes)
+			o1, o2 = gnx(uncastInts(test.p1), uncastInts(test.p2), test.indexes)
 		)
 		for i := 0; i < n; i++ {
 			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
@@ -67,46 +88,46 @@ func TestNPointCrossover(t *testing.T) {
 	}
 }
 
-func TestCrossNPointFloat64(t *testing.T) {
+func TestCrossGNXFloat64(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossNPointFloat64(p1, p2, 2, rng)
+		o1, o2 = CrossGNXFloat64(p1, p2, 2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossNPointFloat64 should not produce offsprings with different sizes")
+		t.Error("CrossGNXFloat64 should not produce offsprings with different sizes")
 	}
 }
 
-func TestCrossNPointInt(t *testing.T) {
+func TestCrossGNXInt(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
-		o1, o2 = CrossNPointInt(p1, p2, 2, rng)
+		o1, o2 = CrossGNXInt(p1, p2, 2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossNPointInt should not produce offsprings with different sizes")
+		t.Error("CrossGNXInt should not produce offsprings with different sizes")
 	}
 }
 
-func TestCrossNPointString(t *testing.T) {
+func TestCrossGNXString(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossNPointString(p1, p2, 2, rng)
+		o1, o2 = CrossGNXString(p1, p2, 2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossNPointString should not produce offsprings with different sizes")
+		t.Error("CrossGNXString should not produce offsprings with different sizes")
 	}
 }
 
-func TestPMXCrossover(t *testing.T) {
+func TestPMX(t *testing.T) {
 	var testCases = []struct {
 		p1 []int
 		p2 []int
@@ -123,11 +144,19 @@ func TestPMXCrossover(t *testing.T) {
 			o1: []int{9, 3, 2, 4, 5, 6, 7, 1, 8},
 			o2: []int{1, 7, 3, 8, 2, 6, 5, 4, 9},
 		},
+		{
+			p1: []int{1, 2, 3},
+			p2: []int{3, 2, 1},
+			a:  0,
+			b:  2,
+			o1: []int{1, 2, 3},
+			o2: []int{3, 2, 1},
+		},
 	}
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = pmxCrossover(uncastInts(test.p1), uncastInts(test.p2), test.a, test.b)
+			o1, o2 = pmx(uncastInts(test.p1), uncastInts(test.p2), test.a, test.b)
 		)
 		for i := 0; i < n; i++ {
 			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
@@ -164,6 +193,92 @@ func TestCrossPMXInt(t *testing.T) {
 }
 
 func TestCrossPMXString(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		p1     = []string{"a", "b", "c"}
+		p2     = []string{"c", "b", "a"}
+		o1, o2 = CrossPMXString(p1, p2, 2, rng)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossPMXString should not produce offsprings with different sizes")
+	}
+}
+
+func TestOX(t *testing.T) {
+	var testCases = []struct {
+		p1 []int
+		p2 []int
+		a  int
+		b  int
+		o1 []int
+		o2 []int
+	}{
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			a:  3,
+			b:  7,
+			o1: []int{3, 8, 2, 4, 5, 6, 7, 1, 9},
+			o2: []int{3, 4, 7, 8, 2, 6, 5, 9, 1},
+		},
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			a:  0,
+			b:  9,
+			o1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			o2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+		},
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			a:  0,
+			b:  0,
+			o1: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			o2: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+	}
+	for _, test := range testCases {
+		var (
+			n      = len(test.p1)
+			o1, o2 = ox(uncastInts(test.p1), uncastInts(test.p2), test.a, test.b)
+		)
+		for i := 0; i < n; i++ {
+			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
+				t.Error("Something went wrong during OX crossover")
+			}
+		}
+	}
+}
+
+func TestCrossOXFloat64(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		p1     = []float64{1, 2, 3}
+		p2     = []float64{3, 2, 1}
+		o1, o2 = CrossOXFloat64(p1, p2, 2, rng)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossOXFloat64 should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossOXInt(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		p1     = []int{1, 2, 3}
+		p2     = []int{3, 2, 1}
+		o1, o2 = CrossOXInt(p1, p2, 2, rng)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossOXInt should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossOXString(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		p1     = []string{"a", "b", "c"}
