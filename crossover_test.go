@@ -40,11 +40,11 @@ func TestGNX(t *testing.T) {
 		o2      []int
 	}{
 		{
-			p1:      []int{1, 2, 3, 4, 5, 6, 7},
-			p2:      []int{7, 6, 5, 4, 3, 2, 1},
-			indexes: []int{2, 5},
-			o1:      []int{1, 2, 5, 4, 3, 6, 7},
-			o2:      []int{7, 6, 3, 4, 5, 2, 1},
+			p1:      []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2:      []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			indexes: []int{3, 7},
+			o1:      []int{1, 2, 3, 8, 2, 6, 5, 8, 9},
+			o2:      []int{9, 3, 7, 4, 5, 6, 7, 1, 4},
 		},
 		{
 			p1:      []int{1, 2, 3},
@@ -145,12 +145,20 @@ func TestPMX(t *testing.T) {
 			o2: []int{1, 7, 3, 8, 2, 6, 5, 4, 9},
 		},
 		{
-			p1: []int{1, 2, 3},
-			p2: []int{3, 2, 1},
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
 			a:  0,
-			b:  2,
-			o1: []int{1, 2, 3},
-			o2: []int{3, 2, 1},
+			b:  9,
+			o1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			o2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+		},
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			a:  0,
+			b:  0,
+			o1: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			o2: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
 		},
 	}
 	for _, test := range testCases {
@@ -257,7 +265,7 @@ func TestCrossOXFloat64(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossOXFloat64(p1, p2, 2, rng)
+		o1, o2 = CrossOXFloat64(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
@@ -270,7 +278,7 @@ func TestCrossOXInt(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
-		o1, o2 = CrossOXInt(p1, p2, 2, rng)
+		o1, o2 = CrossOXInt(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
@@ -283,10 +291,107 @@ func TestCrossOXString(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossPMXString(p1, p2, 2, rng)
+		o1, o2 = CrossOXString(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossPMXString should not produce offsprings with different sizes")
+		t.Error("CrossOXString should not produce offsprings with different sizes")
+	}
+}
+
+func TestGetCycles(t *testing.T) {
+	var testCases = []struct {
+		x      []int
+		y      []int
+		cycles [][]int
+	}{
+		{
+			x: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			y: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			cycles: [][]int{
+				[]int{0, 8, 3, 7},
+				[]int{1, 2, 6, 4},
+				[]int{5},
+			},
+		},
+	}
+	for _, test := range testCases {
+		var cycles = getCycles(uncastInts(test.x), uncastInts(test.y))
+		for i, cycle := range cycles {
+			for j, c := range cycle {
+				if c != test.cycles[i][j] {
+					t.Error("getCycles didn't work as expected")
+				}
+			}
+		}
+	}
+}
+
+func TestCrossCX(t *testing.T) {
+	var testCases = []struct {
+		p1 []int
+		p2 []int
+		o1 []int
+		o2 []int
+	}{
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
+			o1: []int{1, 3, 7, 4, 2, 6, 5, 8, 9},
+			o2: []int{9, 2, 3, 8, 5, 6, 7, 1, 4},
+		},
+		{
+			p1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			p2: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			o1: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			o2: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+		},
+	}
+	for _, test := range testCases {
+		var (
+			n      = len(test.p1)
+			o1, o2 = CrossCX(uncastInts(test.p1), uncastInts(test.p2))
+		)
+		for i := 0; i < n; i++ {
+			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
+				t.Error("Something went wrong during CX crossover")
+			}
+		}
+	}
+}
+
+func TestCrossCXFloat64(t *testing.T) {
+	var (
+		p1     = []float64{1, 2, 3}
+		p2     = []float64{3, 2, 1}
+		o1, o2 = CrossCXFloat64(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossCXFloat64 should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossCXInt(t *testing.T) {
+	var (
+		p1     = []int{1, 2, 3}
+		p2     = []int{3, 2, 1}
+		o1, o2 = CrossCXInt(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossCXInt should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossCXString(t *testing.T) {
+	var (
+		p1     = []string{"a", "b", "c"}
+		p2     = []string{"c", "b", "a"}
+		o1, o2 = CrossCXString(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossCXString should not produce offsprings with different sizes")
 	}
 }
