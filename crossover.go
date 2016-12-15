@@ -135,8 +135,8 @@ func pmx(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 // copying one of the parents and then copying the other parent's values up to a
 // randomly chosen crossover point. Each gene that is replaced is permuted with
 // the gene that is copied in the first parent's genome. Two offsprings are
-// generated in such a way (because there are two parents). This crossover
-// method ensures the offspring's genomes are composed of unique genes.
+// generated in such a way (because there are two parents). The PMX method
+// preserves gene uniqueness.
 func CrossPMX(p1 []interface{}, p2 []interface{}, rng *rand.Rand) (o1 []interface{}, o2 []interface{}) {
 	var indexes = randomInts(2, 0, len(p1), rng)
 	sort.Ints(indexes)
@@ -187,12 +187,13 @@ func ox(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 	// Keep two indicators to know where to fill the offsprings
 	var j1, j2 = b, b
 	for i := b; i < b+n; i++ {
-		if !elementInSlice(p2[i%n], o1[a:b]) {
-			o1[j1%n] = p2[i%n]
+		var k = i % n
+		if !elementInSlice(p2[k], o1[a:b]) {
+			o1[j1%n] = p2[k]
 			j1++
 		}
-		if !elementInSlice(p1[i%n], o2[a:b]) {
-			o2[j2%n] = p1[i%n]
+		if !elementInSlice(p1[k], o2[a:b]) {
+			o2[j2%n] = p1[k]
 			j2++
 		}
 	}
@@ -203,9 +204,8 @@ func ox(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 // the first offspring's genome. Then the second parent's genome is iterated
 // over, starting on the right of the part that was copied. Each gene of the
 // second parent's genome is copied onto the next blank gene of the first
-// offspring's genome if it wasn't already copied from the first parent. This
-// crossover method ensures the offspring's genomes are composed of unique
-// genes.
+// offspring's genome if it wasn't already copied from the first parent. The OX
+// method preserves gene uniqueness.
 func CrossOX(p1 []interface{}, p2 []interface{}, rng *rand.Rand) (o1 []interface{}, o2 []interface{}) {
 	var indexes = randomInts(2, 0, len(p1), rng)
 	sort.Ints(indexes)
@@ -215,7 +215,7 @@ func CrossOX(p1 []interface{}, p2 []interface{}, rng *rand.Rand) (o1 []interface
 
 // CrossOXFloat64 is a convenience function for calling CrossOX on a float64
 // slice.
-func CrossOXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float64, []float64) {
+func CrossOXFloat64(v1 []float64, v2 []float64, rng *rand.Rand) ([]float64, []float64) {
 	var (
 		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
 		o1, o2 = CrossOX(p1, p2, rng)
@@ -224,7 +224,7 @@ func CrossOXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float6
 }
 
 // CrossOXInt is a convenience function for calling CrossOX on an int slice.
-func CrossOXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
+func CrossOXInt(v1 []int, v2 []int, rng *rand.Rand) ([]int, []int) {
 	var (
 		p1, p2 = uncastInts(v1), uncastInts(v2)
 		o1, o2 = CrossOX(p1, p2, rng)
@@ -234,10 +234,89 @@ func CrossOXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 
 // CrossOXString is a convenience function for calling CrossOX on a float64
 // slice.
-func CrossOXString(v1 []string, v2 []string, n int, rng *rand.Rand) ([]string, []string) {
+func CrossOXString(v1 []string, v2 []string, rng *rand.Rand) ([]string, []string) {
 	var (
 		p1, p2 = uncastStrings(v1), uncastStrings(v2)
 		o1, o2 = CrossOX(p1, p2, rng)
+	)
+	return castStrings(o1), castStrings(o2)
+}
+
+// getCycles determines the cycles that exist between two slices. A cycle is a
+// list of indexes indicating mirroring values between each slice.
+func getCycles(x, y []interface{}) (cycles [][]int) {
+	var (
+		xLookup = makeLookup(x)      // Matches values to indexes for quick lookup
+		visited = make(map[int]bool) // Indicates if an index is already in a cycle or not
+	)
+	for i := 0; i < len(x); i++ {
+		if !visited[i] {
+			visited[i] = true
+			var (
+				cycle = []int{i}
+				j     = xLookup[y[i]]
+			)
+			// Continue building the cycle until it closes in on itself
+			for j != cycle[0] {
+				cycle = append(cycle, j)
+				visited[j] = true
+				j = xLookup[y[j]]
+			}
+			cycles = append(cycles, cycle)
+		}
+	}
+	return
+}
+
+// CrossCX (Cycle Crossover). Cycles between the parents are indentified, they
+// are then copied alternatively onto the offsprings. The CX method is
+// deterministic and preserves gene uniqueness.
+func CrossCX(p1, p2 []interface{}) ([]interface{}, []interface{}) {
+	var (
+		n      = len(p1)
+		o1     = make([]interface{}, n)
+		o2     = make([]interface{}, n)
+		cycles = getCycles(p1, p2)
+		s      = true // Switch
+	)
+	for i := 0; i < len(cycles); i++ {
+		for _, j := range cycles[i] {
+			if s {
+				o1[j], o2[j] = p1[j], p2[j]
+			} else {
+				o2[j], o1[j] = p1[j], p2[j]
+			}
+		}
+		s = !s
+	}
+	return o1, o2
+}
+
+// CrossCXFloat64 is a convenience function for calling CrossCX on a float64
+// slice.
+func CrossCXFloat64(v1 []float64, v2 []float64) ([]float64, []float64) {
+	var (
+		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
+		o1, o2 = CrossCX(p1, p2)
+	)
+	return castFloat64s(o1), castFloat64s(o2)
+}
+
+// CrossCXInt is a convenience function for calling CrossCX on an int slice.
+func CrossCXInt(v1 []int, v2 []int) ([]int, []int) {
+	var (
+		p1, p2 = uncastInts(v1), uncastInts(v2)
+		o1, o2 = CrossCX(p1, p2)
+	)
+	return castInts(o1), castInts(o2)
+}
+
+// CrossCXString is a convenience function for calling CrossCX on a float64
+// slice.
+func CrossCXString(v1 []string, v2 []string) ([]string, []string) {
+	var (
+		p1, p2 = uncastStrings(v1), uncastStrings(v2)
+		o1, o2 = CrossCX(p1, p2)
 	)
 	return castStrings(o1), castStrings(o2)
 }

@@ -27,6 +27,15 @@ func getIndex(element interface{}, slice []interface{}) int {
 	return -1
 }
 
+// Make a lookup table from a slice, mapping values to indexes.
+func makeLookup(slice []interface{}) map[interface{}]int {
+	var lookup = make(map[interface{}]int)
+	for i, v := range slice {
+		lookup[v] = i
+	}
+	return lookup
+}
+
 // Divide each element in a float64 slice by a given value.
 func divide(floats []float64, value float64) []float64 {
 	var divided = make([]float64, len(floats))
@@ -60,7 +69,7 @@ func randomWeights(size int) []float64 {
 	return normalized
 }
 
-// Find the strict minimum between two ints.
+// Find the minimum between two ints.
 func min(a, b int) int {
 	if a <= b {
 		return a
