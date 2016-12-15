@@ -49,6 +49,30 @@ func TestGetIndex(t *testing.T) {
 	}
 }
 
+func TestMakeLookup(t *testing.T) {
+	var testCases = []struct {
+		slice  []interface{}
+		lookup map[interface{}]int
+	}{
+		{
+			slice: uncastInts([]int{1, 2, 3}),
+			lookup: map[interface{}]int{
+				1: 0,
+				2: 1,
+				3: 2,
+			},
+		},
+	}
+	for _, test := range testCases {
+		var lookup = makeLookup(test.slice)
+		for k, v := range lookup {
+			if v != test.lookup[k] {
+				t.Error("createLookup didn't work as expected")
+			}
+		}
+	}
+}
+
 func TestGenerateWeights(t *testing.T) {
 	var (
 		sizes = []int{1, 30, 10000}
