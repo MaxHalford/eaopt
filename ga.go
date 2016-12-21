@@ -10,7 +10,7 @@ import (
 // A Topology holds all the information relative to the size of a GA.
 type Topology struct {
 	NPopulations int // Number of populations
-	NClusters    int // Number of clusters each population is split into
+	NClusters    int // Number of species each population is split into
 	NIndividuals int // Initial number of individuals in each population
 }
 
@@ -132,15 +132,15 @@ func (ga *GA) Enhance() {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
-			// Apply clustering if a positive number of clusters has been speficied
+			// Apply speciation if a positive number of species has been speficied
 			if ga.Topology.NClusters > 0 {
-				var clusters = ga.Populations[j].cluster(ga.Topology.NClusters)
+				var species = ga.Populations[j].speciate(ga.Topology.NClusters)
 				// Apply the evolution model to each cluster
-				for k := range clusters {
-					ga.Model.Apply(&clusters[k])
+				for k := range species {
+					ga.Model.Apply(&species[k])
 				}
 				// Merge each cluster back into the original population
-				ga.Populations[j].Individuals = clusters.merge()
+				ga.Populations[j].Individuals = species.merge()
 			} else {
 				// Else apply the evolution model to the entire population
 				ga.Model.Apply(&ga.Populations[j])
