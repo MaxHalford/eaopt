@@ -228,3 +228,30 @@ func TestRandomInts(t *testing.T) {
 		}
 	}
 }
+
+func TestUnion(t *testing.T) {
+	var testCases = []struct {
+		x set
+		y set
+		u set
+	}{
+		{
+			x: set{1: true, 2: true, 3: true},
+			y: set{4: true, 5: true, 6: true},
+			u: set{1: true, 2: true, 3: true, 4: true, 5: true, 6: true},
+		},
+		{
+			x: set{1: true, 2: true, 3: true},
+			y: set{2: true, 3: true, 4: true},
+			u: set{1: true, 2: true, 3: true, 4: true},
+		},
+	}
+	for _, test := range testCases {
+		var u = union(test.x, test.y)
+		for i := range u {
+			if !test.u[i] {
+				t.Error("union didn't work as expected")
+			}
+		}
+	}
+}
