@@ -28,7 +28,7 @@ func getIndex(element interface{}, slice []interface{}) int {
 }
 
 // Make a lookup table from a slice, mapping values to indexes.
-func makeLookup(slice []interface{}) map[interface{}]int {
+func makeIndexLookup(slice []interface{}) map[interface{}]int {
 	var lookup = make(map[interface{}]int)
 	for i, v := range slice {
 		lookup[v] = i

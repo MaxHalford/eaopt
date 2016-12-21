@@ -11,8 +11,7 @@ func InitUnifFloat64(n int, lower, upper float64, rng *rand.Rand) (floats []floa
 	return
 }
 
-// InitNormFloat64 generates random float64s sampled from a normal
-// distribution.
+// InitNormFloat64 generates random float64s sampled from a normal distribution.
 func InitNormFloat64(n int, mean, std float64, rng *rand.Rand) (floats []float64) {
 	floats = make([]float64, n)
 	for i := range floats {

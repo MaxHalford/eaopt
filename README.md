@@ -239,7 +239,7 @@ type GA struct {
 You have to fill in the first 5 attributes, the rest are filled by called the `GA`'s `Init()` method.
 
 - `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
-- `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NClusters`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
+- `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NSpecies`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
 
