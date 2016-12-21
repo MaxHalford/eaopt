@@ -2,13 +2,13 @@ package gago
 
 import "math"
 
-// Cluster splits n individuals into k clusters based on the fitness of each
-// individual where each clusters contains m = n/k (rounded to the closest
+// Speciate splits n individuals into k species based on the fitness of each
+// individual where each species contains m = n/k (rounded to the closest
 // upper integer) individuals with similar fitnesses. For example, with 4
-// clusters, 30 individuals would be split into 3 groups of 8 individuals and 1
+// species, 30 individuals would be split into 3 groups of 8 individuals and 1
 // group of 6 individuals (3*8 + 1*6 = 30). More generally each group is of size
 // min(n-i, m) where i is a multiple of m.
-func (pop Population) cluster(k int) Populations {
+func (pop Population) speciate(k int) Populations {
 	var (
 		pops = make(Populations, k)
 		n    = len(pop.Individuals)
@@ -27,7 +27,7 @@ func (pop Population) cluster(k int) Populations {
 	return pops
 }
 
-// Merge k clusters each of size of n into a single slice of k*n individuals.
+// Merge k species each of size of n into a single slice of k*n individuals.
 func (pops Populations) merge() Individuals {
 	var indis Individuals
 	for _, pop := range pops {

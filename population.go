@@ -26,5 +26,5 @@ func makePopulation(nbrIndis int, gm GenomeMaker) Population {
 	return pop
 }
 
-// Populations type is necessary for migration and clustering purposes.
+// Populations type is necessary for migration and speciation purposes.
 type Populations []Population
