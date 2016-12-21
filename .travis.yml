@@ -1,7 +1,7 @@
 language: go
 sudo: false
 go:
-  - tip  # latest version
+  - tip
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/mattn/goveralls

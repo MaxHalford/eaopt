@@ -31,13 +31,13 @@ func TestValidationNPopulations(t *testing.T) {
 	ga.Topology.NPopulations = nbrPopulations
 }
 
-func TestValidationNClusters(t *testing.T) {
-	var nbrClusters = ga.Topology.NClusters
-	ga.Topology.NClusters = -1
+func TestValidationNSpecies(t *testing.T) {
+	var nbrClusters = ga.Topology.NSpecies
+	ga.Topology.NSpecies = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of Clusters should return an error")
 	}
-	ga.Topology.NClusters = nbrClusters
+	ga.Topology.NSpecies = nbrClusters
 }
 
 func TestValidationNIndividuals(t *testing.T) {

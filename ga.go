@@ -10,7 +10,7 @@ import (
 // A Topology holds all the information relative to the size of a GA.
 type Topology struct {
 	NPopulations int // Number of populations
-	NClusters    int // Number of species each population is split into
+	NSpecies     int // Number of species each population is split into
 	NIndividuals int // Initial number of individuals in each population
 }
 
@@ -19,8 +19,8 @@ func (topo Topology) Validate() error {
 	if topo.NPopulations < 1 {
 		return errors.New("'NPopulations' should be higher or equal to 1")
 	}
-	if topo.NClusters < 0 {
-		return errors.New("'NClusters' should be higher or equal to 1 if provided")
+	if topo.NSpecies < 0 {
+		return errors.New("'NSpecies' should be higher or equal to 1 if provided")
 	}
 	if topo.NIndividuals < 1 {
 		return errors.New("'NIndividuals' should be higher or equal to 1")
@@ -133,8 +133,8 @@ func (ga *GA) Enhance() {
 		go func(j int) {
 			defer wg.Done()
 			// Apply speciation if a positive number of species has been speficied
-			if ga.Topology.NClusters > 0 {
-				var species = ga.Populations[j].speciate(ga.Topology.NClusters)
+			if ga.Topology.NSpecies > 0 {
+				var species = ga.Populations[j].speciate(ga.Topology.NSpecies)
 				// Apply the evolution model to each cluster
 				for k := range species {
 					ga.Model.Apply(&species[k])
