@@ -97,12 +97,18 @@ func pmx(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 		o1 = make([]interface{}, n)
 		o2 = make([]interface{}, n)
 	)
-	// Copy part of the first parent's genome onto the first offspring
+	// Copy part of the first each's genome onto the corresponding offspring
 	copy(o1[a:b], p1[a:b])
 	copy(o2[a:b], p2[a:b])
+	// Create lookup maps to quickly see if a gene has been copied from a parent or not
+	var o1Lookup, o2Lookup = make(set), make(set)
+	for i := a; i < b; i++ {
+		o1Lookup[p1[i]] = true
+		o2Lookup[p2[i]] = true
+	}
 	for i := a; i < b; i++ {
 		// Find the element in the second parent that has not been copied in the first offspring
-		if !elementInSlice(p2[i], o1[a:b]) {
+		if !o1Lookup[p2[i]] {
 			var j = i
 			for o1[j] != nil {
 				j = getIndex(o1[j], p2)
@@ -110,7 +116,7 @@ func pmx(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 			o1[j] = p2[i]
 		}
 		// Find the element in the first parent that has not been copied in the second offspring
-		if !elementInSlice(p1[i], o2[a:b]) {
+		if !o2Lookup[p1[i]] {
 			var j = i
 			for o2[j] != nil {
 				j = getIndex(o2[j], p1)
@@ -182,15 +188,21 @@ func ox(p1, p2 []interface{}, a, b int) ([]interface{}, []interface{}) {
 	// Copy part of the first parent's genome onto the first offspring
 	copy(o1[a:b], p1[a:b])
 	copy(o2[a:b], p2[a:b])
+	// Create lookup maps to quickly see if a gene has been copied from a parent or not
+	var o1Lookup, o2Lookup = make(set), make(set)
+	for i := a; i < b; i++ {
+		o1Lookup[p1[i]] = true
+		o2Lookup[p2[i]] = true
+	}
 	// Keep two indicators to know where to fill the offsprings
 	var j1, j2 = b, b
 	for i := b; i < b+n; i++ {
 		var k = i % n
-		if !elementInSlice(p2[k], o1[a:b]) {
+		if !o1Lookup[p2[k]] {
 			o1[j1%n] = p2[k]
 			j1++
 		}
-		if !elementInSlice(p1[k], o2[a:b]) {
+		if !o2Lookup[p1[k]] {
 			o2[j2%n] = p1[k]
 			j2++
 		}
@@ -244,7 +256,7 @@ func CrossOXString(v1 []string, v2 []string, rng *rand.Rand) ([]string, []string
 // list of indexes indicating mirroring values between each slice.
 func getCycles(x, y []interface{}) (cycles [][]int) {
 	var (
-		xLookup = makeLookup(x)      // Matches values to indexes for quick lookup
+		xLookup = makeIndexLookup(x) // Matches values to indexes for quick lookup
 		visited = make(map[int]bool) // Indicates if an index is already in a cycle or not
 	)
 	for i := 0; i < len(x); i++ {
