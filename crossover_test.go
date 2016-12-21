@@ -1,7 +1,6 @@
 package gago
 
 import (
-	"fmt"
 	"math"
 	"testing"
 )
@@ -441,7 +440,6 @@ func TestCrossERX(t *testing.T) {
 	}
 	for _, test := range testCases {
 		var o1, o2 = CrossERX(uncastStrings(test.p1), uncastStrings(test.p2))
-		fmt.Println(o1, o2)
 		// Check offsprings have parent's first gene as first gene
 		if o1[0] != test.p1[0] || o2[0] != test.p2[0] {
 			t.Error("Something went wrong during ERX crossover")

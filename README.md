@@ -61,7 +61,7 @@
     - [Running a GA](#running-a-ga)
     - [Models](#models)
     - [Multiple populations and migration](#multiple-populations-and-migration)
-    - [Clustering](#clustering)
+    - [Speciation](#speciation)
     - [Presets](#presets)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
@@ -182,7 +182,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 - Different evolution models available
 - Popular operators already implemented
-- Speciation/clustering
+- Speciation/speciation
 - Multi-population GAs and migration
 
 ## Usage
@@ -239,7 +239,7 @@ type GA struct {
 You have to fill in the first 5 attributes, the rest are filled by called the `GA`'s `Init()` method.
 
 - `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
-- `Topology` is a struct which tells gago how many populations (`NPopulations`), clusters (`NClusters`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of clusters.
+- `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NClusters`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
 
@@ -300,18 +300,18 @@ The temperature evolution is relative to one single generation. In order to mimi
 
 It's possible to run a GA without crossover simply by mutating individuals. Essentially this boils down to doing [hill climbing](https://www.wikiwand.com/en/Hill_climbing) because there is not interaction between individuals. Indeed taking a step in hill climbing is equivalent to mutation for genetic algorithms. What's nice is that by using a population of size n you are essentially running multiple independent hill climbs.
 
-### Clustering
+### Speciation
 
-Clusters, also called speciation in the litterature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each clusters are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the litterature, clustering is also called *speciation*.
+Clusters, also called speciation in the litterature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the litterature, speciation is also called *speciation*.
 
 The purpose of a partinioning individuals is to apply genetic operators to similar individuals. In biological terms this encourages "incest" and maintains isolated species. For example in nature animals usually breed with local mates and don't breed with different animal species.
 
-Using clustering/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely dissapear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't dissapear immediatly. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
+Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely dissapear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't dissapear immediatly. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
-With gago it's possible to use clustering on top of all the rest. For the time, the only kind of clustering is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` clusters before applying an evolution model to each cluster. The `k` clusters are then merged into a new population of `n` individuals. This way, clusters don't interact with other clusters.
+With gago it's possible to use speciation on top of all the rest. For the time, the only kind of speciation is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` species before applying an evolution model to each cluster. The `k` species are then merged into a new population of `n` individuals. This way, species don't interact with other species.
 
 <div align="center">
-  <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="clustering" />
+  <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="speciation" />
 </div>
 
 ### Multiple populations and migration
@@ -325,7 +325,7 @@ Using multi-populations can be an easy way to gain in diversity. Moreover, not u
 With gago you can use multi-populations and speciation at the same time. The following flowchart shows what that would look like.
 
 <div align="center">
-  <img src="https://docs.google.com/drawings/d/14VVpTkWquhrcG_oQ61hvZgjKlYWZs_UZRVnL22HFYKM/pub?w=1052&h=607" alt="multi-population_and_clustering" />
+  <img src="https://docs.google.com/drawings/d/14VVpTkWquhrcG_oQ61hvZgjKlYWZs_UZRVnL22HFYKM/pub?w=1052&h=607" alt="multi-population_and_speciation" />
 </div>
 
 ### Presets
