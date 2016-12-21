@@ -3,20 +3,20 @@ package gago
 import "math/rand"
 
 // InitUnifFloat64 generates random float64s x such that lower < x < upper.
-func InitUnifFloat64(n int, lower, upper float64, rng *rand.Rand) (vector []float64) {
-	vector = make([]float64, n)
-	for i := range vector {
-		vector[i] = lower + rng.Float64()*(upper-lower)
+func InitUnifFloat64(n int, lower, upper float64, rng *rand.Rand) (floats []float64) {
+	floats = make([]float64, n)
+	for i := range floats {
+		floats[i] = lower + rng.Float64()*(upper-lower)
 	}
 	return
 }
 
 // InitNormFloat64 generates random float64s sampled from a normal
 // distribution.
-func InitNormFloat64(n int, mean, std float64, rng *rand.Rand) (vector []float64) {
-	vector = make([]float64, n)
-	for i := range vector {
-		vector[i] = rng.NormFloat64()*std + mean
+func InitNormFloat64(n int, mean, std float64, rng *rand.Rand) (floats []float64) {
+	floats = make([]float64, n)
+	for i := range floats {
+		floats[i] = rng.NormFloat64()*std + mean
 	}
 	return
 }

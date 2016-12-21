@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -393,5 +394,61 @@ func TestCrossCXString(t *testing.T) {
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
 		t.Error("CrossCXString should not produce offsprings with different sizes")
+	}
+}
+
+func TestGetNeighbours(t *testing.T) {
+	var testCases = []struct {
+		x          []int
+		neighbours map[interface{}]set
+	}{
+		{
+			x: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
+			neighbours: map[interface{}]set{
+				1: set{9: true, 2: true},
+				2: set{1: true, 3: true},
+				3: set{2: true, 4: true},
+				4: set{3: true, 5: true},
+				5: set{4: true, 6: true},
+				6: set{5: true, 7: true},
+				7: set{6: true, 8: true},
+				8: set{7: true, 9: true},
+				9: set{8: true, 1: true},
+			},
+		},
+	}
+	for _, test := range testCases {
+		var neighbours = getNeighbours(uncastInts(test.x))
+		for i, set := range neighbours {
+			for j := range set {
+				if !test.neighbours[i][j] {
+					t.Error("getNeighbours didn't work as expected")
+				}
+			}
+		}
+	}
+}
+
+func TestCrossERX(t *testing.T) {
+	var testCases = []struct {
+		p1 []string
+		p2 []string
+	}{
+		{
+			p1: []string{"A", "B", "F", "E", "D", "G", "C"},
+			p2: []string{"G", "F", "A", "B", "C", "D", "E"},
+		},
+	}
+	for _, test := range testCases {
+		var o1, o2 = CrossERX(uncastStrings(test.p1), uncastStrings(test.p2))
+		fmt.Println(o1, o2)
+		// Check offsprings have parent's first gene as first gene
+		if o1[0] != test.p1[0] || o2[0] != test.p2[0] {
+			t.Error("Something went wrong during ERX crossover")
+		}
+		// Check lengths
+		if len(o1) != len(test.p1) || len(o2) != len(test.p2) {
+			t.Error("Something went wrong during ERX crossover")
+		}
 	}
 }

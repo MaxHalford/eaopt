@@ -61,8 +61,8 @@ func CrossGNX(p1 []interface{}, p2 []interface{}, n int, rng *rand.Rand) (o1 []i
 	return gnx(p1, p2, indexes)
 }
 
-// CrossGNXFloat64 is a convenience function for calling CrossGNX on a
-// float64 slice.
+// CrossGNXFloat64 is a convenience function for calling CrossGNX on a float64
+// slice.
 func CrossGNXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float64, []float64) {
 	var (
 		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
@@ -71,8 +71,7 @@ func CrossGNXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float
 	return castFloat64s(o1), castFloat64s(o2)
 }
 
-// CrossGNXInt is a convenience function for calling CrossGNX on an int
-// slice.
+// CrossGNXInt is a convenience function for calling CrossGNX on an int slice.
 func CrossGNXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 	var (
 		p1, p2 = uncastInts(v1), uncastInts(v2)
@@ -81,8 +80,8 @@ func CrossGNXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 	return castInts(o1), castInts(o2)
 }
 
-// CrossGNXString is a convenience function for calling CrossGNX on a
-// float64 slice.
+// CrossGNXString is a convenience function for calling CrossGNX on a string
+// slice.
 func CrossGNXString(v1 []string, v2 []string, n int, rng *rand.Rand) ([]string, []string) {
 	var (
 		p1, p2 = uncastStrings(v1), uncastStrings(v2)
@@ -144,8 +143,8 @@ func CrossPMX(p1 []interface{}, p2 []interface{}, rng *rand.Rand) (o1 []interfac
 	return o1, o2
 }
 
-// CrossPMXFloat64 is a convenience function for calling CrossPMX on a
-// float64 slice.
+// CrossPMXFloat64 is a convenience function for calling CrossPMX on a float64
+// slice.
 func CrossPMXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float64, []float64) {
 	var (
 		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
@@ -154,8 +153,7 @@ func CrossPMXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float
 	return castFloat64s(o1), castFloat64s(o2)
 }
 
-// CrossPMXInt is a convenience function for calling CrossPMX on an int
-// slice.
+// CrossPMXInt is a convenience function for calling CrossPMX on an int slice.
 func CrossPMXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 	var (
 		p1, p2 = uncastInts(v1), uncastInts(v2)
@@ -164,8 +162,8 @@ func CrossPMXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 	return castInts(o1), castInts(o2)
 }
 
-// CrossPMXString is a convenience function for calling CrossPMX on a
-// float64 slice.
+// CrossPMXString is a convenience function for calling CrossPMX on a string
+// slice.
 func CrossPMXString(v1 []string, v2 []string, n int, rng *rand.Rand) ([]string, []string) {
 	var (
 		p1, p2 = uncastStrings(v1), uncastStrings(v2)
@@ -232,7 +230,7 @@ func CrossOXInt(v1 []int, v2 []int, rng *rand.Rand) ([]int, []int) {
 	return castInts(o1), castInts(o2)
 }
 
-// CrossOXString is a convenience function for calling CrossOX on a float64
+// CrossOXString is a convenience function for calling CrossOX on a string
 // slice.
 func CrossOXString(v1 []string, v2 []string, rng *rand.Rand) ([]string, []string) {
 	var (
@@ -311,7 +309,7 @@ func CrossCXInt(v1 []int, v2 []int) ([]int, []int) {
 	return castInts(o1), castInts(o2)
 }
 
-// CrossCXString is a convenience function for calling CrossCX on a float64
+// CrossCXString is a convenience function for calling CrossCX on a string
 // slice.
 func CrossCXString(v1 []string, v2 []string) ([]string, []string) {
 	var (
@@ -319,4 +317,78 @@ func CrossCXString(v1 []string, v2 []string) ([]string, []string) {
 		o1, o2 = CrossCX(p1, p2)
 	)
 	return castStrings(o1), castStrings(o2)
+}
+
+// getNeighbours converts a slice into an adjacency map mapping values to  left
+// and right neighbours. The values of the map are sets.
+func getNeighbours(x []interface{}) map[interface{}]set {
+	var (
+		neighbours = make(map[interface{}]set)
+		n          = len(x)
+	)
+	neighbours[x[0]] = set{x[n-1]: true, x[1]: true}
+	for i := 1; i < n-1; i++ {
+		neighbours[x[i]] = set{x[i-1]: true, x[i+1]: true}
+	}
+	neighbours[x[n-1]] = set{x[n-2]: true, x[0]: true}
+	return neighbours
+}
+
+// CrossERX (Edge Recombination Crossover).
+func CrossERX(p1, p2 []interface{}) ([]interface{}, []interface{}) {
+	var (
+		n            = len(p1)
+		o1           = make([]interface{}, n)
+		o2           = make([]interface{}, n)
+		parents      = [][]interface{}{p1, p2}
+		offsprings   = [][]interface{}{o1, o2}
+		p1Neighbours = getNeighbours(p1)
+		p2Neighbours = getNeighbours(p2)
+		pNeighbours  = make(map[interface{}]set)
+	)
+	// Merge the neighbours of each parent whilst ignoring duplicates
+	for i := range p1Neighbours {
+		pNeighbours[i] = union(p1Neighbours[i], p2Neighbours[i])
+	}
+	// Hold two copies of the parent neighbours (one for each offspring)
+	var neighbours = []map[interface{}]set{pNeighbours, nil}
+	neighbours[1] = make(map[interface{}]set)
+	for k, v := range pNeighbours {
+		neighbours[1][k] = v
+	}
+	// The first element of each offspring to be the one of the corresponding parent
+	o1[0] = p1[0]
+	o2[0] = p2[0]
+	// Delete the neighbour from the adjacency set
+	for i := range neighbours {
+		delete(neighbours[i], parents[i][0])
+		for j := range neighbours[i] {
+			if neighbours[i][j][parents[i][0]] {
+				delete(neighbours[i][j], parents[i][0])
+			}
+		}
+	}
+	for o := range offsprings {
+		for i := 1; i < n; i++ {
+			// Find the gene with the least neighbours
+			var (
+				j   interface{}
+				min = 5 // There can't be more than 5 neighbours between 2 parents
+			)
+			for k, v := range neighbours[o] {
+				if len(v) < min {
+					j = k
+					min = len(v)
+				}
+			}
+			offsprings[o][i] = j
+			delete(neighbours[o], j)
+			for k := range neighbours[o] {
+				if neighbours[o][k][j] {
+					delete(neighbours[o][k], j)
+				}
+			}
+		}
+	}
+	return o1, o2
 }

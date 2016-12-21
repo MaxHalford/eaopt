@@ -115,7 +115,29 @@ func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
 	return
 }
 
-func makeRandomNumberGenerator() (rng *rand.Rand) {
-	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
-	return
+// makeRandomNumberGenerator returns a new random number generator with a random
+// seed.
+func makeRandomNumberGenerator() *rand.Rand {
+	return rand.New(rand.NewSource(time.Now().UnixNano()))
+}
+
+type set map[interface{}]bool
+
+// union merges two slices and ignores duplicates.
+func union(x, y set) set {
+	var (
+		u         = make(set)
+		blackList = make(map[interface{}]bool)
+	)
+	for i := range x {
+		u[i] = true
+		blackList[i] = true
+	}
+	for i := range y {
+		if !blackList[i] {
+			u[i] = true
+			blackList[i] = true
+		}
+	}
+	return u
 }
