@@ -37,6 +37,10 @@
   <a href="https://godoc.org/github.com/MaxHalford/gago?imports">
     <img src="https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square" alt="dependencies" />
   </a>
+  <!-- License -->
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="license"/>
+  </a>
 </div>
 
 <br/>
@@ -392,6 +396,4 @@ Feel free to implement your own operators or to make suggestions! Check out the 
 
 ## License
 
-<a href="https://opensource.org/licenses/MIT">
-<img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="mit"/>
-</a>
+The MIT License (MIT). Please see [License file](LICENSE) for more information.
