@@ -404,3 +404,32 @@ func CrossERX(p1, p2 []interface{}) ([]interface{}, []interface{}) {
 	}
 	return o1, o2
 }
+
+// CrossERXFloat64 is a convenience function for calling CrossERX on a float64
+// slice.
+func CrossERXFloat64(v1 []float64, v2 []float64) ([]float64, []float64) {
+	var (
+		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
+		o1, o2 = CrossERX(p1, p2)
+	)
+	return castFloat64s(o1), castFloat64s(o2)
+}
+
+// CrossERXInt is a convenience function for calling CrossERX on an int slice.
+func CrossERXInt(v1 []int, v2 []int) ([]int, []int) {
+	var (
+		p1, p2 = uncastInts(v1), uncastInts(v2)
+		o1, o2 = CrossERX(p1, p2)
+	)
+	return castInts(o1), castInts(o2)
+}
+
+// CrossERXString is a convenience function for calling CrossERX on a string
+// slice.
+func CrossERXString(v1 []string, v2 []string) ([]string, []string) {
+	var (
+		p1, p2 = uncastStrings(v1), uncastStrings(v2)
+		o1, o2 = CrossERX(p1, p2)
+	)
+	return castStrings(o1), castStrings(o2)
+}
