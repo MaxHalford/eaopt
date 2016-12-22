@@ -450,3 +450,39 @@ func TestCrossERX(t *testing.T) {
 		}
 	}
 }
+
+func TestCrossERXFloat64(t *testing.T) {
+	var (
+		p1     = []float64{1, 2, 3}
+		p2     = []float64{3, 2, 1}
+		o1, o2 = CrossERXFloat64(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossERXFloat64 should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossERXInt(t *testing.T) {
+	var (
+		p1     = []int{1, 2, 3}
+		p2     = []int{3, 2, 1}
+		o1, o2 = CrossERXInt(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossERXInt should not produce offsprings with different sizes")
+	}
+}
+
+func TestCrossERXString(t *testing.T) {
+	var (
+		p1     = []string{"a", "b", "c"}
+		p2     = []string{"c", "b", "a"}
+		o1, o2 = CrossERXString(p1, p2)
+	)
+	// Check lengths
+	if len(o1) != len(p1) || len(o2) != len(p1) {
+		t.Error("CrossERXString should not produce offsprings with different sizes")
+	}
+}
