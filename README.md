@@ -143,8 +143,9 @@ func main() {
 
 **More examples**
 
-- [String matching](examples/string_matching.go)
-- [Solving the TSP on a grid](examples/tsp_grid.go)
+- [One Max problem](examples/one_max/main.go)
+- [String matching](examples/string_matching/main.go)
+- [Grid TSP](examples/tsp_grid/main.go)
 
 ## Background
 
