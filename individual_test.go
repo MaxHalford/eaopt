@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"math"
 	"reflect"
 	"testing"
 )
@@ -165,7 +166,55 @@ func TestGetFitnesses(t *testing.T) {
 	}
 }
 
-func TestFitnessMean(t *testing.T) {
+func TestFitMin(t *testing.T) {
+	var testCases = []struct {
+		indis Individuals
+		min   float64
+	}{
+		{Individuals{
+			Individual{nil, 1.0, false},
+		}, 1.0},
+		{Individuals{
+			Individual{nil, 1.0, false},
+			Individual{nil, 2.0, false},
+		}, 1.0},
+		{Individuals{
+			Individual{nil, -1.0, false},
+			Individual{nil, 1.0, false},
+		}, -1.0},
+	}
+	for _, test := range testCases {
+		if test.indis.FitMin() != test.min {
+			t.Error("FitMin didn't work as expected")
+		}
+	}
+}
+
+func TestFitMax(t *testing.T) {
+	var testCases = []struct {
+		indis Individuals
+		max   float64
+	}{
+		{Individuals{
+			Individual{nil, 1.0, false},
+		}, 1.0},
+		{Individuals{
+			Individual{nil, 1.0, false},
+			Individual{nil, 2.0, false},
+		}, 2.0},
+		{Individuals{
+			Individual{nil, -1.0, false},
+			Individual{nil, 1.0, false},
+		}, 1.0},
+	}
+	for _, test := range testCases {
+		if test.indis.FitMax() != test.max {
+			t.Error("FitMax didn't work as expected")
+		}
+	}
+}
+
+func TestFitAvg(t *testing.T) {
 	var testCases = []struct {
 		indis Individuals
 		mean  float64
@@ -183,13 +232,13 @@ func TestFitnessMean(t *testing.T) {
 		}, 0.0},
 	}
 	for _, test := range testCases {
-		if test.indis.FitnessMean() != test.mean {
-			t.Error("FitnessMean didn't work as expected")
+		if test.indis.FitAvg() != test.mean {
+			t.Error("FitAvg didn't work as expected")
 		}
 	}
 }
 
-func TestFitnessVariance(t *testing.T) {
+func TestFitStd(t *testing.T) {
 	var testCases = []struct {
 		indis    Individuals
 		variance float64
@@ -207,8 +256,8 @@ func TestFitnessVariance(t *testing.T) {
 		}, 4.0},
 	}
 	for _, test := range testCases {
-		if test.indis.FitnessVar() != test.variance {
-			t.Error("FitnessVar didn't work as expected")
+		if test.indis.FitStd() != math.Sqrt(test.variance) {
+			t.Error("FitStd didn't work as expected")
 		}
 	}
 }

@@ -1,6 +1,10 @@
 package gago
 
-import "math/rand"
+import (
+	"log"
+	"math/rand"
+	"os"
+)
 
 var (
 	ga = GA{
@@ -17,6 +21,7 @@ var (
 		},
 		Migrator:     MigRing{10},
 		MigFrequency: 3,
+		Logger:       log.New(os.Stdout, "", log.Ldate|log.Ltime),
 	}
 	nbrGenerations = 5 // Initial number of generations to enhance
 )

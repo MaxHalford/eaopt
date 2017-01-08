@@ -18,9 +18,9 @@ func TestMigSizes(t *testing.T) {
 				// Instantiate populations
 				var pops = make([]Population, nbrPops)
 				for i := range pops {
-					pops[i] = makePopulation(nbrIndis, MakeVector)
+					pops[i] = makePopulation(nbrIndis, MakeVector, i)
 					pops[i].Individuals.Evaluate()
-					fitnessMeans[i] = pops[i].Individuals.FitnessMean()
+					fitnessMeans[i] = pops[i].Individuals.FitAvg()
 				}
 				migrator.Apply(pops, rng)
 				// Check the Population sizes haven't changed
@@ -31,7 +31,7 @@ func TestMigSizes(t *testing.T) {
 				}
 				// Check the average fitnesses have changed
 				for i, pop := range pops {
-					if pop.Individuals.FitnessMean() == fitnessMeans[i] {
+					if pop.Individuals.FitAvg() == fitnessMeans[i] {
 						t.Error("Average fitnesses didn't change")
 					}
 				}

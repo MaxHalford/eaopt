@@ -63,6 +63,7 @@
     - [Multiple populations and migration](#multiple-populations-and-migration)
     - [Speciation](#speciation)
     - [Presets](#presets)
+    - [Logging population statistics](#logging-population-statistics)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Alternatives](#alternatives)
@@ -332,6 +333,22 @@ With gago you can use multi-populations and speciation at the same time. The fol
 
 Some prefilled GA instances are available to get started as fast as possible. They are available in the [presets.go](presets.go) file. These instances also serve as example instanciations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
 
+### Logging population statistics
+
+It's possible to log statistics for each population at runtime. To do you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log ouput, whether it be in a file or directly in the standard output.
+
+```go
+ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+```
+
+If a logger is provided, each row in the log output will include
+
+- the population ID,
+- the population minimum fitness,
+- the population maximum fitness,
+- the population average fitness,
+- the population's fitness standard deviation.
+
 ## A note on parallelism
 
 Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run indepently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
@@ -353,6 +370,12 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
     return X, Y.(Vector)
 }
 ```
+
+
+**Why are there type-specific slice crossover methods instead of a generic one?**
+
+Some crossover methods are generic because they are simply rearranging lists. Underhood gago uses the `[]interface{}` to implement generic crossover methods. However the genomes are always typed and are not of type `[]interface{}`. The genomes have to converted to a `[]interface{}` and then back to their original type after crossover. For more information you can check out the [official advice](https://github.com/golang/go/wiki/InterfaceSlice) regarding generic slices and also look at the [casting.go file](casting.go).
+
 
 **Why isn't my `Mutate` method modifying my `Genome`?**
 
@@ -384,10 +407,10 @@ As mentionned earlier, some problems can simply not be written down as [closed-f
 
 **How can I contribute?**
 
-Feel free to implement your own operators or to make suggestions! Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for some guidelines.
+Feel free to implement your own operators or to make suggestions! Check out the [contributing file](CONTRIBUTING.md) for some guidelines.
 
 
-## Alternatives
+## Golang alternatives
 
 - [GeneticGo](https://github.com/handcraftsman/GeneticGo)
 - [goga](https://github.com/tomcraven/goga)
@@ -396,4 +419,4 @@ Feel free to implement your own operators or to make suggestions! Check out the 
 
 ## License
 
-The MIT License (MIT). Please see [License file](LICENSE) for more information.
+The MIT License (MIT). Please see [license file](LICENSE) for more information.
