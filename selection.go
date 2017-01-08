@@ -72,7 +72,7 @@ func getWeights(fitnesses []float64) []float64 {
 	for i, v := range fitnesses {
 		weights[i] = fitnesses[n-1] - v
 	}
-	return cumsum(divide(weights, sum(weights)))
+	return cumsum(divide(weights, sumFloat64s(weights)))
 }
 
 // Spin finds the index

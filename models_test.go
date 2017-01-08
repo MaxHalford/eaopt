@@ -192,7 +192,7 @@ func TestModelsValidate(t *testing.T) {
 func TestModelsConstantSize(t *testing.T) {
 	for _, n := range []int{1, 2, 3, 42} {
 		for _, model := range validModels {
-			var pop = makePopulation(n, MakeVector)
+			var pop = makePopulation(n, MakeVector, 0)
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)

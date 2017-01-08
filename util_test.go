@@ -108,7 +108,7 @@ func TestMin(t *testing.T) {
 	}
 }
 
-func TestSum(t *testing.T) {
+func TestSumFloat64s(t *testing.T) {
 	var testCases = []struct {
 		floats []float64
 		total  float64
@@ -118,13 +118,45 @@ func TestSum(t *testing.T) {
 		{[]float64{1.42, 42.1}, 43.52},
 	}
 	for _, test := range testCases {
-		if sum(test.floats) != test.total {
-			t.Error("sum didn't work as expected")
+		if sumFloat64s(test.floats) != test.total {
+			t.Error("sumFloat64s didn't work as expected")
 		}
 	}
 }
 
-func TestMean(t *testing.T) {
+func TestMinFloat64s(t *testing.T) {
+	var testCases = []struct {
+		floats []float64
+		min    float64
+	}{
+		{[]float64{1.0}, 1.0},
+		{[]float64{1.0, 2.0}, 1.0},
+		{[]float64{-1.0, 1.0}, -1.0},
+	}
+	for _, test := range testCases {
+		if minFloat64s(test.floats) != test.min {
+			t.Error("meanFloat64s didn't work as expected")
+		}
+	}
+}
+
+func TestMaxFloat64s(t *testing.T) {
+	var testCases = []struct {
+		floats []float64
+		max    float64
+	}{
+		{[]float64{1.0}, 1.0},
+		{[]float64{1.0, 2.0}, 2.0},
+		{[]float64{-1.0, 1.0}, 1.0},
+	}
+	for _, test := range testCases {
+		if maxFloat64s(test.floats) != test.max {
+			t.Error("maxFloat64s didn't work as expected")
+		}
+	}
+}
+
+func TestMeanFloat64s(t *testing.T) {
 	var testCases = []struct {
 		floats []float64
 		mean   float64
@@ -134,13 +166,13 @@ func TestMean(t *testing.T) {
 		{[]float64{-1.0, 1.0}, 0.0},
 	}
 	for _, test := range testCases {
-		if mean(test.floats) != test.mean {
-			t.Error("mean didn't work as expected")
+		if meanFloat64s(test.floats) != test.mean {
+			t.Error("meanFloat64s didn't work as expected")
 		}
 	}
 }
 
-func TestVariance(t *testing.T) {
+func TestVarianceFloat64s(t *testing.T) {
 	var testCases = []struct {
 		floats   []float64
 		variance float64
@@ -150,8 +182,8 @@ func TestVariance(t *testing.T) {
 		{[]float64{-2.0, 2.0}, 4.0},
 	}
 	for _, test := range testCases {
-		if variance(test.floats) != test.variance {
-			t.Error("variance didn't work as expected")
+		if varianceFloat64s(test.floats) != test.variance {
+			t.Error("varianceFloat64s didn't work as expected")
 		}
 	}
 }

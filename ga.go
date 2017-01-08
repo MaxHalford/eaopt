@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -36,12 +37,13 @@ type GA struct {
 	Model        Model
 	Migrator     Migrator
 	MigFrequency int // Frequency at which migrations occur
+	Logger       *log.Logger
 
 	// Fields that are generated at runtime
-	Best        Individual // Overall best individual (dummy initialization at the beginning)
-	Duration    time.Duration
-	Generations int
 	Populations Populations
+	Best        Individual // Overall best individual (dummy initialization at the beginning)
+	Age         time.Duration
+	Generations int
 	rng         *rand.Rand
 }
 
@@ -74,36 +76,10 @@ func (ga GA) Validate() error {
 	return nil
 }
 
-// Initialize each population in the GA and assign an initial fitness to each
-// individual in each population. Running Initialize after running Enhance will
-// reset the GA entirely.
-func (ga *GA) Initialize() {
-	ga.Duration = 0
-	ga.Generations = 0
-	ga.Populations = make([]Population, ga.Topology.NPopulations)
-	ga.rng = makeRandomNumberGenerator()
-	var wg sync.WaitGroup
-	for i := range ga.Populations {
-		wg.Add(1)
-		go func(j int) {
-			defer wg.Done()
-			// Generate a population
-			ga.Populations[j] = makePopulation(ga.Topology.NIndividuals, ga.MakeGenome)
-			// Evaluate it's individuals
-			ga.Populations[j].Individuals.Evaluate()
-			// Sort it's individuals
-			ga.Populations[j].Individuals.Sort()
-		}(i)
-	}
-	wg.Wait()
-	// The initial best individual is initialized randomly
-	ga.Best = MakeIndividual(ga.MakeGenome(makeRandomNumberGenerator()))
-	ga.findBest()
-}
-
 // Find the best individual in each population and then compare the best overall
 // individual to the current best individual. This method supposes that the
-// populations have been preemptively sorted by fitness incresingly.
+// populations have been preemptively sorted by fitness incresingly; this way
+// checking the first individual of each population is sufficient.
 func (ga *GA) findBest() {
 	for _, pop := range ga.Populations {
 		var best = pop.Individuals[0]
@@ -113,12 +89,40 @@ func (ga *GA) findBest() {
 	}
 }
 
+// Initialize each population in the GA and assign an initial fitness to each
+// individual in each population. Running Initialize after running Enhance will
+// reset the GA entirely.
+func (ga *GA) Initialize() {
+	ga.Populations = make([]Population, ga.Topology.NPopulations)
+	ga.rng = makeRandomNumberGenerator()
+	var wg sync.WaitGroup
+	for i := range ga.Populations {
+		wg.Add(1)
+		go func(j int) {
+			defer wg.Done()
+			// Generate a population
+			ga.Populations[j] = makePopulation(ga.Topology.NIndividuals, ga.MakeGenome, j)
+			// Evaluate it's individuals
+			ga.Populations[j].Individuals.Evaluate()
+			// Sort it's individuals
+			ga.Populations[j].Individuals.Sort()
+			// Log current statistics if a logger has been provided
+			if ga.Logger != nil {
+				go ga.Populations[j].Log(ga.Logger)
+			}
+		}(i)
+	}
+	wg.Wait()
+	// The initial best individual is initialized randomly
+	ga.Best = MakeIndividual(ga.MakeGenome(makeRandomNumberGenerator()))
+	ga.findBest()
+}
+
 // Enhance each population in the GA. The population level operations are done
 // in parallel with a wait group. After all the population operations have been
 // run, the GA level operations are run.
 func (ga *GA) Enhance() {
 	var start = time.Now()
-	// Increment the generations counter at the beginning to not migrate at generation 0
 	ga.Generations++
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
@@ -148,11 +152,16 @@ func (ga *GA) Enhance() {
 			// Evaluate and sort
 			ga.Populations[j].Individuals.Evaluate()
 			ga.Populations[j].Individuals.Sort()
-			ga.Populations[j].Duration += time.Since(start)
+			ga.Populations[j].Age += time.Since(start)
+			ga.Populations[j].Generations++
+			// Log current statistics if a logger has been provided
+			if ga.Logger != nil {
+				go ga.Populations[j].Log(ga.Logger)
+			}
 		}(i)
 	}
 	wg.Wait()
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
-	ga.Duration += time.Since(start)
+	ga.Age += time.Since(start)
 }

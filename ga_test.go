@@ -130,9 +130,9 @@ func TestGenerations(t *testing.T) {
 func TestDuration(t *testing.T) {
 	var totalDuration time.Duration
 	for _, pop := range ga.Populations {
-		totalDuration += pop.Duration
+		totalDuration += pop.Age
 	}
-	if totalDuration < ga.Duration {
+	if totalDuration < ga.Age {
 		t.Error("Inefficient parallelism")
 	}
 }
