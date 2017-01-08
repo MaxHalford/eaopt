@@ -101,6 +101,9 @@ func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], in
 // Sort is a convenience method for calling the Sort method of the sort package.
 func (indis *Individuals) Sort() { sort.Sort(indis) }
 
+// IsSorted is a convenience method for calling the IsSorted method of the sort package.
+func (indis *Individuals) IsSorted() bool { return sort.IsSorted(indis) }
+
 // Sample k unique individuals from a slice of n individuals.
 func (indis Individuals) sample(k int, rng *rand.Rand) (sample Individuals, indexes []int) {
 	indexes = randomInts(k, 0, len(indis), rng)
@@ -120,12 +123,29 @@ func (indis Individuals) getFitnesses() []float64 {
 	return fitnesses
 }
 
-// FitnessMean returns the average fitness of a slice of individuals.
-func (indis Individuals) FitnessMean() float64 {
-	return mean(indis.getFitnesses())
+// FitMin returns the best fitness of a slice of individuals.
+func (indis Individuals) FitMin() float64 {
+	if indis.IsSorted() {
+		return indis[0].Fitness
+	}
+	return minFloat64s(indis.getFitnesses())
 }
 
-// FitnessVar returns the variance of the fitness of a slice of individuals.
-func (indis Individuals) FitnessVar() float64 {
-	return variance(indis.getFitnesses())
+// FitMax returns the best fitness of a slice of individuals.
+func (indis Individuals) FitMax() float64 {
+	if indis.IsSorted() {
+		return indis[len(indis)-1].Fitness
+	}
+	return maxFloat64s(indis.getFitnesses())
+}
+
+// FitAvg returns the average fitness of a slice of individuals.
+func (indis Individuals) FitAvg() float64 {
+	return meanFloat64s(indis.getFitnesses())
+}
+
+// FitStd returns the standard deviation of the fitness of a slice of
+// individuals.
+func (indis Individuals) FitStd() float64 {
+	return math.Sqrt(varianceFloat64s(indis.getFitnesses()))
 }
