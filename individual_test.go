@@ -175,12 +175,12 @@ func TestFitMin(t *testing.T) {
 			Individual{nil, 1.0, false},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false},
 			Individual{nil, 2.0, false},
+			Individual{nil, 1.0, false},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, -1.0, false},
 			Individual{nil, 1.0, false},
+			Individual{nil, -1.0, false},
 		}, -1.0},
 	}
 	for _, test := range testCases {
@@ -199,12 +199,12 @@ func TestFitMax(t *testing.T) {
 			Individual{nil, 1.0, false},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false},
 			Individual{nil, 2.0, false},
+			Individual{nil, 1.0, false},
 		}, 2.0},
 		{Individuals{
-			Individual{nil, -1.0, false},
 			Individual{nil, 1.0, false},
+			Individual{nil, -1.0, false},
 		}, 1.0},
 	}
 	for _, test := range testCases {

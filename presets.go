@@ -2,7 +2,7 @@ package gago
 
 // Generational returns a GA instance that uses the generational model.
 func Generational(MakeGenome GenomeMaker) GA {
-	var ga = GA{
+	return GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
 			NPopulations: 2,
@@ -15,14 +15,12 @@ func Generational(MakeGenome GenomeMaker) GA {
 			MutRate: 0.5,
 		},
 	}
-	ga.Initialize()
-	return ga
 }
 
 // SimulatedAnnealing returns a GA instance that mimicks a basic simulated
 // annealing procedure.
 func SimulatedAnnealing(MakeGenome GenomeMaker) GA {
-	var ga = GA{
+	return GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
 			NPopulations: 1,
@@ -34,14 +32,12 @@ func SimulatedAnnealing(MakeGenome GenomeMaker) GA {
 			Alpha: 0.99, // Decrease rate per iteration
 		},
 	}
-	ga.Initialize()
-	return ga
 }
 
 // HillClimbing returns a GA instance that mimicks a basic hill-climbing
 // procedure.
 func HillClimbing(MakeGenome GenomeMaker) GA {
-	var ga = GA{
+	return GA{
 		MakeGenome: MakeGenome,
 		Topology: Topology{
 			NPopulations: 1,
@@ -53,6 +49,4 @@ func HillClimbing(MakeGenome GenomeMaker) GA {
 			Strict:   true,
 		},
 	}
-	ga.Initialize()
-	return ga
 }

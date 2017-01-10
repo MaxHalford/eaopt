@@ -64,6 +64,7 @@
     - [Speciation](#speciation)
     - [Presets](#presets)
     - [Logging population statistics](#logging-population-statistics)
+    - [POSTing population statistics](#posting-population-statistics)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Alternatives](#alternatives)
@@ -119,6 +120,8 @@ func MakeVector(rng *rand.Rand) gago.Genome {
 
 func main() {
     var ga = gago.Generational(MakeVector)
+    ga.Initialize()
+
     fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
     for i := 1; i < 10; i++ {
         ga.Enhance()
@@ -143,13 +146,14 @@ func main() {
 
 **More examples**
 
+- [Grid TSP](examples/tsp_grid/main.go)
 - [One Max problem](examples/one_max/main.go)
 - [String matching](examples/string_matching/main.go)
-- [Grid TSP](examples/tsp_grid/main.go)
+- [POST statistics](examples/post_statistics/)
 
 ## Background
 
-There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single genetic algorithm**. `gago` is intented to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
+There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single definition of genetic algorithms**. `gago` is intented to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
 
 ### Terminology
 
@@ -228,12 +232,14 @@ type GA struct {
     Model        Model
     Migrator     Migrator
     MigFrequency int // Frequency at which migrations occur
+    Logger       *log.Logger
+    PostURL      string
 
     // Fields that are generated at runtime
-    Best        Individual // Overall best individual (dummy initialization at the beginning)
-    Duration    time.Duration
-    Generations int
     Populations Populations
+    Best        Individual // Overall best individual (dummy initialization at the beginning)
+    Age         time.Duration
+    Generations int
     rng         *rand.Rand
 }
 ```
@@ -244,8 +250,10 @@ You have to fill in the first 5 attributes, the rest are filled by called the `G
 - `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NSpecies`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
+- `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
+- `PostURL` is optional, you can read more about in the [POSTing section](#posting-population-statistics).
 
-Essentially only `MakeGenome`, `Topology` and `Model` are required to run a GA with gago.
+Essentially only `MakeGenome`, `Topology` and `Model` are required to initialize and run a GA.
 
 
 ### Running a GA
@@ -349,6 +357,17 @@ If a logger is provided, each row in the log output will include
 - the population maximum fitness,
 - the population average fitness,
 - the population's fitness standard deviation.
+
+### POSTing population statistics
+
+It's also possible to POST population statistics to a specified URL. This makes it possible to plot the performance of the genetic algorithm in real-time. Check out [this example](examples/post_statistics) where the data is sent to a Flask server before updating a live Bokeh plot.
+
+```go
+ga.PostUrl = "http://localhost:8000/"
+```
+
+The POST request's body will include the same statistics as the ones described in the logging section.
+
 
 ## A note on parallelism
 
