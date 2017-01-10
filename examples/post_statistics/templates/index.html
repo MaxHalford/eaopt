@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block html %}
+<h1>Messages</h1>
+<div id="messages"></div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+var messages = document.getElementById('messages');
+socket.on('update', function(m) {
+  messages.innerHTML += `<div>${m.min_fitness}`;
+});
+</script>
+{% endblock %}

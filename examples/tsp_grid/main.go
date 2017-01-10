@@ -94,6 +94,8 @@ func main() {
 		ga     = gago.Generational(MakePath)
 		outGif = &gif.GIF{}
 	)
+	ga.Initialize()
+
 	for i := 0; i < GENERATIONS; i++ {
 		ga.Enhance()
 		// Store the drawing for the current best path
