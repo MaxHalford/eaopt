@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dispatching</title>
+    {% block head %}
+      <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
+    {% endblock %}
+  </head>
+  <body>
+    {% block html %}{% endblock %}
+    {% block js %}{% endblock %}
+  </body>
+</html>

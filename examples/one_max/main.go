@@ -49,6 +49,8 @@ func MakeDigits(rng *rand.Rand) gago.Genome {
 
 func main() {
 	var ga = gago.Generational(MakeDigits)
+	ga.Initialize()
+
 	for i := 1; i < 10; i++ {
 		ga.Enhance()
 	}
