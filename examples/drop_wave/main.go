@@ -41,6 +41,8 @@ func MakeVector(rng *rand.Rand) gago.Genome {
 
 func main() {
 	var ga = gago.Generational(MakeVector)
+	ga.Initialize()
+
 	fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
 	for i := 1; i < 10; i++ {
 		ga.Enhance()
