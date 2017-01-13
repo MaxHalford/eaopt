@@ -33,6 +33,10 @@
   <a href="https://goreportcard.com/report/github.com/MaxHalford/gago">
     <img src="https://goreportcard.com/badge/github.com/MaxHalford/gago?style=flat-square" alt="go_report_card" />
   </a>
+  <!-- Code Climate -->
+  <a href="https://codeclimate.com/github/MaxHalford/gago">
+    <img src="https://codeclimate.com/github/MaxHalford/gago/badges/gpa.svg" alt="Code Climate" />
+  </a>
   <!-- Dependencies -->
   <a href="https://godoc.org/github.com/MaxHalford/gago?imports">
     <img src="https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square" alt="dependencies" />
