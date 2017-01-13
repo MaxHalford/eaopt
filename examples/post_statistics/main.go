@@ -48,7 +48,7 @@ func MakeStrings(rng *rand.Rand) gago.Genome {
 
 func main() {
 	var ga = gago.Generational(MakeStrings)
-	ga.PostUrl = "http://127.0.0.1:5000/update"
+	ga.PostURL = "http://127.0.0.1:5000/update"
 	ga.Initialize()
 
 	for i := 1; i < 100; i++ {

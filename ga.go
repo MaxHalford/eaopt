@@ -38,7 +38,7 @@ type GA struct {
 	Migrator     Migrator
 	MigFrequency int // Frequency at which migrations occur
 	Logger       *log.Logger
-	PostUrl      string
+	PostURL      string
 
 	// Fields that are generated at runtime
 	Populations Populations
@@ -112,8 +112,8 @@ func (ga *GA) Initialize() {
 				go ga.Populations[j].Log(ga.Logger)
 			}
 			// Send current statistics with a POST request if a URL has been provided
-			if ga.PostUrl != "" {
-				go ga.Populations[j].Post(ga.PostUrl)
+			if ga.PostURL != "" {
+				go ga.Populations[j].Post(ga.PostURL)
 			}
 		}(i)
 	}
@@ -164,8 +164,8 @@ func (ga *GA) Enhance() {
 				go ga.Populations[j].Log(ga.Logger)
 			}
 			// Send current statistics with a POST request if a URL has been provided
-			if ga.PostUrl != "" {
-				go ga.Populations[j].Post(ga.PostUrl)
+			if ga.PostURL != "" {
+				go ga.Populations[j].Post(ga.PostURL)
 			}
 		}(i)
 	}
