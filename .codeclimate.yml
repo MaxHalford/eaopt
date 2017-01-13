@@ -13,7 +13,6 @@ engines:
     enabled: true
 ratings:
   paths:
-    - "**.go"
+    - "*.go"
 exclude_paths:
   - "examples/*"
-  - "*_test.go"
