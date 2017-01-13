@@ -367,7 +367,7 @@ If a logger is provided, each row in the log output will include
 It's also possible to POST population statistics to a specified URL. This makes it possible to plot the performance of the genetic algorithm in real-time. Check out [this example](examples/post_statistics) where the data is sent to a Flask server before updating a live Bokeh plot.
 
 ```go
-ga.PostUrl = "http://localhost:8000/"
+ga.PostURL = "http://localhost:8000/"
 ```
 
 The POST request's body will include the same statistics as the ones described in the logging section.
