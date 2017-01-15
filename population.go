@@ -63,8 +63,10 @@ func (pop Population) Post(url string) {
 			Std: pop.Individuals.FitStd(),
 		},
 	)
-	var resp, _ = http.Post(url, "application/json; charset=utf-8", payload)
-	defer resp.Body.Close()
+	var resp, err = http.Post(url, "application/json; charset=utf-8", payload)
+	if err != nil {
+		defer resp.Body.Close()
+	}
 }
 
 // Populations type is necessary for migration and speciation purposes.
