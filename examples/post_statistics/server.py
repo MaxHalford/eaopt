@@ -13,7 +13,6 @@ def index():
 @APP.route('/update', methods=['POST'])
 def update():
     payload = request.get_json()
-    print(payload)
     SOCKET.emit('update', payload)
     return '', 200
 
