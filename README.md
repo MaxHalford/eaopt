@@ -348,7 +348,7 @@ Some prefilled GA instances are available to get started as fast as possible. Th
 
 ### Logging population statistics
 
-It's possible to log statistics for each population at runtime. To do you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log ouput, whether it be in a file or directly in the standard output.
+It's possible to log statistics for each population at every generation. To do so you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log ouput, whether it be in a file or directly in the standard output.
 
 ```go
 ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
