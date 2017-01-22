@@ -11,6 +11,15 @@ func InitUnifFloat64(n int, lower, upper float64, rng *rand.Rand) (floats []floa
 	return
 }
 
+// InitJaggFloat64 generates random float64s x such that lower < x < upper with jagged bounds
+func InitJaggFloat64(n int, lower, upper []float64, rng *rand.Rand) (floats []float64) {
+	floats = make([]float64, n)
+	for i := range floats {
+		floats[i] = lower[i] + rng.Float64()*(upper[i]-lower[i])
+	}
+	return
+}
+
 // InitNormFloat64 generates random float64s sampled from a normal distribution.
 func InitNormFloat64(n int, mean, std float64, rng *rand.Rand) (floats []float64) {
 	floats = make([]float64, n)
