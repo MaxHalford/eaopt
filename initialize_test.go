@@ -43,6 +43,36 @@ func TestInitUnifFloat64(t *testing.T) {
 	}
 }
 
+func TestInitJaggFloat64(t *testing.T) {
+	var (
+		N      = []int{0, 1, 2, 42}
+		rng = makeRandomNumberGenerator()
+	)
+	for _, n := range N {
+		var (
+			lower []float64  = make([]float64,n)
+			upper []float64  = make([]float64,n)
+		)
+
+		for i := 0; i<n; i++ {
+			lower[i] = 0.0 + rng.Float64() * 100.0
+			upper[i] = lower[i] + rng.Float64() * 100.0
+		}
+
+		var vector = InitJaggFloat64(n, lower, upper, rng)
+		// Check length
+		if len(vector) != n {
+			t.Error("InitJaggFloat64 didn't produce the right number of values")
+		}
+		// Check values are bounded
+		for i, v := range vector {
+			if v <= lower[i] || v >= upper[i] {
+				t.Error("InitJaggFloat64 produced out of bound values")
+			}
+		}
+	}
+}
+
 func TestInitNormFloat64(t *testing.T) {
 	var rng = makeRandomNumberGenerator()
 	for _, n := range []int{0, 1, 2, 42} {
