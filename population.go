@@ -1,11 +1,8 @@
 package gago
 
 import (
-	"bytes"
-	"encoding/json"
 	"log"
 	"math/rand"
-	"net/http"
 	"time"
 )
 
@@ -43,30 +40,6 @@ func (pop Population) Log(logger *log.Logger) {
 		pop.Individuals.FitAvg(),
 		pop.Individuals.FitStd(),
 	)
-}
-
-// Post a Population's current statistics with a provided URL.
-func (pop Population) Post(url string) {
-	var payload = new(bytes.Buffer)
-	json.NewEncoder(payload).Encode(
-		struct {
-			ID  int     `json:"id"`
-			Min float64 `json:"min_fitness"`
-			Max float64 `json:"max_fitness"`
-			Avg float64 `json:"avg_fitness"`
-			Std float64 `json:"std_fitness"`
-		}{
-			ID:  pop.ID,
-			Min: pop.Individuals.FitMin(),
-			Max: pop.Individuals.FitMax(),
-			Avg: pop.Individuals.FitAvg(),
-			Std: pop.Individuals.FitStd(),
-		},
-	)
-	var resp, err = http.Post(url, "application/json; charset=utf-8", payload)
-	if err != nil {
-		defer resp.Body.Close()
-	}
 }
 
 // Populations type is necessary for migration and speciation purposes.
