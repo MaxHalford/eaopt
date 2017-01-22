@@ -4,6 +4,7 @@ There are many genetic operators yet to be implemented. Feel free to send pull r
 
 ## Ideas
 
+- https://www.wikiwand.com/en/List_of_genetic_algorithm_applications
 - Benchmark against other libraries
 - Add more example usage
 - Implement binary search for the roulette wheel selection
