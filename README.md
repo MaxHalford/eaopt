@@ -253,7 +253,6 @@ You have to fill in the first 5 attributes, the rest are filled by called the `G
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
 - `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
-- `PostURL` is optional, you can read more about in the [POSTing section](#posting-population-statistics).
 
 Essentially only `MakeGenome`, `Topology` and `Model` are required to initialize and run a GA.
 
