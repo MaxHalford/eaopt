@@ -49,7 +49,7 @@
 
 <br/>
 
-<div align="center">An extensive toolkit for implementing genetic algorithms</div>
+<div align="center">An extendible toolkit for implementing genetic algorithms</div>
 
 <br/>
 
@@ -189,10 +189,12 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Features
 
-- Different evolution models available
-- Popular operators already implemented
-- Speciation/speciation
-- Multi-population GAs and migration
+- gago is extendible, you can control most of what's happening
+- Different evolution models are available
+- Popular operators are already implemented
+- Speciation is available
+- Multiple population migration is available
+
 
 ## Usage
 
