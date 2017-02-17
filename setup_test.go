@@ -21,7 +21,7 @@ var (
 		},
 		Migrator:     MigRing{10},
 		MigFrequency: 3,
-		Logger:       log.New(os.Stdout, "", log.Ldate|log.Ltime),
+		Logger:       log.New(os.Stdin, "", log.Ldate|log.Ltime),
 	}
 	nbrGenerations = 5 // Initial number of generations to enhance
 )
