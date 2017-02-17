@@ -1,9 +1,6 @@
-## Genetic operators
-
-There are many genetic operators yet to be implemented. Feel free to send pull requests with your implementations. The only requirements are that the implementation respects the existing [naming convention](#naming-convention) and includes a test in the corresponding `*_test.go` file.
-
 ## Ideas
 
+- Convert all vars to :=
 - https://www.wikiwand.com/en/List_of_genetic_algorithm_applications
 - Benchmark against other libraries
 - Add more example usage
@@ -34,27 +31,28 @@ There are many genetic operators yet to be implemented. Feel free to send pull r
 
 ```go
 // Good
-var x = 42
+x := 42
 
 // Bad
-x := 42
+var x = 42
 ```
 
-### Consecutive variable declarations
+The `:=` operator works in the following case.
 
 ```go
-// Good
-var (
-    a = 1
-    b = 2
-    c = 3
-)
-
-// Bad
-var a = 1
-var b = 2
-var c = 3
+val1, err := getVal1()
+val2, err := getVal2()
 ```
+
+However the following will not work.
+
+```go
+var val1, err = getVal1()
+var val2, err = getVal2()
+```
+
+That's the only reason why I prefer to stick to `:=` for variable declaration.
+
 
 ### Variable declaration in returning functions
 
@@ -77,47 +75,7 @@ func lengthOfList(list []float64) int {
 
 ## Naming convention
 
-### Genetic operators
-
-Each genetic operator has a prefix and a suffix to easily identify it.
-
-#### Prefix
-
-The name of the operator begins with an abreviation of the kind of operator being implemented:
-
-| Operator    | Abbreviation |
-|-------------|--------------|
-| Clusterer   | Clu          |
-| Crossover   | Cross        |
-| Initializer | Init         |
-| Model       | Mod          |
-| Migrator    | Mig          |
-| Mutator     | Mut          |
-| Selector    | Sel          |
-
-#### Suffix
-
-Finally the name of the operator ends with a letter indicating on what kind of genomes the operator works:
-
-| Type    | Abbreviation |
-|---------|--------------|
-| float64 | F            |
-| string  | S            |
-
-No suffix indicates that the genetic operator works on any kind of genome, regardless of the underlying type.
-
-
-### Shortnames
-
-Along with the genetic operators prefixes, other shortnames are used in the code:
-
-| Name              | Abbreviation |
-|-------------------|--------------|
-| Individual        | indi         |
-| Individuals       | indis        |
-| Fitness function  | ff           |
-| Genetic algorithm | ga           |
-| Population        | pop          |
+Please inspire yourself from the existing algorithms before implementing, the naming conventions are easy to grasp.
 
 
 ## Parallelism and random number generation caveat
