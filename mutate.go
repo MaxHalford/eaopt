@@ -33,6 +33,10 @@ func MutUniformString(genome []string, corpus []string, n int, rng *rand.Rand) {
 
 // MutPermute permutes two genes at random n times.
 func MutPermute(genome []interface{}, n int, rng *rand.Rand) {
+	// Nothing to permute
+	if len(genome) <= 1 {
+		return
+	}
 	for i := 0; i < n; i++ {
 		// Choose two points on the genome
 		var (
