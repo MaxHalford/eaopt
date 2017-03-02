@@ -75,16 +75,6 @@ func getWeights(fitnesses []float64) []float64 {
 	return cumsum(divide(weights, sumFloat64s(weights)))
 }
 
-// Spin finds the index
-func spin(value float64, wheel []float64) int {
-	for i, v := range wheel {
-		if value < v {
-			return i
-		}
-	}
-	return -1
-}
-
 // Apply roulette wheel selection.
 func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
 	var (
@@ -94,7 +84,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 	)
 	for i := range selected {
 		var (
-			index  = spin(rand.Float64(), weights)
+			index  = binarySearchFloat64(rand.Float64(), weights)
 			winner = indis[index]
 		)
 		indexes[i] = index
