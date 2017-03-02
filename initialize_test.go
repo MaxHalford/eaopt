@@ -45,18 +45,18 @@ func TestInitUnifFloat64(t *testing.T) {
 
 func TestInitJaggFloat64(t *testing.T) {
 	var (
-		N      = []int{0, 1, 2, 42}
+		N   = []int{0, 1, 2, 42}
 		rng = makeRandomNumberGenerator()
 	)
 	for _, n := range N {
 		var (
-			lower []float64  = make([]float64,n)
-			upper []float64  = make([]float64,n)
+			lower = make([]float64, n)
+			upper = make([]float64, n)
 		)
 
-		for i := 0; i<n; i++ {
-			lower[i] = 0.0 + rng.Float64() * 100.0
-			upper[i] = lower[i] + rng.Float64() * 100.0
+		for i := 0; i < n; i++ {
+			lower[i] = 0.0 + rng.Float64()*100.0
+			upper[i] = lower[i] + rng.Float64()*100.0
 		}
 
 		var vector = InitJaggFloat64(n, lower, upper, rng)
