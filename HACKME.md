@@ -1,10 +1,8 @@
 ## Ideas
 
-- Convert all vars to :=
 - https://www.wikiwand.com/en/List_of_genetic_algorithm_applications
 - Benchmark against other libraries
 - Add more example usage
-- Implement binary search for the roulette wheel selection
 - Add a way to compare individuals based on their genome to improve speciation
 - Make it easier to test models. Also make sure they work as expected.
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
@@ -25,7 +23,7 @@
 ### Guidelines
 
 - Keep names short
-- Aim for 80 characters per line
+- Aim for 100 characters per line
 
 ### Variable declaration
 
