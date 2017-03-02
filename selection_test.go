@@ -88,25 +88,6 @@ func TestGetWeights(t *testing.T) {
 	}
 }
 
-func TestSpin(t *testing.T) {
-	var testCases = []struct {
-		value float64
-		wheel []float64
-		index int
-	}{
-		{0.1, []float64{0.3, 0.7, 1}, 0},
-		{0.3, []float64{0.3, 0.7, 1}, 1},
-		{0.8, []float64{0.3, 0.7, 1}, 2},
-		{1, []float64{0.3, 0.7, 1}, -1},
-	}
-	for _, test := range testCases {
-		var index = spin(test.value, test.wheel)
-		if index != test.index {
-			t.Error("spin didn't work as expected")
-		}
-	}
-}
-
 func TestSelRoulette(t *testing.T) {
 	var (
 		rng   = makeRandomNumberGenerator()

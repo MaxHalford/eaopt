@@ -163,3 +163,29 @@ func union(x, y set) set {
 	}
 	return u
 }
+
+// binarySearchFloat64 searches for the index of the first value in a sorted slice which is above a
+// given value.
+func binarySearchFloat64(value float64, floats []float64) int {
+	var (
+		index = -1
+		a     = 0
+		b     = len(floats) / 2
+		c     = len(floats) - 1
+	)
+
+	for a != b && b != c {
+		if value <= floats[b] {
+			c = b
+			b = (a + c) / 2
+		} else {
+			a = b
+			b = (a + c + 1) / 2
+		}
+		if value <= floats[b] {
+			index = b
+		}
+	}
+
+	return index
+}
