@@ -164,8 +164,8 @@ func union(x, y set) set {
 	return u
 }
 
-// bisectLeftFloat64 searches for the index of the first value in a sorted slice which is above a
-// given value.
+// bisectLeftFloat64 searches for the index of the lowest of the values that are higher than a given
+// value.
 func bisectLeftFloat64(value float64, floats []float64) int {
 	var (
 		index = -1
