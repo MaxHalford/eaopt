@@ -432,4 +432,4 @@ Feel free to implement your own operators or to make suggestions! Check out the 
 
 ## License
 
-The MIT License (MIT). Please see [license file](LICENSE) for more information.
+The MIT License (MIT). Please see the [license file](LICENSE) for more information.
