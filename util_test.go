@@ -288,7 +288,7 @@ func TestUnion(t *testing.T) {
 	}
 }
 
-func TestBinarySearchFloat64(t *testing.T) {
+func TestBisectLeftFloat64(t *testing.T) {
 	var testCases = []struct {
 		value  float64
 		floats []float64
@@ -341,8 +341,8 @@ func TestBinarySearchFloat64(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		if binarySearchFloat64(test.value, test.floats) != test.index {
-			t.Error("binarySearchFloat64 didn't work as expected")
+		if bisectLeftFloat64(test.value, test.floats) != test.index {
+			t.Error("bisectLeftFloat64 didn't work as expected")
 		}
 	}
 }
