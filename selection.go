@@ -84,7 +84,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 	)
 	for i := range selected {
 		var (
-			index  = binarySearchFloat64(rand.Float64(), weights)
+			index  = bisectLeftFloat64(rand.Float64(), weights)
 			winner = indis[index]
 		)
 		indexes[i] = index
