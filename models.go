@@ -113,7 +113,7 @@ func (mod ModSteadyState) Apply(pop *Population) {
 		offspring1.Evaluate()
 		offspring2.Evaluate()
 		var indis = Individuals{parents[0], parents[1], offspring1, offspring2}
-		indis.Sort()
+		indis.SortByFitness()
 		pop.Individuals[indexes[0]] = indis[0]
 		pop.Individuals[indexes[1]] = indis[1]
 	} else {

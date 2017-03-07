@@ -105,7 +105,7 @@ func (ga *GA) Initialize() {
 			// Evaluate it's individuals
 			ga.Populations[j].Individuals.Evaluate()
 			// Sort it's individuals
-			ga.Populations[j].Individuals.Sort()
+			ga.Populations[j].Individuals.SortByFitness()
 			// Log current statistics if a logger has been provided
 			if ga.Logger != nil {
 				go ga.Populations[j].Log(ga.Logger)
@@ -151,7 +151,7 @@ func (ga *GA) Enhance() {
 			}
 			// Evaluate and sort
 			ga.Populations[j].Individuals.Evaluate()
-			ga.Populations[j].Individuals.Sort()
+			ga.Populations[j].Individuals.SortByFitness()
 			ga.Populations[j].Age += time.Since(start)
 			ga.Populations[j].Generations++
 			// Log current statistics if a logger has been provided
