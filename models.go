@@ -109,7 +109,8 @@ func (mod ModSteadyState) Apply(pop *Population) {
 		}
 	}
 	if mod.KeepBest {
-		// Replace the chosen parents with the best individuals out of the parents and the individuals
+		// Replace the chosen parents with the best individuals out of the
+		// parents and the individuals
 		offspring1.Evaluate()
 		offspring2.Evaluate()
 		var indis = Individuals{parents[0], parents[1], offspring1, offspring2}
@@ -225,8 +226,10 @@ func (mod ModRing) Apply(pop *Population) {
 		}
 		offspring1.Evaluate()
 		offspring2.Evaluate()
-		// Select an individual out of the original individual and the offsprings
-		var selected, _ = mod.Selector.Apply(1, Individuals{indi, offspring1, offspring2}, pop.rng)
+		// Select an individual out of the original individual and the
+		// offsprings
+		var indis = Individuals{indi, offspring1, offspring2}
+		var selected, _ = mod.Selector.Apply(1, indis, pop.rng)
 		pop.Individuals[i] = selected[0]
 	}
 }
@@ -271,7 +274,8 @@ func (mod ModSimAnn) Apply(pop *Population) {
 			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
 			} else {
-				if math.Exp((indi.Fitness-neighbour.Fitness)/mod.T) > pop.rng.Float64() {
+				var p = math.Exp((indi.Fitness - neighbour.Fitness) / mod.T)
+				if p > pop.rng.Float64() {
 					pop.Individuals[i] = neighbour
 				}
 			}
