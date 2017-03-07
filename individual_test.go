@@ -98,13 +98,13 @@ func TestMutateIndividuals(t *testing.T) {
 	}
 }
 
-func TestIndividualsSort(t *testing.T) {
+func TestIndividualsSortByFitness(t *testing.T) {
 	var indis = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
 	// Assign a fitness to each individual in decreasing order
 	for i := range indis {
 		indis[i].Fitness = float64(len(indis) - i)
 	}
-	indis.Sort()
+	indis.SortByFitness()
 	// Check fitnesses are in increasing order
 	for i := 1; i < len(indis); i++ {
 		if indis[i-1].Fitness > indis[i].Fitness {

@@ -45,7 +45,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 	)
 	for i := range selected {
 		var sample, roundIndexes = indis.sample(sel.NParticipants, rng)
-		sample.Sort()
+		sample.SortByFitness()
 		indexes[i] = roundIndexes[0]
 		selected[i] = sample[0]
 	}
