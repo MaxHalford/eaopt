@@ -17,7 +17,7 @@ type MigRing struct {
 	NMigrants int // Number of migrants per exchange between Populations
 }
 
-// Apply shuffle migration.
+// Apply MigRing.
 func (mig MigRing) Apply(pops Populations, rng *rand.Rand) {
 	for i := 0; i < len(pops)-1; i++ {
 		for _, k := range randomInts(mig.NMigrants, 0, len(pops[i].Individuals), rng) {
