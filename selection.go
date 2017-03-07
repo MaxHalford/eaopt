@@ -15,7 +15,7 @@ type Selector interface {
 // SelElitism selection returns the n best individuals of a group.
 type SelElitism struct{}
 
-// Apply elitism selection.
+// Apply SelElitism.
 func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
 	var indexes = make([]int, n)
 	for i := 0; i < n; i++ {
@@ -37,7 +37,7 @@ type SelTournament struct {
 	NParticipants int
 }
 
-// Apply tournament selection.
+// Apply SelTournament.
 func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
 	var (
 		selected = make(Individuals, n)
@@ -75,7 +75,7 @@ func getWeights(fitnesses []float64) []float64 {
 	return cumsum(divide(weights, sumFloat64s(weights)))
 }
 
-// Apply roulette wheel selection.
+// Apply SelRoulette.
 func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
 	var (
 		selected = make(Individuals, n)
