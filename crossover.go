@@ -151,7 +151,7 @@ func CrossPMX(p1 []interface{}, p2 []interface{}, rng *rand.Rand) (o1 []interfac
 
 // CrossPMXFloat64 is a convenience function for calling CrossPMX on a float64
 // slice.
-func CrossPMXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float64, []float64) {
+func CrossPMXFloat64(v1 []float64, v2 []float64, rng *rand.Rand) ([]float64, []float64) {
 	var (
 		p1, p2 = uncastFloat64s(v1), uncastFloat64s(v2)
 		o1, o2 = CrossPMX(p1, p2, rng)
@@ -160,7 +160,7 @@ func CrossPMXFloat64(v1 []float64, v2 []float64, n int, rng *rand.Rand) ([]float
 }
 
 // CrossPMXInt is a convenience function for calling CrossPMX on an int slice.
-func CrossPMXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
+func CrossPMXInt(v1 []int, v2 []int, rng *rand.Rand) ([]int, []int) {
 	var (
 		p1, p2 = uncastInts(v1), uncastInts(v2)
 		o1, o2 = CrossPMX(p1, p2, rng)
@@ -170,7 +170,7 @@ func CrossPMXInt(v1 []int, v2 []int, n int, rng *rand.Rand) ([]int, []int) {
 
 // CrossPMXString is a convenience function for calling CrossPMX on a string
 // slice.
-func CrossPMXString(v1 []string, v2 []string, n int, rng *rand.Rand) ([]string, []string) {
+func CrossPMXString(v1 []string, v2 []string, rng *rand.Rand) ([]string, []string) {
 	var (
 		p1, p2 = uncastStrings(v1), uncastStrings(v2)
 		o1, o2 = CrossPMX(p1, p2, rng)
