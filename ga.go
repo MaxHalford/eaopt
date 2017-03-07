@@ -78,7 +78,7 @@ func (ga GA) Validate() error {
 
 // Find the best individual in each population and then compare the best overall
 // individual to the current best individual. This method supposes that the
-// populations have been preemptively sorted by fitness incresingly; this way
+// populations have been preemptively ascendingly sorted by fitness so that
 // checking the first individual of each population is sufficient.
 func (ga *GA) findBest() {
 	for _, pop := range ga.Populations {
