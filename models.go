@@ -51,7 +51,7 @@ type ModGenerational struct {
 	MutRate  float64
 }
 
-// Apply the generational model to a population.
+// Apply ModGenerational.
 func (mod ModGenerational) Apply(pop *Population) {
 	// Generate as many offsprings as there are of individuals in the current population
 	var offsprings = generateOffsprings(
@@ -93,7 +93,7 @@ type ModSteadyState struct {
 	MutRate  float64
 }
 
-// Apply the steady state model to a population.
+// Apply ModSteadyState.
 func (mod ModSteadyState) Apply(pop *Population) {
 	var (
 		parents, indexes       = mod.Selector.Apply(2, pop.Individuals, pop.rng)
@@ -150,7 +150,7 @@ type ModDownToSize struct {
 	MutRate     float64
 }
 
-// Apply the steady state model to a population.
+// Apply ModDownToSize.
 func (mod ModDownToSize) Apply(pop *Population) {
 	var offsprings = generateOffsprings(
 		mod.NOffsprings,
@@ -208,7 +208,7 @@ type ModRing struct {
 	MutRate  float64
 }
 
-// Apply the ring model to a population.
+// Apply ModRing.
 func (mod ModRing) Apply(pop *Population) {
 	for i, indi := range pop.Individuals {
 		var (
@@ -262,7 +262,7 @@ type ModSimAnn struct {
 	Alpha float64 // Decrease rate per iteration
 }
 
-// Apply simulated annealing to a population.
+// Apply ModSimAnn.
 func (mod ModSimAnn) Apply(pop *Population) {
 	// Continue until having reached the minimum temperature
 	for mod.T > mod.Tmin {
@@ -311,7 +311,7 @@ type ModMutationOnly struct {
 	Strict   bool
 }
 
-// Apply mutation only to a population.
+// Apply ModMutationOnly.
 func (mod ModMutationOnly) Apply(pop *Population) {
 	var chosen, positions = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
 	for i, indi := range chosen {
