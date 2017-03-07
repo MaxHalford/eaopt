@@ -49,7 +49,7 @@
 
 <br/>
 
-<div align="center">An extendible toolkit for implementing genetic algorithms</div>
+<div align="center">An extensible toolkit for conceiving and running genetic algorithms</div>
 
 <br/>
 
