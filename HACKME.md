@@ -1,12 +1,11 @@
 ## Ideas
 
+- Add functional tests with deterministic operators to make everything works
 - Add more example usage
 - Add a way to compare individuals based on their genome to improve speciation
 - Make it easier to test models. Also make sure they work as expected.
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
 - Implement and order mutation operators
-- Consider comparing to the best fitness at every individual evaluation, instead of doing a global search after each generation
-- Implementing genome type interfaces (for example SliceGenome with At and Set methods)
 - Consider using memetic algorithms for local optimization (not well said). For example make it possible to use hill climbing
 - Add population and species pointers for individuals
 - Implement Partitioning Around Medoids (PAM) for speciating

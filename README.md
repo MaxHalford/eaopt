@@ -76,7 +76,7 @@
 
 ## Example
 
-The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html).
+The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1.
 
 ![drop_wave](examples/drop_wave/chart.png)
 
@@ -157,7 +157,7 @@ func main() {
 
 ## Background
 
-There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single definition of genetic algorithms**. `gago` is intented to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
+There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single definition of genetic algorithms**. `gago` is intended to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
 
 ### Terminology
 
@@ -181,7 +181,7 @@ In a nutshell, a GA solves an optimization problem by doing the following:
 4. Apply genetic operators following a model.
 5. Repeat from step 2 until the stopping criterion is not satisfied.
 
-This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a **model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criterions include
+This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a **model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criteria include
 
 - a fixed number of generations,
 - a fixed duration,
@@ -190,7 +190,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Features
 
-- gago is extendible, you can control most of what's happening
+- gago is extensible, you can control most of what's happening
 - Different evolution models are available
 - Popular operators are already implemented
 - Speciation is available
@@ -222,7 +222,7 @@ The `Evaluate()` method assigns a score to a given genome. The sweet thing is th
 
 The `Mutate(rng *rand.Rand)` method is where you can mutate a solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use to not reinvent the wheel; this is what is being done in most of the provided examples.
 
-The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces two new individuals (called offsprings) by applying some kind of mixture between the parent's attributes. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is an non-genericity thing specific to Go; it's easier to convince youself by checking out the examples.
+The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces two new individuals (called offsprings) by applying some kind of mixture between the parent's attributes. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
 
 Once you have implemented the `Genome` you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
 
@@ -249,12 +249,12 @@ type GA struct {
 }
 ```
 
-You have to fill in the first 5 attributes, the rest are filled by called the `GA`'s `Init()` method.
+You have to fill in the first 5 fields, the rest are generated when calling the `GA`'s `Initialize()` method.
 
 - `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
 - `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NSpecies`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
-- `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run indepently. Again this is an advanced concept in the genetic algorithms field that you should't deal with at first.
+- `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
 - `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
 
 Essentially only `MakeGenome`, `Topology` and `Model` are required to initialize and run a GA.
@@ -262,13 +262,13 @@ Essentially only `MakeGenome`, `Topology` and `Model` are required to initialize
 
 ### Running a GA
 
-Once you have implemented the `Genome` interface and instanciated a `GA` struct you are good to go. You can call the `GA`'s `Enhance()` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Enhance()` method multiple by using a loop or by imposing a time limit.
+Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Enhance()` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Enhance()` method multiple by using a loop or by imposing a time limit.
 
-At any time you have access to the `GA`'s `Best` field which is an internal represention of your genome. The `Best` field itself contains a `Fitness` field and a `Genome` field respectively indicating the best obtained solution and the parameters of that solution.
+At any time you have access to the `GA`'s `Best` field which is an internal representation of your genome. The `Best` field itself contains a `Fitness` field and a `Genome` field respectively indicating the best obtained solution and the parameters of that solution.
 
 ### Models
 
-`gago` makes it easy to use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the underlying operators. In a nutshell, an evolution model attemps to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
+`gago` makes it easy to use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the underlying operators. In a nutshell, an evolution model attempts to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
 
 #### Generational model
 
@@ -280,7 +280,7 @@ The generational model is one the, if not the most, popular models. Simply put i
 
 #### Steady state model
 
-The steady state model differs from the generational model in that the entire population isn't replaced between each generations. Instead of adding the children of the selected parents into the next generation, the 2 best individuals out of the two parents and two children are added back into the population so that the population size remains constant. However, one may also replace the parents with the children regardless of their fitness. This method has the advantage of not having to evaluate the newly generated offsprings. Whatsmore, crossover often generates individuals who are sub-par but who have a lot of potential; giving individuals generated from crossover a chance can be beneficial on the long run.
+The steady state model differs from the generational model in that the entire population isn't replaced between each generations. Instead of adding the children of the selected parents into the next generation, the 2 best individuals out of the two parents and two children are added back into the population so that the population size remains constant. However, one may also replace the parents with the children regardless of their fitness. This method has the advantage of not having to evaluate the newly generated offsprings. Whats more, crossover often generates individuals who are sub-par but who have a lot of potential; giving individuals generated from crossover a chance can be beneficial on the long run.
 
 <div align="center">
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vTTk7b1QS67CZTr7-ksBMlk_cIDhm2YMZjemmrhXbLei5_VgvXCsINCLu8uia3ea6Ouj9I3V5HcZUwS/pub?w=962&h=499" alt="steady-state" width="70%" />
@@ -314,11 +314,11 @@ It's possible to run a GA without crossover simply by mutating individuals. Esse
 
 ### Speciation
 
-Clusters, also called speciation in the litterature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the litterature, speciation is also called *speciation*.
+Clusters, also called speciation in the literature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the literature, speciation is also called *speciation*.
 
-The purpose of a partinioning individuals is to apply genetic operators to similar individuals. In biological terms this encourages "incest" and maintains isolated species. For example in nature animals usually breed with local mates and don't breed with different animal species.
+The purpose of a partitioning individuals is to apply genetic operators to similar individuals. In biological terms this encourages "incest" and maintains isolated species. For example in nature animals usually breed with local mates and don't breed with different animal species.
 
-Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely dissapear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't dissapear immediatly. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
+Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely disappear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't disappear immediately. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
 With gago it's possible to use speciation on top of all the rest. For the time, the only kind of speciation is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` species before applying an evolution model to each cluster. The `k` species are then merged into a new population of `n` individuals. This way, species don't interact with other species.
 
@@ -342,11 +342,11 @@ With gago you can use multi-populations and speciation at the same time. The fol
 
 ### Presets
 
-Some prefilled GA instances are available to get started as fast as possible. They are available in the [presets.go](presets.go) file. These instances also serve as example instanciations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
+Some preset GA instances are available to get started as fast as possible. They are available in the [presets.go](presets.go) file. These instances also serve as example instantiations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
 
 ### Logging population statistics
 
-It's possible to log statistics for each population at every generation. To do so you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log ouput, whether it be in a file or directly in the standard output.
+It's possible to log statistics for each population at every generation. To do so you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log output, whether it be in a file or directly in the standard output.
 
 ```go
 ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
@@ -363,7 +363,7 @@ If a logger is provided, each row in the log output will include
 
 ## A note on parallelism
 
-Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run indepently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
+Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run independently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
 
 One approach I considered was to run the individual operations in parallel. Basically a parallel loop would apply all the necessary operations to a set of individuals. First of all this isn't as simple as it seems, the prime issue being the [race condition](https://www.wikiwand.com/en/Embarrassingly_parallel) that can occur when applying crossover. Moreover the initialization overhead was relatively too large, mainly because mutation and evaluation can be *too* fast for a thread to be viable.
 
@@ -386,12 +386,12 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
 
 **Why are there type-specific slice crossover methods instead of a generic one?**
 
-Some crossover methods are generic because they are simply rearranging lists. Underhood gago uses the `[]interface{}` to implement generic crossover methods. However the genomes are always typed and are not of type `[]interface{}`. The genomes have to converted to a `[]interface{}` and then back to their original type after crossover. For more information you can check out the [official advice](https://github.com/golang/go/wiki/InterfaceSlice) regarding generic slices and also look at the [casting.go file](casting.go).
+Some crossover methods are generic because they are simply rearranging lists. Under the hood gago uses the `[]interface{}` to implement generic crossover methods. However the genomes are always typed and are not of type `[]interface{}`. The genomes have to converted to a `[]interface{}` and then back to their original type after crossover. For more information you can check out the [official advice](https://github.com/golang/go/wiki/InterfaceSlice) regarding generic slices and also look at the [casting.go file](casting.go).
 
 
 **Why isn't my `Mutate` method modifying my `Genome`?**
 
-The `Mutate` has to modify the values of the `Genome` inplace. The following code will work because the `Vector` is a slice; slices in Golang are references to underlying data, hence modifying a slice modifies them inplace.
+The `Mutate` has to modify the values of the `Genome` in-place. The following code will work because the `Vector` is a slice; slices in Go are references to underlying data, hence modifying a slice modifies them in-place.
 
 ```go
 type Vector []float64
@@ -415,7 +415,7 @@ func (n *Name) Mutate(rng *rand.Rand) {
 
 Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
 
-As mentionned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in a neural network is an open problem that doesn't yet have a reliable solution. Neural networks used in production are usually architectured by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, usually by optimizing the network's topology.
+As mentioned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in a neural network is an open problem that doesn't yet have a reliable solution. Neural networks architectures used in production are usually designed by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, usually by optimizing the network's topology.
 
 **How can I contribute?**
 
