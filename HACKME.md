@@ -1,7 +1,5 @@
 ## Ideas
 
-- https://www.wikiwand.com/en/List_of_genetic_algorithm_applications
-- Benchmark against other libraries
 - Add more example usage
 - Add a way to compare individuals based on their genome to improve speciation
 - Make it easier to test models. Also make sure they work as expected.

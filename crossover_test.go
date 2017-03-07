@@ -179,7 +179,7 @@ func TestCrossPMXFloat64(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossPMXFloat64(p1, p2, 2, rng)
+		o1, o2 = CrossPMXFloat64(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
@@ -192,7 +192,7 @@ func TestCrossPMXInt(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
-		o1, o2 = CrossPMXInt(p1, p2, 2, rng)
+		o1, o2 = CrossPMXInt(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
@@ -205,7 +205,7 @@ func TestCrossPMXString(t *testing.T) {
 		rng    = makeRandomNumberGenerator()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossPMXString(p1, p2, 2, rng)
+		o1, o2 = CrossPMXString(p1, p2, rng)
 	)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {

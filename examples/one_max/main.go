@@ -35,8 +35,7 @@ func (X Digits) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
 	return Digits(o1), Digits(o2)
 }
 
-// MakeDigits creates random slices of digits by randomly assigning them 1s and
-// 0s.
+// MakeDigits creates a random slice of digits by randomly picking 1s and 0s.
 func MakeDigits(rng *rand.Rand) gago.Genome {
 	var digits = make(Digits, N)
 	for i := range digits {

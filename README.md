@@ -152,6 +152,7 @@ func main() {
 
 - [Grid TSP](examples/tsp_grid/main.go)
 - [One Max problem](examples/one_max/main.go)
+- [N-queens problem](examples/string_matching/main.go)
 - [String matching](examples/string_matching/main.go)
 
 ## Background
