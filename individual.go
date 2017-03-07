@@ -91,18 +91,17 @@ func (indis Individuals) Mutate(mutRate float64, rng *rand.Rand) {
 	}
 }
 
-// Sort the individuals of a population in ascending order based on their
-// fitness. The convention is that we always want to minimize a function. A
-// function f(x) can be function maximized by minimizing -f(x) or 1/f(x).
-func (indis Individuals) Len() int           { return len(indis) }
-func (indis Individuals) Less(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
-func (indis Individuals) Swap(i, j int)      { indis[i], indis[j] = indis[j], indis[i] }
+// SortByFitness ascendingly sorts individuals by fitness.
+func (indis Individuals) SortByFitness() {
+	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
+	sort.Slice(indis, less)
+}
 
-// Sort is a convenience method for calling the Sort method of the sort package.
-func (indis *Individuals) Sort() { sort.Sort(indis) }
-
-// IsSorted is a convenience method for calling the IsSorted method of the sort package.
-func (indis *Individuals) IsSorted() bool { return sort.IsSorted(indis) }
+// AreSortedByFitness checks if individuals are ascendingly sorted by fitness.
+func (indis Individuals) AreSortedByFitness() bool {
+	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
+	return sort.SliceIsSorted(indis, less)
+}
 
 // Sample k unique individuals from a slice of n individuals.
 func (indis Individuals) sample(k int, rng *rand.Rand) (sample Individuals, indexes []int) {
@@ -125,7 +124,7 @@ func (indis Individuals) getFitnesses() []float64 {
 
 // FitMin returns the best fitness of a slice of individuals.
 func (indis Individuals) FitMin() float64 {
-	if indis.IsSorted() {
+	if indis.AreSortedByFitness() {
 		return indis[0].Fitness
 	}
 	return minFloat64s(indis.getFitnesses())
@@ -133,7 +132,7 @@ func (indis Individuals) FitMin() float64 {
 
 // FitMax returns the best fitness of a slice of individuals.
 func (indis Individuals) FitMax() float64 {
-	if indis.IsSorted() {
+	if indis.AreSortedByFitness() {
 		return indis[len(indis)-1].Fitness
 	}
 	return maxFloat64s(indis.getFitnesses())
