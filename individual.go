@@ -33,8 +33,8 @@ func MakeIndividual(genome Genome) Individual {
 	}
 }
 
-// DeepCopy an individual.
-func (indi Individual) DeepCopy() Individual {
+// Copy returns the same exact same individual but with a different pointer.
+func (indi Individual) Copy() Individual {
 	return MakeIndividual(indi.Genome)
 }
 
@@ -65,6 +65,14 @@ func (indi *Individual) Crossover(indi2 Individual, rng *rand.Rand) (Individual,
 // Individuals is a convenience type, methods that belong to an Individual can
 // be called declaratively.
 type Individuals []Individual
+
+// Copy returns the same exact same slice of individuals but with a different
+// pointer.
+func (indis Individuals) Copy() Individuals {
+	var newIndis = make(Individuals, len(indis))
+	copy(newIndis, indis)
+	return newIndis
+}
 
 // Generate a slice of n new individuals.
 func makeIndividuals(n int, gm GenomeMaker, rng *rand.Rand) Individuals {

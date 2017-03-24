@@ -1,6 +1,42 @@
 package gago
 
-import "math"
+import (
+	"math"
+)
+
+// // A Speciator partitions a population into n smaller subpopulations. Each
+// // subpopulation shares the same random number generator inherited from the
+// // initial population.
+// type Speciator interface {
+// 	Apply(pop Population, rng *rand.Rand) Populations
+// }
+
+// // SpecKMedoids (k-medoid clustering). The implementation is based on the
+// // Partitioning Around Medoids algorithm (PAM); the only variation is that the
+// // initial medoids are generated deterministically by choosing the ones with
+// // the lowest average dissimilarities.
+// type SpecKMedoids struct {
+// 	K      int                           // Number of medoids
+// 	Metric func(a, b Individual) float64 // Dissimimilarity measure
+// }
+
+// // Apply SpecKMedoids.
+// func (kmed SpecKMedoids) Apply(pop Population, rng *rand.Rand) Populations {
+// 	var (
+// 		pops = make(Populations, kmed.K)
+// 		dm   = makeDistanceMemoizer(kmed.metric)
+// 	)
+// 	var indis = pop.Individuals.Copy()
+// 	// Calculate the dissimilarity matrix
+// 	var D = calcDissimilarityMatrix(pop.Individuals, kmed.DissMeasure)
+// 	// Select the k individuals with the lowest average dissimiliraties
+// 	var avgDisses = make([]float64, len(indis))
+// 	for i := range avgs {
+// 		avgDisses[i] = meanFloat64s(D[i])
+// 	}
+// 	sort.Slice(indis, func(i, j int) bool { return avgDisses[i] < avgDisses[j] })
+// 	return pops
+// }
 
 // Speciate splits n individuals into k species based on the fitness of each
 // individual where each species contains m = n/k (rounded to the closest
@@ -28,7 +64,7 @@ func (pop Population) speciate(k int) Populations {
 }
 
 // Merge k species each of size of n into a single slice of k*n individuals.
-func (pops Populations) merge() Individuals {
+func (pops Populations) mergeIndividuals() Individuals {
 	var indis Individuals
 	for _, pop := range pops {
 		indis = append(indis, pop.Individuals...)

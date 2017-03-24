@@ -144,7 +144,7 @@ func (ga *GA) Enhance() {
 					ga.Model.Apply(&species[k])
 				}
 				// Merge each cluster back into the original population
-				ga.Populations[j].Individuals = species.merge()
+				ga.Populations[j].Individuals = species.mergeIndividuals()
 			} else {
 				// Else apply the evolution model to the entire population
 				ga.Model.Apply(&ga.Populations[j])

@@ -3,6 +3,7 @@ package gago
 import (
 	"errors"
 	"math/rand"
+	"sort"
 )
 
 // Selector chooses a subset of size n from a group of individuals. The group of
@@ -84,7 +85,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 	)
 	for i := range selected {
 		var (
-			index  = bisectLeftFloat64(rand.Float64(), weights)
+			index  = sort.SearchFloat64s(weights, rand.Float64())
 			winner = indis[index]
 		)
 		indexes[i] = index
