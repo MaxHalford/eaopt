@@ -23,7 +23,7 @@
   </a>
   <!-- Build status -->
   <a href="https://travis-ci.org/MaxHalford/gago">
-    <img src="https://img.shields.io/travis/MaxHalford/gago.svg?style=flat-square" alt="build_status" />
+    <img src="https://img.shields.io/travis/MaxHalford/gago/master.svg?style=flat-square" alt="build_status" />
   </a>
   <!-- Test coverage -->
   <a href="https://coveralls.io/github/MaxHalford/gago?branch=master">
