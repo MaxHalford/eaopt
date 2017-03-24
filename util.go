@@ -163,31 +163,3 @@ func union(x, y set) set {
 	}
 	return u
 }
-
-// bisectLeftFloat64 searches for the index of the lowest of the values that are higher than a given
-// value.
-func bisectLeftFloat64(value float64, floats []float64) int {
-	var (
-		index = -1
-		a     = 0
-		b     = len(floats) / 2
-		c     = len(floats) - 1
-	)
-
-	for a != b && b != c {
-		if value <= floats[b] {
-			index = b
-			c = b
-			b = (a + c) / 2
-		} else {
-			a = b
-			b = (a + c + 1) / 2
-		}
-	}
-
-	if value <= floats[b] {
-		index = b
-	}
-
-	return index
-}

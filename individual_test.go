@@ -10,7 +10,7 @@ func TestDeepCopyIndividual(t *testing.T) {
 	var (
 		genome = MakeVector(makeRandomNumberGenerator())
 		indi1  = MakeIndividual(genome)
-		indi2  = indi1.DeepCopy()
+		indi2  = indi1.Copy()
 	)
 	if &indi1 == &indi2 || &indi1.Genome == &indi2.Genome {
 		t.Error("Individual was not deep copied")
@@ -65,6 +65,18 @@ func TestMakeIndividuals(t *testing.T) {
 		var indis = makeIndividuals(n, MakeVector, rng)
 		if len(indis) != n {
 			t.Error("makeIndividuals didn't generate the right number of individuals")
+		}
+	}
+}
+
+func TestDeepCopyIndividuals(t *testing.T) {
+	var (
+		indis    = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
+		newIndis = indis.Copy()
+	)
+	for i := range indis {
+		if &indis[i] == &newIndis[i] || &indis[i].Genome == &newIndis[i].Genome {
+			t.Error("Individual was not deep copied")
 		}
 	}
 }
