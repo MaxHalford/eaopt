@@ -30,7 +30,7 @@ func TestSpeciation(t *testing.T) {
 	}
 }
 
-func TestSpeciationMerge(t *testing.T) {
+func TestSpeciationMergeIndividuals(t *testing.T) {
 	var (
 		nbrIndividuals = []int{1, 2, 3}
 		nbrClusters    = []int{1, 2, 3}
@@ -45,7 +45,7 @@ func TestSpeciationMerge(t *testing.T) {
 					Individuals: makeIndividuals(nbi, MakeVector, rng),
 				}
 			}
-			var indis = species.merge()
+			var indis = species.mergeIndividuals()
 			// Check the species of individuals
 			if len(indis) != nbi*nbc {
 				t.Error("Merge didn't work properly")
