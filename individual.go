@@ -33,9 +33,12 @@ func MakeIndividual(genome Genome) Individual {
 	}
 }
 
-// Copy returns the same exact same individual but with a different pointer.
-func (indi Individual) Copy() Individual {
-	return MakeIndividual(indi.Genome)
+// Clone an individual to produce a new individual with a different pointer.
+func (indi Individual) Clone() Individual {
+	var clone = MakeIndividual(indi.Genome)
+	clone.Fitness = indi.Fitness
+	clone.Evaluated = true
+	return clone
 }
 
 // Evaluate the fitness of an individual. Don't evaluate individuals that have
