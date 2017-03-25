@@ -1,9 +1,5 @@
 ## Ideas
 
-- Speciation
-- Slice interface
-
-- Add functional tests with deterministic operators to make everything works
 - Add more example usage
 - Add a way to compare individuals based on their genome to improve speciation
 - Make it easier to test models. Also make sure they work as expected.
