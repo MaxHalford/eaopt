@@ -6,36 +6,6 @@ import (
 	"time"
 )
 
-// Check whether a slice contains a given element or not.
-func elementInSlice(element interface{}, slice []interface{}) bool {
-	for _, v := range slice {
-		if v == element {
-			return true
-		}
-	}
-	return false
-}
-
-// Find where an element is in a slice.
-func getIndex(element interface{}, slice []interface{}) int {
-	for i, v := range slice {
-		if v == element {
-			return i
-		}
-	}
-	// Element not in slice
-	return -1
-}
-
-// Make a lookup table from a slice, mapping values to indexes.
-func makeIndexLookup(slice []interface{}) map[interface{}]int {
-	var lookup = make(map[interface{}]int)
-	for i, v := range slice {
-		lookup[v] = i
-	}
-	return lookup
-}
-
 // Divide each element in a float64 slice by a given value.
 func divide(floats []float64, value float64) []float64 {
 	var divided = make([]float64, len(floats))

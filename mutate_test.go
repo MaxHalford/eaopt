@@ -1,6 +1,35 @@
 package gago
 
-import "testing"
+import (
+	"testing"
+)
+
+func sliceContainsInt(x int, ints []int) bool {
+	for _, v := range ints {
+		if v == x {
+			return true
+		}
+	}
+	return false
+}
+
+func sliceContainsFloat64(x float64, floats []float64) bool {
+	for _, v := range floats {
+		if v == x {
+			return true
+		}
+	}
+	return false
+}
+
+func sliceContainsString(x string, strings []string) bool {
+	for _, v := range strings {
+		if v == x {
+			return true
+		}
+	}
+	return false
+}
 
 func TestMutNormalFloat64All(t *testing.T) {
 	var (
@@ -65,26 +94,6 @@ func TestMutUniformString(t *testing.T) {
 	}
 }
 
-func TestMutPermuteFloat64(t *testing.T) {
-	var (
-		rng     = makeRandomNumberGenerator()
-		genome  = []float64{1, 2, 3}
-		mutated = make([]float64, len(genome))
-	)
-	copy(mutated, genome)
-	MutPermuteFloat64(mutated, 3, rng)
-	// Check the length of the mutated genome is consistent
-	if len(mutated) != len(genome) {
-		t.Error("Mutated genome has the wrong length")
-	}
-	// Check the genes in the initial genome are still present
-	for _, v := range genome {
-		if !elementInSlice(v, uncastFloat64s(mutated)) {
-			t.Error("Gene in initial genome has disappeared")
-		}
-	}
-}
-
 func TestMutPermuteInt(t *testing.T) {
 	var (
 		rng     = makeRandomNumberGenerator()
@@ -99,7 +108,27 @@ func TestMutPermuteInt(t *testing.T) {
 	}
 	// Check the genes in the initial genome are still present
 	for _, v := range genome {
-		if !elementInSlice(v, uncastInts(mutated)) {
+		if !sliceContainsInt(v, mutated) {
+			t.Error("Gene in initial genome has disappeared")
+		}
+	}
+}
+
+func TestMutPermuteFloat64(t *testing.T) {
+	var (
+		rng     = makeRandomNumberGenerator()
+		genome  = []float64{1, 2, 3}
+		mutated = make([]float64, len(genome))
+	)
+	copy(mutated, genome)
+	MutPermuteFloat64(mutated, 3, rng)
+	// Check the length of the mutated genome is consistent
+	if len(mutated) != len(genome) {
+		t.Error("Mutated genome has the wrong length")
+	}
+	// Check the genes in the initial genome are still present
+	for _, v := range genome {
+		if !sliceContainsFloat64(v, mutated) {
 			t.Error("Gene in initial genome has disappeared")
 		}
 	}
@@ -119,27 +148,7 @@ func TestMutPermuteString(t *testing.T) {
 	}
 	// Check the genes in the initial genome are still present
 	for _, v := range genome {
-		if !elementInSlice(v, uncastStrings(mutated)) {
-			t.Error("Gene in initial genome has disappeared")
-		}
-	}
-}
-
-func TestMutSpliceFloat64(t *testing.T) {
-	var (
-		rng     = makeRandomNumberGenerator()
-		genome  = []float64{1, 2, 3}
-		mutated = make([]float64, len(genome))
-	)
-	copy(mutated, genome)
-	MutSpliceFloat64(mutated, rng)
-	// Check the length of the mutated genome is consistent
-	if len(mutated) != len(genome) {
-		t.Error("Mutated genome has the wrong length")
-	}
-	// Check the genes in the initial genome are still present
-	for _, v := range genome {
-		if !elementInSlice(v, uncastFloat64s(mutated)) {
+		if !sliceContainsString(v, mutated) {
 			t.Error("Gene in initial genome has disappeared")
 		}
 	}
@@ -159,7 +168,27 @@ func TestMutSpliceInt(t *testing.T) {
 	}
 	// Check the genes in the initial genome are still present
 	for _, v := range genome {
-		if !elementInSlice(v, uncastInts(mutated)) {
+		if !sliceContainsInt(v, mutated) {
+			t.Error("Gene in initial genome has disappeared")
+		}
+	}
+}
+
+func TestMutSpliceFloat64(t *testing.T) {
+	var (
+		rng     = makeRandomNumberGenerator()
+		genome  = []float64{1, 2, 3}
+		mutated = make([]float64, len(genome))
+	)
+	copy(mutated, genome)
+	MutSpliceFloat64(mutated, rng)
+	// Check the length of the mutated genome is consistent
+	if len(mutated) != len(genome) {
+		t.Error("Mutated genome has the wrong length")
+	}
+	// Check the genes in the initial genome are still present
+	for _, v := range genome {
+		if !sliceContainsFloat64(v, mutated) {
 			t.Error("Gene in initial genome has disappeared")
 		}
 	}
@@ -179,7 +208,7 @@ func TestMutSpliceString(t *testing.T) {
 	}
 	// Check the genes in the initial genome are still present
 	for _, v := range genome {
-		if !elementInSlice(v, uncastStrings(mutated)) {
+		if !sliceContainsString(v, mutated) {
 			t.Error("Gene in initial genome has disappeared")
 		}
 	}
