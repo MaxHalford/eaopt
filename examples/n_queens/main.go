@@ -10,7 +10,7 @@ import (
 )
 
 // N_QUEENS is the size of each genome.
-const N_QUEENS = 12
+const N_QUEENS = 20
 
 // Positions is a slice of ints.
 type Positions []int
@@ -75,10 +75,10 @@ func main() {
 	var ga = gago.Generational(MakeBoard)
 	ga.Initialize()
 
-	for i := 1; i < 100; i++ {
+	for ga.Best.Fitness > 0 {
 		ga.Enhance()
 	}
 
 	fmt.Println(ga.Best.Genome)
-	fmt.Printf("Best fitness -> %f\n", ga.Best.Fitness)
+	fmt.Printf("Solution obtained after %d generations in %s\n", ga.Generations, ga.Age)
 }
