@@ -78,11 +78,11 @@ func TestGNX(t *testing.T) {
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = gnx(uncastInts(test.p1), uncastInts(test.p2), test.indexes)
+			o1, o2 = gnx(IntSlice(test.p1), IntSlice(test.p2), test.indexes)
 		)
 		for i := 0; i < n; i++ {
-			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
-				t.Error("Something went wrong during n-point crossover")
+			if o1.At(i).(int) != test.o1[i] || o2.At(i).(int) != test.o2[i] {
+				t.Error("Something went wrong during GNX crossover")
 			}
 		}
 	}
@@ -164,10 +164,10 @@ func TestPMX(t *testing.T) {
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = pmx(uncastInts(test.p1), uncastInts(test.p2), test.a, test.b)
+			o1, o2 = pmx(IntSlice(test.p1), IntSlice(test.p2), test.a, test.b)
 		)
 		for i := 0; i < n; i++ {
-			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
+			if o1.At(i).(int) != test.o1[i] || o2.At(i).(int) != test.o2[i] {
 				t.Error("Something went wrong during PMX crossover")
 			}
 		}
@@ -250,10 +250,10 @@ func TestOX(t *testing.T) {
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = ox(uncastInts(test.p1), uncastInts(test.p2), test.a, test.b)
+			o1, o2 = ox(IntSlice(test.p1), IntSlice(test.p2), test.a, test.b)
 		)
 		for i := 0; i < n; i++ {
-			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
+			if o1.At(i).(int) != test.o1[i] || o2.At(i).(int) != test.o2[i] {
 				t.Error("Something went wrong during OX crossover")
 			}
 		}
@@ -299,34 +299,6 @@ func TestCrossOXString(t *testing.T) {
 	}
 }
 
-func TestGetCycles(t *testing.T) {
-	var testCases = []struct {
-		x      []int
-		y      []int
-		cycles [][]int
-	}{
-		{
-			x: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
-			y: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
-			cycles: [][]int{
-				[]int{0, 8, 3, 7},
-				[]int{1, 2, 6, 4},
-				[]int{5},
-			},
-		},
-	}
-	for _, test := range testCases {
-		var cycles = getCycles(uncastInts(test.x), uncastInts(test.y))
-		for i, cycle := range cycles {
-			for j, c := range cycle {
-				if c != test.cycles[i][j] {
-					t.Error("getCycles didn't work as expected")
-				}
-			}
-		}
-	}
-}
-
 func TestCrossCX(t *testing.T) {
 	var testCases = []struct {
 		p1 []int
@@ -350,10 +322,10 @@ func TestCrossCX(t *testing.T) {
 	for _, test := range testCases {
 		var (
 			n      = len(test.p1)
-			o1, o2 = CrossCX(uncastInts(test.p1), uncastInts(test.p2))
+			o1, o2 = CrossCX(IntSlice(test.p1), IntSlice(test.p2))
 		)
 		for i := 0; i < n; i++ {
-			if o1[i] != test.o1[i] || o2[i] != test.o2[i] {
+			if o1.At(i).(int) != test.o1[i] || o2.At(i).(int) != test.o2[i] {
 				t.Error("Something went wrong during CX crossover")
 			}
 		}
@@ -396,38 +368,6 @@ func TestCrossCXString(t *testing.T) {
 	}
 }
 
-func TestGetNeighbours(t *testing.T) {
-	var testCases = []struct {
-		x          []int
-		neighbours map[interface{}]set
-	}{
-		{
-			x: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
-			neighbours: map[interface{}]set{
-				1: set{9: true, 2: true},
-				2: set{1: true, 3: true},
-				3: set{2: true, 4: true},
-				4: set{3: true, 5: true},
-				5: set{4: true, 6: true},
-				6: set{5: true, 7: true},
-				7: set{6: true, 8: true},
-				8: set{7: true, 9: true},
-				9: set{8: true, 1: true},
-			},
-		},
-	}
-	for _, test := range testCases {
-		var neighbours = getNeighbours(uncastInts(test.x))
-		for i, set := range neighbours {
-			for j := range set {
-				if !test.neighbours[i][j] {
-					t.Error("getNeighbours didn't work as expected")
-				}
-			}
-		}
-	}
-}
-
 func TestCrossERX(t *testing.T) {
 	var testCases = []struct {
 		p1 []string
@@ -439,13 +379,13 @@ func TestCrossERX(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		var o1, o2 = CrossERX(uncastStrings(test.p1), uncastStrings(test.p2))
+		var o1, o2 = CrossERX(StringSlice(test.p1), StringSlice(test.p2))
 		// Check offsprings have parent's first gene as first gene
-		if o1[0] != test.p1[0] || o2[0] != test.p2[0] {
+		if o1.At(0).(string) != test.p1[0] || o2.At(0).(string) != test.p2[0] {
 			t.Error("Something went wrong during ERX crossover")
 		}
 		// Check lengths
-		if len(o1) != len(test.p1) || len(o2) != len(test.p2) {
+		if o1.Len() != len(test.p1) || o2.Len() != len(test.p2) {
 			t.Error("Something went wrong during ERX crossover")
 		}
 	}
