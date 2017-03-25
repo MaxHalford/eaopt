@@ -1,6 +1,8 @@
 package gago
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // Type specific mutations for slices
 
@@ -32,74 +34,54 @@ func MutUniformString(genome []string, corpus []string, n int, rng *rand.Rand) {
 // Generic mutations for slices
 
 // MutPermute permutes two genes at random n times.
-func MutPermute(genome []interface{}, n int, rng *rand.Rand) {
+func MutPermute(genome Slice, n int, rng *rand.Rand) {
 	// Nothing to permute
-	if len(genome) <= 1 {
+	if genome.Len() <= 1 {
 		return
 	}
 	for i := 0; i < n; i++ {
 		// Choose two points on the genome
-		var (
-			points = randomInts(2, 0, len(genome), rng)
-			i      = points[0]
-			j      = points[1]
-		)
-		// Permute the genes
-		genome[i], genome[j] = genome[j], genome[i]
+		var points = randomInts(2, 0, genome.Len(), rng)
+		genome.Swap(points[0], points[1])
 	}
 }
 
-// MutPermuteFloat64 is a convenience function for calling MutPermute on a
-// float64 slice.
-func MutPermuteFloat64(values []float64, n int, rng *rand.Rand) {
-	var genome = uncastFloat64s(values)
-	MutPermute(genome, n, rng)
-	copy(values, castFloat64s(genome))
+// MutPermuteInt calls MutPermute on an int slice.
+func MutPermuteInt(s []int, n int, rng *rand.Rand) {
+	MutPermute(IntSlice(s), n, rng)
 }
 
-// MutPermuteInt is a convenience function for calling MutPermute on an int
-// slice.
-func MutPermuteInt(values []int, n int, rng *rand.Rand) {
-	var genome = uncastInts(values)
-	MutPermute(genome, n, rng)
-	copy(values, castInts(genome))
+// MutPermuteFloat64 calls MutPermute on a float64 slice.
+func MutPermuteFloat64(s []float64, n int, rng *rand.Rand) {
+	MutPermute(Float64Slice(s), n, rng)
 }
 
-// MutPermuteString is a convenience function for calling MutPermute on a string
-// slice.
-func MutPermuteString(values []string, n int, rng *rand.Rand) {
-	var genome = uncastStrings(values)
-	MutPermute(genome, n, rng)
-	copy(values, castStrings(genome))
+// MutPermuteString callsMutPermute on a string slice.
+func MutPermuteString(s []string, n int, rng *rand.Rand) {
+	MutPermute(StringSlice(s), n, rng)
 }
 
-// MutSplice splits a genome in 2 and glues the pieces back together in a
-// different order.
-func MutSplice(genome []interface{}, rng *rand.Rand) {
-	var split = rng.Intn(len(genome)-1) + 1
-	copy(genome, append(genome[split:], genome[:split]...))
+// MutSplice splits a genome in 2 and glues the pieces back together in reverse
+// order.
+func MutSplice(genome Slice, rng *rand.Rand) {
+	var (
+		k    = rng.Intn(genome.Len()-1) + 1
+		a, b = genome.Split(k)
+	)
+	genome.Replace(b.Append(a))
 }
 
-// MutSpliceFloat64 is a convenience function for calling MutSplice on a float64
-// slice.
-func MutSpliceFloat64(values []float64, rng *rand.Rand) {
-	var genome = uncastFloat64s(values)
-	MutSplice(genome, rng)
-	copy(values, castFloat64s(genome))
+// MutSpliceInt calls MutSplice on an int slice.
+func MutSpliceInt(s []int, rng *rand.Rand) {
+	MutSplice(IntSlice(s), rng)
 }
 
-// MutSpliceInt is a convenience function for calling MutSplice on an int
-// slice.
-func MutSpliceInt(values []int, rng *rand.Rand) {
-	var genome = uncastInts(values)
-	MutSplice(genome, rng)
-	copy(values, castInts(genome))
+// MutSpliceFloat64 calls MutSplice on a float64 slice.
+func MutSpliceFloat64(s []float64, rng *rand.Rand) {
+	MutSplice(Float64Slice(s), rng)
 }
 
-// MutSpliceString is a convenience function for calling MutSplice on a string
-// slice.
-func MutSpliceString(values []string, rng *rand.Rand) {
-	var genome = uncastStrings(values)
-	MutSplice(genome, rng)
-	copy(values, castStrings(genome))
+// MutSpliceString calls MutSplice on a string slice.
+func MutSpliceString(s []string, rng *rand.Rand) {
+	MutSplice(StringSlice(s), rng)
 }
