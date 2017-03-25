@@ -226,6 +226,27 @@ The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces 
 
 Once you have implemented the `Genome` you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
 
+### Using the Slice interface
+
+Classically GAs are used to optimize problems where the genome has a slice representation - eg. a vector or a sequence of DNA code. Almost all the mutation and crossover algorithms gago makes available are based on the `Slice` interface which has the following definition.
+
+```go
+type Slice interface {
+    At(i int) interface{}
+    Set(i int, v interface{})
+    Len() int
+    Swap(i, j int)
+    Slice(a, b int) Slice
+    Split(k int) (Slice, Slice)
+    Append(Slice) Slice
+    Replace(Slice)
+    Clone() Slice
+}
+```
+
+Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go)).
+
+
 ### Instantiating a GA struct
 
 Let's have a look at the GA struct.

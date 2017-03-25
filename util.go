@@ -6,36 +6,6 @@ import (
 	"time"
 )
 
-// Check whether a slice contains a given element or not.
-func elementInSlice(element interface{}, slice []interface{}) bool {
-	for _, v := range slice {
-		if v == element {
-			return true
-		}
-	}
-	return false
-}
-
-// Find where an element is in a slice.
-func getIndex(element interface{}, slice []interface{}) int {
-	for i, v := range slice {
-		if v == element {
-			return i
-		}
-	}
-	// Element not in slice
-	return -1
-}
-
-// Make a lookup table from a slice, mapping values to indexes.
-func makeIndexLookup(slice []interface{}) map[interface{}]int {
-	var lookup = make(map[interface{}]int)
-	for i, v := range slice {
-		lookup[v] = i
-	}
-	return lookup
-}
-
 // Divide each element in a float64 slice by a given value.
 func divide(floats []float64, value float64) []float64 {
 	var divided = make([]float64, len(floats))
@@ -162,32 +132,4 @@ func union(x, y set) set {
 		}
 	}
 	return u
-}
-
-// bisectLeftFloat64 searches for the index of the lowest of the values that are higher than a given
-// value.
-func bisectLeftFloat64(value float64, floats []float64) int {
-	var (
-		index = -1
-		a     = 0
-		b     = len(floats) / 2
-		c     = len(floats) - 1
-	)
-
-	for a != b && b != c {
-		if value <= floats[b] {
-			index = b
-			c = b
-			b = (a + c) / 2
-		} else {
-			a = b
-			b = (a + c + 1) / 2
-		}
-	}
-
-	if value <= floats[b] {
-		index = b
-	}
-
-	return index
 }

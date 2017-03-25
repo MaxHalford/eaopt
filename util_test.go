@@ -7,72 +7,6 @@ import (
 	"time"
 )
 
-func TestElementInSlice(t *testing.T) {
-	var testCases = []struct {
-		element interface{}
-		slice   []interface{}
-		in      bool
-	}{
-		{
-			element: 1,
-			slice:   uncastInts([]int{1, 2, 3}),
-			in:      true,
-		},
-		{
-			element: 4,
-			slice:   uncastInts([]int{1, 2, 3}),
-			in:      false,
-		},
-	}
-	for _, test := range testCases {
-		if elementInSlice(test.element, test.slice) != test.in {
-			t.Error("elementInSlice is not behaving as expected")
-		}
-	}
-}
-
-func TestGetIndex(t *testing.T) {
-	var test []interface{}
-	test = append(test, 1)
-	test = append(test, "イースター")
-	// Integer in array
-	if getIndex(1, test) != 0 {
-		t.Error("Problem with getIndex")
-	}
-	// String in array
-	if getIndex("イースター", test) != 1 {
-		t.Error("Problem with getIndex")
-	}
-	// Element in array
-	if getIndex("tamago", test) != -1 {
-		t.Error("Problem with getIndex")
-	}
-}
-
-func TestMakeIndexLookup(t *testing.T) {
-	var testCases = []struct {
-		slice  []interface{}
-		lookup map[interface{}]int
-	}{
-		{
-			slice: uncastInts([]int{1, 2, 3}),
-			lookup: map[interface{}]int{
-				1: 0,
-				2: 1,
-				3: 2,
-			},
-		},
-	}
-	for _, test := range testCases {
-		var lookup = makeIndexLookup(test.slice)
-		for k, v := range lookup {
-			if v != test.lookup[k] {
-				t.Error("createLookup didn't work as expected")
-			}
-		}
-	}
-}
-
 func TestGenerateWeights(t *testing.T) {
 	var (
 		sizes = []int{1, 30, 10000}
@@ -284,65 +218,6 @@ func TestUnion(t *testing.T) {
 			if !test.u[i] {
 				t.Error("union didn't work as expected")
 			}
-		}
-	}
-}
-
-func TestBisectLeftFloat64(t *testing.T) {
-	var testCases = []struct {
-		value  float64
-		floats []float64
-		index  int
-	}{
-		{
-			value:  -1,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  0,
-		},
-		{
-			value:  0,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  0,
-		},
-		{
-			value:  0.1,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  1,
-		},
-		{
-			value:  0.2,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  1,
-		},
-		{
-			value:  0.3,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  2,
-		},
-		{
-			value:  0.5,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  3,
-		},
-		{
-			value:  0.9,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  5,
-		},
-		{
-			value:  1,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  5,
-		},
-		{
-			value:  2,
-			floats: []float64{0, 0.2, 0.4, 0.6, 0.8, 1},
-			index:  -1,
-		},
-	}
-	for _, test := range testCases {
-		if bisectLeftFloat64(test.value, test.floats) != test.index {
-			t.Error("bisectLeftFloat64 didn't work as expected")
 		}
 	}
 }
