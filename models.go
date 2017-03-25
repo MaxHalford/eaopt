@@ -268,7 +268,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
 			// Generate a random neighbour through mutation
-			var neighbour = indi.DeepCopy()
+			var neighbour = indi.Clone()
 			neighbour.Mutate(pop.rng)
 			neighbour.Evaluate()
 			if neighbour.Fitness < indi.Fitness {
@@ -315,7 +315,7 @@ type ModMutationOnly struct {
 func (mod ModMutationOnly) Apply(pop *Population) {
 	var chosen, positions = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
 	for i, indi := range chosen {
-		var mutant = indi.DeepCopy()
+		var mutant = indi.Clone()
 		mutant.Mutate(pop.rng)
 		mutant.Evaluate()
 		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
