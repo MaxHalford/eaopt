@@ -35,6 +35,8 @@ func init() {
 
 type Vector []float64
 
+// Implement the Genome interface
+
 func (X Vector) Evaluate() float64 {
 	var sum float64
 	for _, x := range X {
@@ -50,6 +52,16 @@ func (X Vector) Mutate(rng *rand.Rand) {
 func (X Vector) Crossover(Y Genome, rng *rand.Rand) (Genome, Genome) {
 	var o1, o2 = CrossGNXFloat64(X, Y.(Vector), 2, rng)
 	return Vector(o1), Vector(o2)
+}
+
+// Implement the Slice interface
+
+func (X Vector) Swap(i, j int) {
+	X[i], X[j] = X[j], X[i]
+}
+
+func (X Vector) Len() int {
+	return len(X)
 }
 
 func MakeVector(rng *rand.Rand) Genome {
