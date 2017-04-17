@@ -33,10 +33,10 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
 	return Vector(o1), Vector(o2)
 }
 
-// MakeVector returns a random vector by generating 5 values uniformally
+// MakeVector returns a random vector by generating 2 values uniformally
 // distributed between -10 and 10.
 func MakeVector(rng *rand.Rand) gago.Genome {
-	return Vector(gago.InitUnifFloat64(4, -10, 10, rng))
+	return Vector(gago.InitUnifFloat64(2, -10, 10, rng))
 }
 
 func main() {

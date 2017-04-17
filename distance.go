@@ -39,10 +39,6 @@ func (dm *DistanceMemoizer) GetDistance(a, b Individual) float64 {
 	}
 	if _, ok := dm.Distances[b.ID]; !ok {
 		dm.Distances[b.ID] = make(map[string]float64)
-	} else {
-		if dist, ok := dm.Distances[b.ID][a.ID]; ok {
-			return dist
-		}
 	}
 	// Calculate the distance between the genomes and memoize it
 	var dist = dm.Metric(a, b)
