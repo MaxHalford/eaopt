@@ -61,6 +61,7 @@
   - [Features](#features)
   - [Usage](#usage)
     - [Implementing the Genome interface](#implementing-the-genome-interface)
+    - [Using the Slice interface](#using-the-slice-interface)
     - [Instantiating a GA struct](#instantiating-a-ga-struct)
     - [Running a GA](#running-a-ga)
     - [Models](#models)
@@ -255,10 +256,12 @@ Let's have a look at the GA struct.
 type GA struct {
     // Fields that are provided by the user
     MakeGenome   GenomeMaker
-    Topology     Topology
+    NPops        int
+    PopSize      int
     Model        Model
     Migrator     Migrator
     MigFrequency int // Frequency at which migrations occur
+    Speciator    Speciator
     Logger       *log.Logger
 
     // Fields that are generated at runtime
@@ -273,12 +276,14 @@ type GA struct {
 You have to fill in the first 5 fields, the rest are generated when calling the `GA`'s `Initialize()` method.
 
 - `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
-- `Topology` is a struct which tells gago how many populations (`NPopulations`), species (`NSpecies`), individuals (`NIndividuals`) to use. GAs with multiple populations that you shouldn't worry about if you're a GA novice. The same goes for the number of species.
+- `NPops` determines the number of populations that will be used.
+- `PopSize` determines the number of individuals inside each population.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
+- `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
 - `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
 
-Essentially only `MakeGenome`, `Topology` and `Model` are required to initialize and run a GA.
+Essentially, only `MakeGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
 
 
 ### Running a GA
@@ -341,7 +346,7 @@ The purpose of a partitioning individuals is to apply genetic operators to simil
 
 Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely disappear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't disappear immediately. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
-With gago it's possible to use speciation on top of all the rest. For the time, the only kind of speciation is fitness based. Later on it will be possible to provided a function to compare two individuals based on their genome. What happens is that a population of `n` individuals is grouped into `k` species before applying an evolution model to each cluster. The `k` species are then merged into a new population of `n` individuals. This way, species don't interact with other species.
+With gago it's possible to use speciation on top of all the rest. To do so the `Speciator` field of the `GA` struct has to specified.
 
 <div align="center">
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="speciation" width="70%" />

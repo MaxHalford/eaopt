@@ -68,7 +68,7 @@ func (mod ModGenerational) Apply(pop *Population) {
 	copy(pop.Individuals, offsprings)
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModGenerational fields.
 func (mod ModGenerational) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
@@ -124,7 +124,7 @@ func (mod ModSteadyState) Apply(pop *Population) {
 	}
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModSteadyState fields.
 func (mod ModSteadyState) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
@@ -171,11 +171,11 @@ func (mod ModDownToSize) Apply(pop *Population) {
 	copy(pop.Individuals, selected)
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModDownToSize fields.
 func (mod ModDownToSize) Validate() error {
 	// Check the number of offsprings value
 	if mod.NOffsprings <= 0 {
-		return errors.New("'NOffsprings' has to higher than 0")
+		return errors.New("NOffsprings has to higher than 0")
 	}
 	// Check the first selection method presence
 	if mod.SelectorA == nil {
@@ -234,7 +234,7 @@ func (mod ModRing) Apply(pop *Population) {
 	}
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModRing fields.
 func (mod ModRing) Validate() error {
 	// Check the selection method presence
 	if mod.Selector == nil {
@@ -268,7 +268,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
 			// Generate a random neighbour through mutation
-			var neighbour = indi.Clone()
+			var neighbour = indi.Clone(pop.rng)
 			neighbour.Mutate(pop.rng)
 			neighbour.Evaluate()
 			if neighbour.Fitness < indi.Fitness {
@@ -284,15 +284,15 @@ func (mod ModSimAnn) Apply(pop *Population) {
 	}
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModSimAnn fields.
 func (mod ModSimAnn) Validate() error {
 	// Check the stopping temperature value
 	if mod.Tmin < 0 {
-		return errors.New("'Tmin' should be higher than 0")
+		return errors.New("Tmin should be higher than 0")
 	}
 	// Check the starting temperature value
 	if mod.T < mod.Tmin {
-		return errors.New("'T' should be a number higher than 'Tmin'")
+		return errors.New("T should be a number higher than Tmin")
 	}
 	// Check the decrease rate value
 	if mod.Alpha <= 0 || mod.Alpha >= 1 {
@@ -315,7 +315,7 @@ type ModMutationOnly struct {
 func (mod ModMutationOnly) Apply(pop *Population) {
 	var chosen, positions = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
 	for i, indi := range chosen {
-		var mutant = indi.Clone()
+		var mutant = indi.Clone(pop.rng)
 		mutant.Mutate(pop.rng)
 		mutant.Evaluate()
 		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
@@ -324,11 +324,11 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 	}
 }
 
-// Validate the model to verify the parameters are coherent.
+// Validate ModMutationOnly fields.
 func (mod ModMutationOnly) Validate() error {
 	// Check the number of chosen individuals value
 	if mod.NChosen < 1 {
-		return errors.New("'NChosen' should be higher than 0")
+		return errors.New("NChosen should be higher than 0")
 	}
 	// Check the selector presence
 	if mod.Selector == nil {
