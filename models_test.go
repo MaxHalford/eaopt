@@ -190,9 +190,10 @@ func TestModelsValidate(t *testing.T) {
 // TestModelsConstantSize checks that each model doesn't change the size of a
 // population when applied.
 func TestModelsConstantSize(t *testing.T) {
+	var rng = makeRandomNumberGenerator()
 	for _, n := range []int{1, 2, 3, 42} {
 		for _, model := range validModels {
-			var pop = makePopulation(n, MakeVector, 0)
+			var pop = makePopulation(n, MakeVector, randString(3, rng))
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)

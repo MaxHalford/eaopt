@@ -22,23 +22,28 @@ type Individual struct {
 	Genome    Genome
 	Fitness   float64
 	Evaluated bool
+	ID        string
 }
 
 // MakeIndividual returns a fresh individual.
-func MakeIndividual(genome Genome) Individual {
+func MakeIndividual(genome Genome, rng *rand.Rand) Individual {
 	return Individual{
 		Genome:    genome,
 		Fitness:   math.Inf(1),
 		Evaluated: false,
+		ID:        randString(6, rng),
 	}
 }
 
-// Clone an individual to produce a new individual with a different pointer.
-func (indi Individual) Clone() Individual {
-	var clone = MakeIndividual(indi.Genome)
-	clone.Fitness = indi.Fitness
-	clone.Evaluated = true
-	return clone
+// Clone an individual to produce a new individual with a different pointer and
+// a different ID.
+func (indi Individual) Clone(rng *rand.Rand) Individual {
+	return Individual{
+		Genome:    indi.Genome,
+		Fitness:   indi.Fitness,
+		Evaluated: indi.Evaluated,
+		ID:        randString(6, rng),
+	}
 }
 
 // Evaluate the fitness of an individual. Don't evaluate individuals that have
@@ -57,31 +62,47 @@ func (indi *Individual) Mutate(rng *rand.Rand) {
 }
 
 // Crossover an individual by calling the Crossover method of it's Genome.
-func (indi *Individual) Crossover(indi2 Individual, rng *rand.Rand) (Individual, Individual) {
+func (indi Individual) Crossover(mate Individual, rng *rand.Rand) (Individual, Individual) {
 	var (
-		genome1, genome2       = indi.Genome.Crossover(indi2.Genome, rng)
-		offspring1, offspring2 = MakeIndividual(genome1), MakeIndividual(genome2)
+		genome1, genome2 = indi.Genome.Crossover(mate.Genome, rng)
+		offspring1       = MakeIndividual(genome1, rng)
+		offspring2       = MakeIndividual(genome2, rng)
 	)
 	return offspring1, offspring2
+}
+
+// IdxOfClosest returns the index of the closest individual from a slice of
+// individuals based on the Metric field of a DistanceMemoizer.
+func (indi Individual) IdxOfClosest(indis Individuals, dm DistanceMemoizer) (i int) {
+	var min = math.Inf(1)
+	for j, candidate := range indis {
+		var dist = dm.GetDistance(indi, candidate)
+		if dist < min {
+			min, i = dist, j
+		}
+	}
+	return i
 }
 
 // Individuals is a convenience type, methods that belong to an Individual can
 // be called declaratively.
 type Individuals []Individual
 
-// Copy returns the same exact same slice of individuals but with a different
+// Clone returns the same exact same slice of individuals but with a different
 // pointer.
-func (indis Individuals) Copy() Individuals {
-	var newIndis = make(Individuals, len(indis))
-	copy(newIndis, indis)
-	return newIndis
+func (indis Individuals) Clone(rng *rand.Rand) Individuals {
+	var clones = make(Individuals, len(indis))
+	for i, indi := range indis {
+		clones[i] = indi.Clone(rng)
+	}
+	return clones
 }
 
 // Generate a slice of n new individuals.
 func makeIndividuals(n int, gm GenomeMaker, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, n)
 	for i := range indis {
-		indis[i] = MakeIndividual(gm(rng))
+		indis[i] = MakeIndividual(gm(rng), rng)
 	}
 	return indis
 }
@@ -108,8 +129,8 @@ func (indis Individuals) SortByFitness() {
 	sort.Slice(indis, less)
 }
 
-// AreSortedByFitness checks if individuals are ascendingly sorted by fitness.
-func (indis Individuals) AreSortedByFitness() bool {
+// IsSortedByFitness checks if individuals are ascendingly sorted by fitness.
+func (indis Individuals) IsSortedByFitness() bool {
 	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
 	return sort.SliceIsSorted(indis, less)
 }
@@ -135,7 +156,7 @@ func (indis Individuals) getFitnesses() []float64 {
 
 // FitMin returns the best fitness of a slice of individuals.
 func (indis Individuals) FitMin() float64 {
-	if indis.AreSortedByFitness() {
+	if indis.IsSortedByFitness() {
 		return indis[0].Fitness
 	}
 	return minFloat64s(indis.getFitnesses())
@@ -143,7 +164,7 @@ func (indis Individuals) FitMin() float64 {
 
 // FitMax returns the best fitness of a slice of individuals.
 func (indis Individuals) FitMax() float64 {
-	if indis.AreSortedByFitness() {
+	if indis.IsSortedByFitness() {
 		return indis[len(indis)-1].Fitness
 	}
 	return maxFloat64s(indis.getFitnesses())

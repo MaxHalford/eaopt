@@ -2,6 +2,7 @@ package gago
 
 import (
 	"log"
+	"math"
 	"math/rand"
 	"os"
 )
@@ -9,10 +10,8 @@ import (
 var (
 	ga = GA{
 		MakeGenome: MakeVector,
-		Topology: Topology{
-			NPopulations: 2,
-			NIndividuals: 50,
-		},
+		NPops:      2,
+		PopSize:    50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NParticipants: 3,
@@ -67,3 +66,20 @@ func (X Vector) Len() int {
 func MakeVector(rng *rand.Rand) Genome {
 	return Vector(InitUnifFloat64(4, -10, 10, rng))
 }
+
+// Minkowski distance with p = 1
+func l1Distance(x1, x2 Individual) (dist float64) {
+	var g1 = x1.Genome.(Vector)
+	var g2 = x2.Genome.(Vector)
+	for i := range g1 {
+		dist += math.Abs(g1[i] - g2[i])
+	}
+	return
+}
+
+// Identity model
+
+type ModIdentity struct{}
+
+func (mod ModIdentity) Apply(pop *Population) {}
+func (mod ModIdentity) Validate() error       { return nil }
