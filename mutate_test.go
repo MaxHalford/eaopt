@@ -94,6 +94,22 @@ func TestMutUniformString(t *testing.T) {
 	}
 }
 
+func TestMutPermuteSingleGene(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		genome = []int{42}
+	)
+	MutPermuteInt(genome, 1, rng)
+	// Check the length of the mutated genome
+	if len(genome) != 1 {
+		t.Error("Mutated genome has the wrong length")
+	}
+	// Check the value of the mutated genome
+	for genome[0] != 42 {
+		t.Error("Mutated genome has the wrong value")
+	}
+}
+
 func TestMutPermuteInt(t *testing.T) {
 	var (
 		rng     = makeRandomNumberGenerator()

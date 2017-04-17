@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestDeepCopyIndividual(t *testing.T) {
+func TestCloneIndividual(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		genome = MakeVector(rng)
@@ -67,6 +67,21 @@ func TestMakeIndividuals(t *testing.T) {
 		var indis = makeIndividuals(n, MakeVector, rng)
 		if len(indis) != n {
 			t.Error("makeIndividuals didn't generate the right number of individuals")
+		}
+	}
+}
+
+func TestCloneIndividuals(t *testing.T) {
+	var (
+		rng    = makeRandomNumberGenerator()
+		indis  = makeIndividuals(20, MakeVector, rng)
+		clones = indis.Clone(rng)
+	)
+	for _, indi := range indis {
+		for _, clone := range clones {
+			if &indi == &clone || indi.ID == clone.ID {
+				t.Error("Cloning did not work as expected")
+			}
 		}
 	}
 }

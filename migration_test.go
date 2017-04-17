@@ -39,3 +39,15 @@ func TestMigSizes(t *testing.T) {
 		}
 	}
 }
+
+func TestMigRingValidate(t *testing.T) {
+	var mig = MigRing{1}
+	if err := mig.Validate(); err != nil {
+		t.Error("Validation should not have raised error")
+	}
+	// Set NMigrants lower than 1
+	mig.NMigrants = 0
+	if err := mig.Validate(); err == nil {
+		t.Error("Validation should raised error")
+	}
+}
