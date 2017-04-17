@@ -83,3 +83,8 @@ Talking about parallelism, there is a reason why the populations are run in para
 - The documentation is built with [mkdocs](https://mkdocs.readthedocs.io).
 - Each page has an associated markdown file in the `docs/` folder.
 - You can `mkdocs serve` to enable live editing of the documentation.
+
+## Performance
+
+1. `go test -bench . -cpuprofile=cpu.prof`
+2. `go tool pprof main.test cpu.prof or `go-torch main.test cpu.prof`
