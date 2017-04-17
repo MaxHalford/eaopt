@@ -107,7 +107,7 @@ type SpecFitnessInterval struct {
 }
 
 // Apply SpecFitnessInterval.
-func (spec SpecFitnessInterval) Apply(indis Individuals) []Individuals {
+func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) []Individuals {
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)
