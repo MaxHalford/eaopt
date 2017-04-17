@@ -88,8 +88,8 @@ func (indi Individual) IdxOfClosest(indis Individuals, dm DistanceMemoizer) (i i
 // be called declaratively.
 type Individuals []Individual
 
-// Clone returns the same exact same slice of individuals but with a different
-// pointer.
+// Clone returns the same exact same slice of individuals but with different
+// pointers and ID fields.
 func (indis Individuals) Clone(rng *rand.Rand) Individuals {
 	var clones = make(Individuals, len(indis))
 	for i, indi := range indis {

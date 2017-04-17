@@ -2,19 +2,22 @@ package gago
 
 import "testing"
 
-func TestFindIndex(t *testing.T) {
+func TestSearch(t *testing.T) {
 	var s = StringSlice{"イ", "ー", "ス", "タ", "ー"}
 	if i, err := search("イ", s); i != 0 || err != nil {
-		t.Error("Problem with search")
+		t.Error("Problem with search 1")
 	}
 	if i, err := search("ー", s); i != 1 || err != nil {
-		t.Error("Problem with search")
+		t.Error("Problem with search 2")
 	}
 	if i, err := search("ス", s); i != 2 || err != nil {
-		t.Error("Problem with search")
+		t.Error("Problem with search 3")
 	}
 	if i, err := search("タ", s); i != 3 || err != nil {
-		t.Error("Problem with search")
+		t.Error("Problem with search 4")
+	}
+	if _, err := search("|", s); err == nil {
+		t.Error("Problem with search 5")
 	}
 }
 

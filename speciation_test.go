@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestSpecKMedoids(t *testing.T) {
+func TestSpecKMedoidsApply(t *testing.T) {
 	// Example dataset from https://www.wikiwand.com/en/K-medoids
 	var (
 		rng = makeRandomNumberGenerator()
@@ -36,7 +36,31 @@ func TestSpecKMedoids(t *testing.T) {
 	}
 }
 
-func TestSpecFitnessInterval(t *testing.T) {
+func TestSpecKMedoidsValidate(t *testing.T) {
+	var spec = SpecKMedoids{2, l1Distance, 1}
+	if err := spec.Validate(); err != nil {
+		t.Error("Validation should not have raised error")
+	}
+	// Set K lower than 2
+	spec.K = 1
+	if err := spec.Validate(); err == nil {
+		t.Error("Validation should have raised error")
+	}
+	spec.K = 2
+	// Nullify Metric
+	spec.Metric = nil
+	if err := spec.Validate(); err == nil {
+		t.Error("Validation should have raised error")
+	}
+	spec.Metric = l1Distance
+	// Set MaxIterations lower than 1
+	spec.MaxIterations = 0
+	if err := spec.Validate(); err == nil {
+		t.Error("Validation should have raised error")
+	}
+}
+
+func TestSpecFitnessIntervalApply(t *testing.T) {
 	var (
 		nIndividuals = []int{1, 2, 3}
 		nSpecies     = []int{1, 2, 3}
@@ -65,26 +89,14 @@ func TestSpecFitnessInterval(t *testing.T) {
 	}
 }
 
-// func TestSpeciationMergeIndividuals(t *testing.T) {
-// 	var (
-// 		nbrIndividuals = []int{1, 2, 3}
-// 		nbrClusters    = []int{1, 2, 3}
-// 		rng            = makeRandomNumberGenerator()
-// 	)
-// 	for _, nbi := range nbrIndividuals {
-// 		for _, nbc := range nbrClusters {
-// 			var species = make(Populations, nbc)
-// 			// Fill the species with individuals
-// 			for i := 0; i < nbc; i++ {
-// 				species[i] = Population{
-// 					Individuals: makeIndividuals(nbi, MakeVector, rng),
-// 				}
-// 			}
-// 			var indis = species.mergeIndividuals()
-// 			// Check the species of individuals
-// 			if len(indis) != nbi*nbc {
-// 				t.Error("Merge didn't work properly")
-// 			}
-// 		}
-// 	}
-// }
+func TestSpecFitnessIntervalValidate(t *testing.T) {
+	var spec = SpecFitnessInterval{2}
+	if err := spec.Validate(); err != nil {
+		t.Error("Validation should not have raised error")
+	}
+	// Set K lower than 2
+	spec.K = 1
+	if err := spec.Validate(); err == nil {
+		t.Error("Validation should have raised error")
+	}
+}

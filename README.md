@@ -117,10 +117,10 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
     return Vector(o1), Vector(o2)
 }
 
-// MakeVector returns a random vector by generating 5 values uniformally
+// MakeVector returns a random vector by generating 2 values uniformally
 // distributed between -10 and 10.
 func MakeVector(rng *rand.Rand) gago.Genome {
-    return Vector(gago.InitUnifFloat64(4, -10, 10, rng))
+    return Vector(gago.InitUnifFloat64(2, -10, 10, rng))
 }
 
 func main() {
@@ -137,16 +137,16 @@ func main() {
 ```
 
 ```sh
->>> Best fitness at generation 0: -0.119248
->>> Best fitness at generation 1: -0.286210
->>> Best fitness at generation 2: -0.286210
->>> Best fitness at generation 3: -0.513424
->>> Best fitness at generation 4: -0.513424
->>> Best fitness at generation 5: -0.821705
->>> Best fitness at generation 6: -0.980396
->>> Best fitness at generation 7: -0.999257
->>> Best fitness at generation 8: -0.999257
->>> Best fitness at generation 9: -0.999257
+>>> Best fitness at generation 0: -0.550982
+>>> Best fitness at generation 1: -0.924220
+>>> Best fitness at generation 2: -0.987282
+>>> Best fitness at generation 3: -0.987282
+>>> Best fitness at generation 4: -0.987282
+>>> Best fitness at generation 5: -0.987282
+>>> Best fitness at generation 6: -0.987282
+>>> Best fitness at generation 7: -0.997961
+>>> Best fitness at generation 8: -0.999954
+>>> Best fitness at generation 9: -0.999995
 ```
 
 **More examples**
