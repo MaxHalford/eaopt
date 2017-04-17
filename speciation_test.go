@@ -72,7 +72,7 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 				m       = min(int(math.Ceil(float64(nbi/nbs))), nbi)
 				indis   = makeIndividuals(nbi, MakeVector, rng)
 				spec    = SpecFitnessInterval{K: nbs}
-				species = spec.Apply(indis)
+				species = spec.Apply(indis, rng)
 			)
 			// Check the cluster sizes are equal to min(n-i, m) where i is a
 			// multiple of m
