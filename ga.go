@@ -166,15 +166,15 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
 			Individuals: specie,
 			Age:         pop.Age,
 			Generations: pop.Generations,
-			ID:          randString(3, pop.rng),
+			ID:          randString(len(pop.ID), pop.rng),
 			rng:         pop.rng,
 		}
 		model.Apply(&pops[i])
 	}
 	// Merge each species back into the original population
 	var i int
-	for _, pop := range pops {
-		copy(pop.Individuals[i:i+len(pop.Individuals)], pop.Individuals)
-		i += len(pop.Individuals)
+	for _, subpop := range pops {
+		copy(pop.Individuals[i:i+len(subpop.Individuals)], subpop.Individuals)
+		i += len(subpop.Individuals)
 	}
 }

@@ -61,14 +61,26 @@ func TestValidationModel(t *testing.T) {
 }
 
 func TestValidationMigFrequency(t *testing.T) {
-	var migFrequency = ga.MigFrequency
+	var (
+		migrator     = ga.Migrator
+		migFrequency = ga.MigFrequency
+	)
 	ga.Migrator = MigRing{}
 	ga.MigFrequency = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid MigFrequency should return an error")
 	}
-	ga.Migrator = nil
+	ga.Migrator = migrator
 	ga.MigFrequency = migFrequency
+}
+
+func TestValidationSpeciator(t *testing.T) {
+	var speciator = ga.Speciator
+	ga.Speciator = SpecFitnessInterval{0}
+	if ga.Validate() == nil {
+		t.Error("Invalid Speciator should return an error")
+	}
+	ga.Speciator = speciator
 }
 
 func TestRandomNumberGenerators(t *testing.T) {
@@ -128,8 +140,18 @@ func TestDuration(t *testing.T) {
 	}
 }
 
-func BenchmarkEnhance(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		ga.Enhance()
+func TestSpeciateEvolveMerge(t *testing.T) {
+	var (
+		rng = makeRandomNumberGenerator()
+		pop = Population{ID: "42", rng: rng, Individuals: Individuals{}}
+	)
+	for i := 0; i < 7; i++ {
+		pop.Individuals = append(pop.Individuals, Individual{Fitness: float64(i)})
+	}
+	pop.speciateEvolveMerge(SpecFitnessInterval{3}, ModIdentity{})
+	for i := 0; i < 7; i++ {
+		if pop.Individuals[i].Fitness != float64(i) {
+			t.Error("speciateEvolveMerge did not work as expected")
+		}
 	}
 }
