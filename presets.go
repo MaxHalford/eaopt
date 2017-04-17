@@ -4,10 +4,8 @@ package gago
 func Generational(MakeGenome GenomeMaker) GA {
 	return GA{
 		MakeGenome: MakeGenome,
-		Topology: Topology{
-			NPopulations: 2,
-			NIndividuals: 50,
-		},
+		NPops:      2,
+		PopSize:    50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NParticipants: 3,
@@ -22,10 +20,8 @@ func Generational(MakeGenome GenomeMaker) GA {
 func SimulatedAnnealing(MakeGenome GenomeMaker) GA {
 	return GA{
 		MakeGenome: MakeGenome,
-		Topology: Topology{
-			NPopulations: 1,
-			NIndividuals: 1,
-		},
+		NPops:      1,
+		PopSize:    1,
 		Model: ModSimAnn{
 			T:     100,  // Starting temperature
 			Tmin:  1,    // Stopping temperature
@@ -39,10 +35,8 @@ func SimulatedAnnealing(MakeGenome GenomeMaker) GA {
 func HillClimbing(MakeGenome GenomeMaker) GA {
 	return GA{
 		MakeGenome: MakeGenome,
-		Topology: Topology{
-			NPopulations: 1,
-			NIndividuals: 1,
-		},
+		NPops:      1,
+		PopSize:    1,
 		Model: ModMutationOnly{
 			NChosen:  1,
 			Selector: SelElitism{},

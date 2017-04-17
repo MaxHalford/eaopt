@@ -23,30 +23,21 @@ func TestValidationGenomeMaker(t *testing.T) {
 }
 
 func TestValidationNPopulations(t *testing.T) {
-	var nbrPopulations = ga.Topology.NPopulations
-	ga.Topology.NPopulations = -1
+	var nPops = ga.NPops
+	ga.NPops = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of Populations should return an error")
 	}
-	ga.Topology.NPopulations = nbrPopulations
-}
-
-func TestValidationNSpecies(t *testing.T) {
-	var nbrClusters = ga.Topology.NSpecies
-	ga.Topology.NSpecies = -1
-	if ga.Validate() == nil {
-		t.Error("Invalid number of Clusters should return an error")
-	}
-	ga.Topology.NSpecies = nbrClusters
+	ga.NPops = nPops
 }
 
 func TestValidationNIndividuals(t *testing.T) {
-	var nbrIndividuals = ga.Topology.NIndividuals
-	ga.Topology.NIndividuals = -1
+	var popSize = ga.PopSize
+	ga.PopSize = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of Individuals should return an error")
 	}
-	ga.Topology.NIndividuals = nbrIndividuals
+	ga.PopSize = popSize
 }
 
 func TestValidationModel(t *testing.T) {

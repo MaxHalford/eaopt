@@ -8,35 +8,16 @@ import (
 	"time"
 )
 
-// A Topology holds all the information relative to the size of a GA.
-type Topology struct {
-	NPopulations int // Number of populations
-	NSpecies     int // Number of species each population is split into
-	NIndividuals int // Initial number of individuals in each population
-}
-
-// Validate the properties of a Topology.
-func (topo Topology) Validate() error {
-	if topo.NPopulations < 1 {
-		return errors.New("'NPopulations' should be higher or equal to 1")
-	}
-	if topo.NSpecies < 0 {
-		return errors.New("'NSpecies' should be higher or equal to 1 if provided")
-	}
-	if topo.NIndividuals < 1 {
-		return errors.New("'NIndividuals' should be higher or equal to 1")
-	}
-	return nil
-}
-
 // A GA contains population which themselves contain individuals.
 type GA struct {
 	// Fields that are provided by the user
 	MakeGenome   GenomeMaker
-	Topology     Topology
+	NPops        int
+	PopSize      int
 	Model        Model
 	Migrator     Migrator
 	MigFrequency int // Frequency at which migrations occur
+	Speciator    Speciator
 	Logger       *log.Logger
 
 	// Fields that are generated at runtime
@@ -52,25 +33,34 @@ type GA struct {
 func (ga GA) Validate() error {
 	// Check the GenomeMaker presence
 	if ga.MakeGenome == nil {
-		return errors.New("'GenomeMaker' cannot be nil")
+		return errors.New("GenomeMaker cannot be nil")
 	}
-	// Check the topology is valid
-	var topoErr = ga.Topology.Validate()
-	if topoErr != nil {
-		return topoErr
+	// Check the number of populations is higher than 0
+	if ga.NPops < 1 {
+		return errors.New("NPops should be higher than 0")
+	}
+	// Check the number of individuals per population is higher than 0
+	if ga.PopSize < 1 {
+		return errors.New("PopSize should be higher than 0")
 	}
 	// Check the model presence
 	if ga.Model == nil {
-		return errors.New("'Model' cannot be nil")
+		return errors.New("Model cannot be nil")
 	}
 	// Check the model is valid
 	var modelErr = ga.Model.Validate()
 	if modelErr != nil {
 		return modelErr
 	}
-	// Check the migration frequency in the presence of a migrator
+	// Check the migration frequency if a Migrator has been provided
 	if ga.Migrator != nil && ga.MigFrequency < 1 {
-		return errors.New("'MigFrequency' should be strictly higher than 0")
+		return errors.New("MigFrequency should be strictly higher than 0")
+	}
+	// Check the speciator is valid if it has been provided
+	if ga.Speciator != nil {
+		if specErr := ga.Speciator.Validate(); specErr != nil {
+			return specErr
+		}
 	}
 	// No error
 	return nil
@@ -93,7 +83,7 @@ func (ga *GA) findBest() {
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
-	ga.Populations = make([]Population, ga.Topology.NPopulations)
+	ga.Populations = make([]Population, ga.NPops)
 	ga.rng = makeRandomNumberGenerator()
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
@@ -101,10 +91,14 @@ func (ga *GA) Initialize() {
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(ga.Topology.NIndividuals, ga.MakeGenome, j)
-			// Evaluate it's individuals
+			ga.Populations[j] = makePopulation(
+				ga.PopSize,
+				ga.MakeGenome,
+				randString(3, ga.rng),
+			)
+			// Evaluate its individuals
 			ga.Populations[j].Individuals.Evaluate()
-			// Sort it's individuals
+			// Sort its individuals
 			ga.Populations[j].Individuals.SortByFitness()
 			// Log current statistics if a logger has been provided
 			if ga.Logger != nil {
@@ -114,7 +108,8 @@ func (ga *GA) Initialize() {
 	}
 	wg.Wait()
 	// The initial best individual is initialized randomly
-	ga.Best = MakeIndividual(ga.MakeGenome(makeRandomNumberGenerator()))
+	var rng = makeRandomNumberGenerator()
+	ga.Best = MakeIndividual(ga.MakeGenome(rng), rng)
 	ga.findBest()
 }
 
@@ -127,7 +122,7 @@ func (ga *GA) Enhance() {
 	// Migrate the individuals between the populations if there are enough
 	// populations, there is a migrator and the migration frequency divides the
 	// generation count
-	if ga.Topology.NPopulations > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
+	if len(ga.Populations) > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations, ga.rng)
 	}
 	// Use a wait group to enhance the populations in parallel
@@ -137,14 +132,8 @@ func (ga *GA) Enhance() {
 		go func(j int) {
 			defer wg.Done()
 			// Apply speciation if a positive number of species has been speficied
-			if ga.Topology.NSpecies > 0 {
-				var species = ga.Populations[j].speciate(ga.Topology.NSpecies)
-				// Apply the evolution model to each cluster
-				for k := range species {
-					ga.Model.Apply(&species[k])
-				}
-				// Merge each cluster back into the original population
-				ga.Populations[j].Individuals = species.merge()
+			if ga.Speciator != nil {
+				ga.Populations[j].speciateEvolveMerge(ga.Speciator, ga.Model)
 			} else {
 				// Else apply the evolution model to the entire population
 				ga.Model.Apply(&ga.Populations[j])
@@ -164,4 +153,28 @@ func (ga *GA) Enhance() {
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
 	ga.Age += time.Since(start)
+}
+
+func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
+	var (
+		species = spec.Apply(pop.Individuals, pop.rng)
+		pops    = make([]Population, len(species))
+	)
+	// Create a slice of population from the obtained species and evolve each one separately
+	for i, specie := range species {
+		pops[i] = Population{
+			Individuals: specie,
+			Age:         pop.Age,
+			Generations: pop.Generations,
+			ID:          randString(3, pop.rng),
+			rng:         pop.rng,
+		}
+		model.Apply(&pops[i])
+	}
+	// Merge each species back into the original population
+	var i int
+	for _, pop := range pops {
+		copy(pop.Individuals[i:i+len(pop.Individuals)], pop.Individuals)
+		i += len(pop.Individuals)
+	}
 }
