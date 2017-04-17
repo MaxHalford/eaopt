@@ -1,11 +1,15 @@
 package gago
 
-import "math/rand"
+import (
+	"errors"
+	"math/rand"
+)
 
 // Migrator applies crossover to the GA level, as such it doesn't
 // require an independent random number generator and can use the global one.
 type Migrator interface {
 	Apply(pops Populations, rng *rand.Rand)
+	Validate() error
 }
 
 // MigRing migration exchanges individuals between consecutive Populations in a
@@ -24,4 +28,12 @@ func (mig MigRing) Apply(pops Populations, rng *rand.Rand) {
 			pops[i].Individuals[k], pops[i+1].Individuals[k] = pops[i+1].Individuals[k], pops[i].Individuals[k]
 		}
 	}
+}
+
+// Validate MigRing fields.
+func (mig MigRing) Validate() error {
+	if mig.NMigrants < 1 {
+		return errors.New("NMigrants should be higher than 0")
+	}
+	return nil
 }

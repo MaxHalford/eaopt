@@ -13,16 +13,16 @@ type Population struct {
 	Individuals Individuals
 	Age         time.Duration
 	Generations int
-	ID          int
+	ID          string
 	rng         *rand.Rand
 }
 
 // Generate a new population.
-func makePopulation(nbrIndis int, gm GenomeMaker, id int) Population {
+func makePopulation(nIndis int, gm GenomeMaker, id string) Population {
 	var (
 		rng = makeRandomNumberGenerator()
 		pop = Population{
-			Individuals: makeIndividuals(nbrIndis, gm, rng),
+			Individuals: makeIndividuals(nIndis, gm, rng),
 			ID:          id,
 			rng:         rng,
 		}
@@ -33,7 +33,7 @@ func makePopulation(nbrIndis int, gm GenomeMaker, id int) Population {
 // Log a Population's current statistics with a provided log.Logger.
 func (pop Population) Log(logger *log.Logger) {
 	logger.Printf(
-		"id=%d min=%f max=%f avg=%f std=%f",
+		"id=%s min=%f max=%f avg=%f std=%f",
 		pop.ID,
 		pop.Individuals.FitMin(),
 		pop.Individuals.FitMax(),

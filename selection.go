@@ -25,7 +25,7 @@ func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individua
 	return indis[:n], indexes
 }
 
-// Validate elitism selection parameters.
+// Validate SelElitism fields.
 func (sel SelElitism) Validate() error {
 	return nil
 }
@@ -53,7 +53,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 	return selected, indexes
 }
 
-// Validate tournament selection parameters.
+// Validate SelTournament fields.
 func (sel SelTournament) Validate() error {
 	if sel.NParticipants < 1 {
 		return errors.New("NParticipants should be higher than 0")
@@ -94,7 +94,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 	return selected, indexes
 }
 
-// Validate roulette wheel selection parameters.
+// Validate SelRoulette fields.
 func (sel SelRoulette) Validate() error {
 	return nil
 }

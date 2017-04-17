@@ -8,9 +8,10 @@ import (
 
 func TestDeepCopyIndividual(t *testing.T) {
 	var (
-		genome = MakeVector(makeRandomNumberGenerator())
-		indi1  = MakeIndividual(genome)
-		indi2  = indi1.Clone()
+		rng    = makeRandomNumberGenerator()
+		genome = MakeVector(rng)
+		indi1  = MakeIndividual(genome, rng)
+		indi2  = indi1.Clone(rng)
 	)
 	if &indi1 == &indi2 || &indi1.Genome == &indi2.Genome {
 		t.Error("Individual was not deep copied")
@@ -19,8 +20,9 @@ func TestDeepCopyIndividual(t *testing.T) {
 
 func TestEvaluateIndividual(t *testing.T) {
 	var (
-		genome = MakeVector(makeRandomNumberGenerator())
-		indi   = MakeIndividual(genome)
+		rng    = makeRandomNumberGenerator()
+		genome = MakeVector(rng)
+		indi   = MakeIndividual(genome, rng)
 	)
 	if indi.Evaluated {
 		t.Error("Individual shouldn't have Evaluated set to True")
@@ -35,7 +37,7 @@ func TestMutateIndividual(t *testing.T) {
 	var (
 		rng    = makeRandomNumberGenerator()
 		genome = MakeVector(rng)
-		indi   = MakeIndividual(genome)
+		indi   = MakeIndividual(genome, rng)
 	)
 	indi.Evaluate()
 	indi.Mutate(rng)
@@ -47,8 +49,8 @@ func TestMutateIndividual(t *testing.T) {
 func TestCrossoverIndividual(t *testing.T) {
 	var (
 		rng                    = makeRandomNumberGenerator()
-		indi1                  = MakeIndividual(MakeVector(rng))
-		indi2                  = MakeIndividual(MakeVector(rng))
+		indi1                  = MakeIndividual(MakeVector(rng), rng)
+		indi2                  = MakeIndividual(MakeVector(rng), rng)
 		offspring1, offspring2 = indi1.Crossover(indi2, rng)
 	)
 	if offspring1.Evaluated || offspring2.Evaluated {
@@ -152,9 +154,9 @@ func TestIndividualsSample(t *testing.T) {
 func TestGetFitnesses(t *testing.T) {
 	var (
 		indis = Individuals{
-			Individual{nil, 0.0, false},
-			Individual{nil, 1.0, false},
-			Individual{nil, 2.0, false},
+			Individual{Fitness: 0.0},
+			Individual{Fitness: 1.0},
+			Individual{Fitness: 2.0},
 		}
 		target    = []float64{0.0, 1.0, 2.0}
 		fitnesses = indis.getFitnesses()
@@ -172,15 +174,15 @@ func TestFitMin(t *testing.T) {
 		min   float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 1.0},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 2.0, false},
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 2.0},
+			Individual{Fitness: 1.0},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false},
-			Individual{nil, -1.0, false},
+			Individual{Fitness: 1.0},
+			Individual{Fitness: -1.0},
 		}, -1.0},
 	}
 	for _, test := range testCases {
@@ -196,15 +198,15 @@ func TestFitMax(t *testing.T) {
 		max   float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 1.0},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 2.0, false},
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 2.0},
+			Individual{Fitness: 1.0},
 		}, 2.0},
 		{Individuals{
-			Individual{nil, 1.0, false},
-			Individual{nil, -1.0, false},
+			Individual{Fitness: 1.0},
+			Individual{Fitness: -1.0},
 		}, 1.0},
 	}
 	for _, test := range testCases {
@@ -220,15 +222,15 @@ func TestFitAvg(t *testing.T) {
 		mean  float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 1.0},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, 1.0, false},
-			Individual{nil, 2.0, false},
+			Individual{Fitness: 1.0},
+			Individual{Fitness: 2.0},
 		}, 1.5},
 		{Individuals{
-			Individual{nil, -1.0, false},
-			Individual{nil, 1.0, false},
+			Individual{Fitness: -1.0},
+			Individual{Fitness: 1.0},
 		}, 0.0},
 	}
 	for _, test := range testCases {
@@ -244,15 +246,15 @@ func TestFitStd(t *testing.T) {
 		variance float64
 	}{
 		{Individuals{
-			Individual{nil, 1.0, false},
+			Individual{Fitness: 1.0},
 		}, 0.0},
 		{Individuals{
-			Individual{nil, -1.0, false},
-			Individual{nil, 1.0, false},
+			Individual{Fitness: -1.0},
+			Individual{Fitness: 1.0},
 		}, 1.0},
 		{Individuals{
-			Individual{nil, -2.0, false},
-			Individual{nil, 2.0, false},
+			Individual{Fitness: -2.0},
+			Individual{Fitness: 2.0},
 		}, 4.0},
 	}
 	for _, test := range testCases {
