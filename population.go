@@ -10,10 +10,10 @@ import (
 // Individuals can migrate from one population to another. Each population has a
 // random number generator to bypass the global rand mutex.
 type Population struct {
-	Individuals Individuals
-	Age         time.Duration
-	Generations int
-	ID          string
+	Individuals Individuals   `json:"indis"`
+	Age         time.Duration `json:"age"`
+	Generations int           `json:"generations"`
+	ID          string        `json:"id"`
 	rng         *rand.Rand
 }
 
