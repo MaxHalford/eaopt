@@ -1,13 +1,10 @@
 ## Ideas
 
 - Add more example usage
-- Add a way to compare individuals based on their genome to improve speciation
 - Make it easier to test models. Also make sure they work as expected.
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
-- Implement and order mutation operators
 - Consider using memetic algorithms for local optimization (not well said). For example make it possible to use hill climbing
 - Add population and species pointers for individuals
-- Implement Partitioning Around Medoids (PAM) for speciating
 - Implement Particle Swarm Optimization
 - List available operators/models
 - http://deap.readthedocs.io/en/master/
