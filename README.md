@@ -154,7 +154,7 @@ func main() {
 
 **More examples**
 
-- [Cross-in-Tray](examples/cross_in_tray/)
+- [Cross-in-Tray (speciation)](examples/cross_in_tray/)
 - [Grid TSP](examples/tsp_grid/main.go)
 - [One Max problem](examples/one_max/main.go)
 - [N-queens problem](examples/string_matching/)
