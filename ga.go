@@ -11,20 +11,20 @@ import (
 // A GA contains population which themselves contain individuals.
 type GA struct {
 	// Fields that are provided by the user
-	MakeGenome   GenomeMaker
-	NPops        int
-	PopSize      int
-	Model        Model
-	Migrator     Migrator
-	MigFrequency int // Frequency at which migrations occur
-	Speciator    Speciator
-	Logger       *log.Logger
+	MakeGenome   GenomeMaker `json:"-"`
+	NPops        int         `json:"-"`
+	PopSize      int         `json:"-"`
+	Model        Model       `json:"-"`
+	Migrator     Migrator    `json:"-"`
+	MigFrequency int         `json:"-"` // Frequency at which migrations occur
+	Speciator    Speciator   `json:"-"`
+	Logger       *log.Logger `json:"-"`
 
 	// Fields that are generated at runtime
-	Populations Populations
-	Best        Individual // Overall best individual (dummy initialization at the beginning)
-	Age         time.Duration
-	Generations int
+	Populations Populations   `json:"pops"`
+	Best        Individual    `json:"best"` // Overall best individual
+	Age         time.Duration `json:"duration"`
+	Generations int           `json:"generations"`
 	rng         *rand.Rand
 }
 

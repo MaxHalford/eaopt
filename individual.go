@@ -19,10 +19,10 @@ type GenomeMaker func(rng *rand.Rand) Genome
 
 // An Individual wraps a Genome and contains the fitness assigned to the Genome.
 type Individual struct {
-	Genome    Genome
-	Fitness   float64
-	Evaluated bool
-	ID        string
+	Genome    Genome  `json:"genome"`
+	Fitness   float64 `json:"fitness"`
+	Evaluated bool    `json:"-"`
+	ID        string  `json:"id"`
 }
 
 // MakeIndividual returns a fresh individual.
