@@ -2,7 +2,6 @@ package gago
 
 import (
 	"math"
-	"reflect"
 	"testing"
 )
 
@@ -132,36 +131,41 @@ func TestIndividualsSortByFitness(t *testing.T) {
 
 func TestIndividualsSample(t *testing.T) {
 	var (
-		rng        = makeRandomNumberGenerator()
-		indis      = makeIndividuals(10, MakeVector, rng)
-		sampleSize = 3
-		sample, _  = indis.sample(sampleSize, rng)
+		rng         = makeRandomNumberGenerator()
+		nIndis      = 10
+		indis       = makeIndividuals(nIndis, MakeVector, rng)
+		sampleSizes = []int{0, 1, nIndis - 1, nIndis, nIndis + 1}
 	)
-	if len(sample) != sampleSize {
-		t.Error("Wrong sample size")
-	}
-	// Check the sampled individuals come from the original population
-	for _, a := range sample {
-		var exists = false
-		for _, b := range indis {
-			if reflect.DeepEqual(a, b) {
-				exists = true
+	for _, sampleSize := range sampleSizes {
+		var sample, _ = indis.sample(sampleSize, rng)
+		if len(sample) != min(sampleSize, nIndis) {
+			t.Error("Wrong sample size")
+		}
+		// Check the sampled individuals come from the original population
+		for _, a := range sample {
+			var exists = false
+			for _, b := range indis {
+				if a.ID == b.ID {
+					exists = true
+					break
+				}
+			}
+			if exists == false {
+				t.Error("Sampled individuals should come from the original population")
 			}
 		}
-		if exists == false {
-			t.Error("Sampled individuals should come from the original population")
-		}
-	}
-	// Check the sampled individuals have new references
-	for _, a := range sample {
-		var referenced = false
-		for _, b := range indis {
-			if &a == &b {
-				referenced = true
+		// Check the sampled individuals have new references
+		for _, a := range sample {
+			var referenced = false
+			for _, b := range indis {
+				if &a == &b {
+					referenced = true
+					break
+				}
 			}
-		}
-		if referenced == true {
-			t.Error("Sampled individuals shouln't share pointers with original population")
+			if referenced == true {
+				t.Error("Sampled individuals shouln't share pointers with original population")
+			}
 		}
 	}
 }

@@ -79,7 +79,10 @@
 
 The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1.
 
-![drop_wave](examples/drop_wave/chart.png)
+<div align="center">
+  <img src="examples/drop_wave/chart.png" alt="drop_wave_chart" />
+  <img src="examples/drop_wave/function.png" alt="drop_wave_function" />
+</div>
 
 ```go
 package main
@@ -151,9 +154,10 @@ func main() {
 
 **More examples**
 
+- [Cross-in-Tray](examples/cross_in_tray/)
 - [Grid TSP](examples/tsp_grid/main.go)
 - [One Max problem](examples/one_max/main.go)
-- [N-queens problem](examples/string_matching/main.go)
+- [N-queens problem](examples/string_matching/)
 - [String matching](examples/string_matching/main.go)
 
 ## Background
