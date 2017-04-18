@@ -12,7 +12,7 @@ import (
 type Vector []float64
 
 // Evaluate a Vector with the Drop-Wave function which takes two variables as
-// input and reaches a minimum of -1 in (0, 0).
+// input and reaches a minimum of -1 in X = (0, 0).
 func (X Vector) Evaluate() float64 {
 	var (
 		numerator   = 1 + m.Cos(12*m.Sqrt(m.Pow(X[0], 2)+m.Pow(X[1], 2)))

@@ -137,8 +137,18 @@ func (indis Individuals) IsSortedByFitness() bool {
 
 // Sample k unique individuals from a slice of n individuals.
 func (indis Individuals) sample(k int, rng *rand.Rand) (sample Individuals, indexes []int) {
-	indexes = randomInts(k, 0, len(indis), rng)
+	// No need to sample if there are less than k+1 individuals
+	if len(indis) <= k {
+		sample = make(Individuals, len(indis))
+		indexes = make([]int, len(indis))
+		for i, indi := range indis {
+			sample[i] = indi
+			indexes[i] = i
+		}
+		return
+	}
 	sample = make(Individuals, k)
+	indexes = randomInts(k, 0, len(indis), rng)
 	for i := 0; i < k; i++ {
 		sample[i] = indis[indexes[i]]
 	}
