@@ -69,7 +69,6 @@
     - [Speciation](#speciation)
     - [Presets](#presets)
     - [Logging population statistics](#logging-population-statistics)
-    - [POSTing population statistics](#posting-population-statistics)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Alternatives](#alternatives)
