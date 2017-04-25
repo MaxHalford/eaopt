@@ -160,10 +160,6 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
 		species = spec.Apply(pop.Individuals, pop.rng)
 		pops    = make([]Population, len(species))
 	)
-	// for _, spec := range species {
-	// 	fmt.Print(len(spec), " ")
-	// }
-	// fmt.Println("")
 	// Create a slice of population from the obtained species and evolve each one separately
 	for i, specie := range species {
 		pops[i] = Population{
