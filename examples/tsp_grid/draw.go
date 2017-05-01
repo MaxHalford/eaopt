@@ -33,6 +33,10 @@ func drawPath(p Path, generation int, distance float64) *image.Paletted {
 		dc.DrawLine(p[i].x, p[i].y, p[i+1].x, p[i+1].y)
 		dc.Stroke()
 	}
+	// Draw a circle at the starting point
+	dc.DrawPoint(p[0].x, p[0].y, 5)
+	dc.SetRGB(0.8, 0, 0)
+	dc.Stroke()
 	return imageToPaletted(dc.Image())
 }
 
@@ -44,6 +48,6 @@ func imageToPaletted(img image.Image) *image.Paletted {
 	palette = append(palette, color.RGBA{0xff, 0x00, 0x00, 0xff})
 	// Dithering
 	var pm = image.NewPaletted(img.Bounds(), palette)
-	draw.FloydSteinberg.Draw(pm, img.Bounds(), img, image.ZP)
+	draw.Draw(pm, img.Bounds(), img, image.ZP, draw.Src)
 	return pm
 }
