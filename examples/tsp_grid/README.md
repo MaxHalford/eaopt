@@ -4,4 +4,8 @@ Solving the TSP with a grid configuration is useful for benchmarking GAs. Indeed
 
 Running the code produces the following GIF, showing the progress of the best solution found by the GA through time.
 
-![evolution.gif](evolution.gif)
+<div align="center">
+  <img src="progress.gif" alt="progress" />
+</div>
+
+![progress.gif](progress.gif)

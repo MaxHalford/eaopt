@@ -12,5 +12,5 @@ I used [this blog post](https://jakevdp.github.io/blog/2012/08/18/matplotlib-ani
 Run `go run main.go && python plot_progress.py` in a terminal to get the following kind of animation.
 
 <div align="center">
-    <img src="progress.gif" alt="progress" />
+  <img src="progress.gif" alt="progress" />
 </div>

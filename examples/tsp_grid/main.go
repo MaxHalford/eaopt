@@ -14,7 +14,7 @@ const (
 	// GRIDSIZE determines the size of the grid, ie there will be GRIDSIZE^2 points
 	GRIDSIZE = 5
 	// GENERATIONS determines how many generations the GA will be run for
-	GENERATIONS = 500
+	GENERATIONS = 800
 )
 
 // A Point is defined with (x, y) coordinates.
@@ -25,22 +25,51 @@ type Point struct {
 // A Path is a slice of Points.
 type Path []Point
 
-// Convert a slice of Interfaces to a slice of Points.
-func castPoints(interfaces []interface{}) Path {
-	var path = make(Path, len(interfaces))
-	for i, v := range interfaces {
-		path[i] = v.(Point)
-	}
-	return path
+// At method from Slice
+func (p Path) At(i int) interface{} {
+	return p[i]
 }
 
-// Convert a slice of Points to a slice of interfaces.
-func uncastPoints(path Path) []interface{} {
-	var interfaces = make([]interface{}, len(path))
-	for i, v := range path {
-		interfaces[i] = v
-	}
-	return interfaces
+// Set method from Slice
+func (p Path) Set(i int, v interface{}) {
+	p[i] = v.(Point)
+}
+
+// Len method from Slice
+func (p Path) Len() int {
+	return len(p)
+}
+
+// Swap method from Slice
+func (p Path) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+// Slice method from Slice
+func (p Path) Slice(a, b int) gago.Slice {
+	return p[a:b]
+}
+
+// Split method from Slice
+func (p Path) Split(k int) (gago.Slice, gago.Slice) {
+	return p[:k], p[k:]
+}
+
+// Append method from Slice
+func (p Path) Append(q gago.Slice) gago.Slice {
+	return append(p, q.(Path)...)
+}
+
+// Replace method from Slice
+func (p Path) Replace(q gago.Slice) {
+	copy(p, q.(Path))
+}
+
+// Clone method from Slice
+func (p Path) Clone() gago.Slice {
+	var clone = make(Path, len(p))
+	copy(clone, p)
+	return clone
 }
 
 // Evaluate a Path by summing the consecutive Euclidean distances.
@@ -53,20 +82,18 @@ func (p Path) Evaluate() (distance float64) {
 
 // Mutate a Path by applying by permutation mutation and/or splice mutation.
 func (p Path) Mutate(rng *rand.Rand) {
-	var genome = uncastPoints(p)
 	if rng.Float64() < 0.35 {
-		gago.MutPermute(genome, 3, rng)
+		gago.MutPermute(p, 3, rng)
 	}
 	if rng.Float64() < 0.45 {
-		gago.MutSplice(genome, rng)
+		gago.MutSplice(p, rng)
 	}
-	copy(p, castPoints(genome))
 }
 
 // Crossover a Path with another Path by using Partially Mixed Crossover (PMX).
-func (p Path) Crossover(p1 gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-	var o1, o2 = gago.CrossPMX(uncastPoints(p), uncastPoints(p1.(Path)), rng)
-	return castPoints(o1), castPoints(o2)
+func (p Path) Crossover(q gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
+	var o1, o2 = gago.CrossPMX(p, q.(Path), rng)
+	return o1.(Path), o2.(Path)
 }
 
 // MakePath creates a slice of Points along a grid and then shuffles the slice.
@@ -109,7 +136,7 @@ func main() {
 	fmt.Printf("Optimal is %d\n", int(optimal))
 	fmt.Printf("Off by %f percent\n", 100*(ga.Best.Fitness-optimal)/optimal)
 	// Save to out.gif
-	var outFile, _ = os.OpenFile("evolution.gif", os.O_WRONLY|os.O_CREATE, 0600)
+	var outFile, _ = os.OpenFile("progress.gif", os.O_WRONLY|os.O_CREATE, 0600)
 	defer outFile.Close()
 	gif.EncodeAll(outFile, outGif)
 }
