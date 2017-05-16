@@ -248,7 +248,7 @@ type Slice interface {
 }
 ```
 
-Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go)).
+Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and [`examples/tsp_grid/main.go`](examples/tsp_grid/main.go)).
 
 
 ### Instantiating a GA struct
@@ -411,11 +411,6 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
     return X, Y.(Vector)
 }
 ```
-
-
-**Why are there type-specific slice crossover methods instead of a generic one?**
-
-Some crossover methods are generic because they are simply rearranging lists. Under the hood gago uses the `[]interface{}` to implement generic crossover methods. However the genomes are always typed and are not of type `[]interface{}`. The genomes have to converted to a `[]interface{}` and then back to their original type after crossover. For more information you can check out the [official advice](https://github.com/golang/go/wiki/InterfaceSlice) regarding generic slices and also look at the [casting.go file](casting.go).
 
 
 **Why isn't my `Mutate` method modifying my `Genome`?**
