@@ -79,8 +79,8 @@
 The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1.
 
 <div align="center">
-  <img src="examples/drop_wave/chart.png" alt="drop_wave_chart" />
-  <img src="examples/drop_wave/function.png" alt="drop_wave_function" />
+  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/chart.png" alt="drop_wave_chart" />
+  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/function.png" alt="drop_wave_function" />
 </div>
 
 ```go
@@ -153,11 +153,13 @@ func main() {
 
 **More examples**
 
-- [Cross-in-Tray (speciation)](examples/cross_in_tray/)
-- [Grid TSP](examples/tsp_grid/main.go)
-- [One Max problem](examples/one_max/main.go)
-- [N-queens problem](examples/string_matching/)
-- [String matching](examples/string_matching/main.go)
+There is a [separate repository](https://github.com/MaxHalford/gago-examples) containing examples.
+
+- [Cross-in-Tray (speciation)](https://github.com/MaxHalford/gago-examples/tree/master/cross_in_tray)
+- [Grid TSP](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid)
+- [One Max problem](https://github.com/MaxHalford/gago-examples/tree/master/one_max)
+- [N-queens problem](https://github.com/MaxHalford/gago-examples/tree/master/n_queens)
+- [String matching](https://github.com/MaxHalford/gago-examples/tree/master/string_matching)
 
 ## Background
 
@@ -248,7 +250,7 @@ type Slice interface {
 }
 ```
 
-Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and [`examples/tsp_grid/main.go`](examples/tsp_grid/main.go)).
+Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial - have a look at [`slice.go`](slice.go) and the [grid TSP example](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid).
 
 
 ### Instantiating a GA struct
@@ -437,7 +439,7 @@ func (n *Name) Mutate(rng *rand.Rand) {
 
 **When are genetic algorithms good to apply?**
 
-Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
+Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient - like the introductory example.
 
 As mentioned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in a neural network is an open problem that doesn't yet have a reliable solution. Neural networks architectures used in production are usually designed by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, usually by optimizing the network's topology.
 
