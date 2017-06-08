@@ -79,8 +79,8 @@
 The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1.
 
 <div align="center">
-  <img src="examples/drop_wave/chart.png" alt="drop_wave_chart" />
-  <img src="examples/drop_wave/function.png" alt="drop_wave_function" />
+  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/chart.png" alt="drop_wave_chart" />
+  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/function.png" alt="drop_wave_function" />
 </div>
 
 ```go
