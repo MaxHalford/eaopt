@@ -27,7 +27,7 @@ func search(v interface{}, s Slice) (int, error) {
 }
 
 // Make a lookup table from a slice, mapping values to indexes.
-func makeIndexLookup(s Slice) map[interface{}]int {
+func newIndexLookup(s Slice) map[interface{}]int {
 	var lookup = make(map[interface{}]int)
 	for i := 0; i < s.Len(); i++ {
 		lookup[s.At(i)] = i
@@ -39,8 +39,8 @@ func makeIndexLookup(s Slice) map[interface{}]int {
 // list of indexes indicating mirroring values between each slice.
 func getCycles(s1, s2 Slice) (cycles [][]int) {
 	var (
-		s1Lookup = makeIndexLookup(s1) // Matches values to indexes for quick lookup
-		visited  = make(map[int]bool)  // Indicates if an index is already in a cycle or not
+		s1Lookup = newIndexLookup(s1) // Matches values to indexes for quick lookup
+		visited  = make(map[int]bool) // Indicates if an index is already in a cycle or not
 	)
 	for i := 0; i < s1.Len(); i++ {
 		if !visited[i] {

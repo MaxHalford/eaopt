@@ -28,7 +28,7 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) []Individuals 
 		individuals = make(Individuals, len(indis))
 		species     = make([]Individuals, spec.K)
 		medoids     = make(Individuals, spec.K)
-		dm          = makeDistanceMemoizer(spec.Metric)
+		dm          = newDistanceMemoizer(spec.Metric)
 	)
 	// Make a copy of the provided individuals to avoid side effects
 	copy(individuals, indis)

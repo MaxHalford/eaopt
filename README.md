@@ -119,14 +119,14 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
     return Vector(o1), Vector(o2)
 }
 
-// MakeVector returns a random vector by generating 2 values uniformally
+// NewVector returns a random vector by generating 2 values uniformally
 // distributed between -10 and 10.
-func MakeVector(rng *rand.Rand) gago.Genome {
+func NewVector(rng *rand.Rand) gago.Genome {
     return Vector(gago.InitUnifFloat64(2, -10, 10, rng))
 }
 
 func main() {
-    var ga = gago.Generational(MakeVector)
+    var ga = gago.Generational(NewVector)
     ga.Initialize()
 
     fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
@@ -153,11 +153,11 @@ func main() {
 
 **More examples**
 
-- [Cross-in-Tray (speciation)](examples/cross_in_tray/)
-- [Grid TSP](examples/tsp_grid/main.go)
-- [One Max problem](examples/one_max/main.go)
-- [N-queens problem](examples/string_matching/)
-- [String matching](examples/string_matching/main.go)
+- [Cross-in-Tray (speciation)](https://github.com/MaxHalford/gago-examples/tree/master/cross_in_tray)
+- [Grid TSP](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid)
+- [One Max problem](https://github.com/MaxHalford/gago-examples/tree/master/one_max)
+- [N-queens problem](https://github.com/MaxHalford/gago-examples/tree/master/n_queens)
+- [String matching](https://github.com/MaxHalford/gago-examples/tree/master/string_matching)
 
 ## Background
 
@@ -258,7 +258,7 @@ Let's have a look at the GA struct.
 ```go
 type GA struct {
     // Fields that are provided by the user
-    MakeGenome   GenomeMaker
+    GenomeFactory   GenomeFactory
     NPops        int
     PopSize      int
     Model        Model
@@ -278,7 +278,7 @@ type GA struct {
 
 You have to fill in the first 5 fields, the rest are generated when calling the `GA`'s `Initialize()` method.
 
-- `MakeGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
+- `GenomeFactory` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
 - `NPops` determines the number of populations that will be used.
 - `PopSize` determines the number of individuals inside each population.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
@@ -286,7 +286,7 @@ You have to fill in the first 5 fields, the rest are generated when calling the 
 - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
 - `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
 
-Essentially, only `MakeGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
+Essentially, only `GenomeFactory`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
 
 
 ### Running a GA

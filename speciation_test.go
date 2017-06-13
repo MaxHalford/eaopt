@@ -8,18 +8,18 @@ import (
 func TestSpecKMedoidsApply(t *testing.T) {
 	// Example dataset from https://www.wikiwand.com/en/K-medoids
 	var (
-		rng = makeRandomNumberGenerator()
+		rng = newRandomNumberGenerator()
 		pop = Individuals{
-			MakeIndividual(Vector{2, 6}, rng),
-			MakeIndividual(Vector{3, 4}, rng),
-			MakeIndividual(Vector{3, 8}, rng),
-			MakeIndividual(Vector{4, 7}, rng),
-			MakeIndividual(Vector{6, 2}, rng),
-			MakeIndividual(Vector{6, 4}, rng),
-			MakeIndividual(Vector{7, 3}, rng),
-			MakeIndividual(Vector{7, 4}, rng),
-			MakeIndividual(Vector{8, 5}, rng),
-			MakeIndividual(Vector{7, 6}, rng),
+			NewIndividual(Vector{2, 6}, rng),
+			NewIndividual(Vector{3, 4}, rng),
+			NewIndividual(Vector{3, 8}, rng),
+			NewIndividual(Vector{4, 7}, rng),
+			NewIndividual(Vector{6, 2}, rng),
+			NewIndividual(Vector{6, 4}, rng),
+			NewIndividual(Vector{7, 3}, rng),
+			NewIndividual(Vector{7, 4}, rng),
+			NewIndividual(Vector{8, 5}, rng),
+			NewIndividual(Vector{7, 6}, rng),
 		}
 		species = SpecKMedoids{2, l1Distance, 10}.Apply(pop, rng)
 	)
@@ -64,13 +64,13 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 	var (
 		nIndividuals = []int{1, 2, 3}
 		nSpecies     = []int{1, 2, 3}
-		rng          = makeRandomNumberGenerator()
+		rng          = newRandomNumberGenerator()
 	)
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {
 			var (
 				m       = min(int(math.Ceil(float64(nbi/nbs))), nbi)
-				indis   = makeIndividuals(nbi, MakeVector, rng)
+				indis   = newIndividuals(nbi, NewVector, rng)
 				spec    = SpecFitnessInterval{K: nbs}
 				species = spec.Apply(indis, rng)
 			)

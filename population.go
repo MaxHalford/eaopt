@@ -18,11 +18,11 @@ type Population struct {
 }
 
 // Generate a new population.
-func makePopulation(nIndis int, gm GenomeMaker, id string) Population {
+func newPopulation(size int, gf GenomeFactory, id string) Population {
 	var (
-		rng = makeRandomNumberGenerator()
+		rng = newRandomNumberGenerator()
 		pop = Population{
-			Individuals: makeIndividuals(nIndis, gm, rng),
+			Individuals: newIndividuals(size, gf, rng),
 			ID:          id,
 			rng:         rng,
 		}

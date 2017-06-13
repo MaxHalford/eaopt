@@ -7,9 +7,9 @@ import (
 
 func TestCloneIndividual(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
-		genome = MakeVector(rng)
-		indi1  = MakeIndividual(genome, rng)
+		rng    = newRandomNumberGenerator()
+		genome = NewVector(rng)
+		indi1  = NewIndividual(genome, rng)
 		indi2  = indi1.Clone(rng)
 	)
 	if &indi1 == &indi2 || &indi1.Genome == &indi2.Genome {
@@ -19,9 +19,9 @@ func TestCloneIndividual(t *testing.T) {
 
 func TestEvaluateIndividual(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
-		genome = MakeVector(rng)
-		indi   = MakeIndividual(genome, rng)
+		rng    = newRandomNumberGenerator()
+		genome = NewVector(rng)
+		indi   = NewIndividual(genome, rng)
 	)
 	if indi.Evaluated {
 		t.Error("Individual shouldn't have Evaluated set to True")
@@ -34,9 +34,9 @@ func TestEvaluateIndividual(t *testing.T) {
 
 func TestMutateIndividual(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
-		genome = MakeVector(rng)
-		indi   = MakeIndividual(genome, rng)
+		rng    = newRandomNumberGenerator()
+		genome = NewVector(rng)
+		indi   = NewIndividual(genome, rng)
 	)
 	indi.Evaluate()
 	indi.Mutate(rng)
@@ -47,9 +47,9 @@ func TestMutateIndividual(t *testing.T) {
 
 func TestCrossoverIndividual(t *testing.T) {
 	var (
-		rng                    = makeRandomNumberGenerator()
-		indi1                  = MakeIndividual(MakeVector(rng), rng)
-		indi2                  = MakeIndividual(MakeVector(rng), rng)
+		rng                    = newRandomNumberGenerator()
+		indi1                  = NewIndividual(NewVector(rng), rng)
+		indi2                  = NewIndividual(NewVector(rng), rng)
 		offspring1, offspring2 = indi1.Crossover(indi2, rng)
 	)
 	if offspring1.Evaluated || offspring2.Evaluated {
@@ -60,20 +60,20 @@ func TestCrossoverIndividual(t *testing.T) {
 	}
 }
 
-func TestMakeIndividuals(t *testing.T) {
-	var rng = makeRandomNumberGenerator()
+func TestNewIndividuals(t *testing.T) {
+	var rng = newRandomNumberGenerator()
 	for _, n := range []int{1, 2, 42} {
-		var indis = makeIndividuals(n, MakeVector, rng)
+		var indis = newIndividuals(n, NewVector, rng)
 		if len(indis) != n {
-			t.Error("makeIndividuals didn't generate the right number of individuals")
+			t.Error("newIndividuals didn't generate the right number of individuals")
 		}
 	}
 }
 
 func TestCloneIndividuals(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
-		indis  = makeIndividuals(20, MakeVector, rng)
+		rng    = newRandomNumberGenerator()
+		indis  = newIndividuals(20, NewVector, rng)
 		clones = indis.Clone(rng)
 	)
 	for _, indi := range indis {
@@ -86,7 +86,7 @@ func TestCloneIndividuals(t *testing.T) {
 }
 
 func TestEvaluateIndividuals(t *testing.T) {
-	var indis = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
+	var indis = newIndividuals(10, NewVector, newRandomNumberGenerator())
 	for _, indi := range indis {
 		if indi.Evaluated {
 			t.Error("Individual shouldn't have Evaluated set to True")
@@ -102,8 +102,8 @@ func TestEvaluateIndividuals(t *testing.T) {
 
 func TestMutateIndividuals(t *testing.T) {
 	var (
-		rng   = makeRandomNumberGenerator()
-		indis = makeIndividuals(10, MakeVector, rng)
+		rng   = newRandomNumberGenerator()
+		indis = newIndividuals(10, NewVector, rng)
 	)
 	indis.Evaluate()
 	indis.Mutate(1, rng)
@@ -115,7 +115,7 @@ func TestMutateIndividuals(t *testing.T) {
 }
 
 func TestIndividualsSortByFitness(t *testing.T) {
-	var indis = makeIndividuals(10, MakeVector, makeRandomNumberGenerator())
+	var indis = newIndividuals(10, NewVector, newRandomNumberGenerator())
 	// Assign a fitness to each individual in decreasing order
 	for i := range indis {
 		indis[i].Fitness = float64(len(indis) - i)
@@ -131,9 +131,9 @@ func TestIndividualsSortByFitness(t *testing.T) {
 
 func TestIndividualsSample(t *testing.T) {
 	var (
-		rng         = makeRandomNumberGenerator()
+		rng         = newRandomNumberGenerator()
 		nIndis      = 10
-		indis       = makeIndividuals(nIndis, MakeVector, rng)
+		indis       = newIndividuals(nIndis, NewVector, rng)
 		sampleSizes = []int{0, 1, nIndis - 1, nIndis, nIndis + 1}
 	)
 	for _, sampleSize := range sampleSizes {

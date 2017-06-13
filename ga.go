@@ -11,14 +11,14 @@ import (
 // A GA contains population which themselves contain individuals.
 type GA struct {
 	// Fields that are provided by the user
-	MakeGenome   GenomeMaker `json:"-"`
-	NPops        int         `json:"-"`
-	PopSize      int         `json:"-"`
-	Model        Model       `json:"-"`
-	Migrator     Migrator    `json:"-"`
-	MigFrequency int         `json:"-"` // Frequency at which migrations occur
-	Speciator    Speciator   `json:"-"`
-	Logger       *log.Logger `json:"-"`
+	GenomeFactory GenomeFactory `json:"-"`
+	NPops         int           `json:"-"`
+	PopSize       int           `json:"-"`
+	Model         Model         `json:"-"`
+	Migrator      Migrator      `json:"-"`
+	MigFrequency  int           `json:"-"` // Frequency at which migrations occur
+	Speciator     Speciator     `json:"-"`
+	Logger        *log.Logger   `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -31,9 +31,9 @@ type GA struct {
 // Validate the parameters of a GA to ensure it will run correctly; some
 // settings or combination of settings may be incoherent during runtime.
 func (ga GA) Validate() error {
-	// Check the GenomeMaker presence
-	if ga.MakeGenome == nil {
-		return errors.New("GenomeMaker cannot be nil")
+	// Check the GenomeFactory presence
+	if ga.GenomeFactory == nil {
+		return errors.New("GenomeFactory cannot be nil")
 	}
 	// Check the number of populations is higher than 0
 	if ga.NPops < 1 {
@@ -84,16 +84,16 @@ func (ga *GA) findBest() {
 // reset the GA entirely.
 func (ga *GA) Initialize() {
 	ga.Populations = make([]Population, ga.NPops)
-	ga.rng = makeRandomNumberGenerator()
+	ga.rng = newRandomNumberGenerator()
 	var wg sync.WaitGroup
 	for i := range ga.Populations {
 		wg.Add(1)
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = makePopulation(
+			ga.Populations[j] = newPopulation(
 				ga.PopSize,
-				ga.MakeGenome,
+				ga.GenomeFactory,
 				randString(3, ga.rng),
 			)
 			// Evaluate its individuals
@@ -108,8 +108,8 @@ func (ga *GA) Initialize() {
 	}
 	wg.Wait()
 	// The initial best individual is initialized randomly
-	var rng = makeRandomNumberGenerator()
-	ga.Best = MakeIndividual(ga.MakeGenome(rng), rng)
+	var rng = newRandomNumberGenerator()
+	ga.Best = NewIndividual(ga.GenomeFactory(rng), rng)
 	ga.findBest()
 }
 

@@ -10,8 +10,8 @@ type DistanceMemoizer struct {
 	nCalculations int // Total number of calls to Metric for testing purposes
 }
 
-// makeDistanceMemoizer initializes a DistanceMemoizer.
-func makeDistanceMemoizer(metric Metric) DistanceMemoizer {
+// newDistanceMemoizer initializes a DistanceMemoizer.
+func newDistanceMemoizer(metric Metric) DistanceMemoizer {
 	return DistanceMemoizer{
 		Metric:    metric,
 		Distances: make(map[string]map[string]float64),

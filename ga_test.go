@@ -13,13 +13,13 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationGenomeMaker(t *testing.T) {
-	var genomeMaker = ga.MakeGenome
-	ga.MakeGenome = nil
+func TestValidationGenomeFactory(t *testing.T) {
+	var genomeFactory = ga.GenomeFactory
+	ga.GenomeFactory = nil
 	if ga.Validate() == nil {
-		t.Error("Nil GenomeMaker should return an error")
+		t.Error("Nil GenomeFactory should return an error")
 	}
-	ga.MakeGenome = genomeMaker
+	ga.GenomeFactory = genomeFactory
 }
 
 func TestValidationNPopulations(t *testing.T) {
@@ -142,7 +142,7 @@ func TestDuration(t *testing.T) {
 
 func TestSpeciateEvolveMerge(t *testing.T) {
 	var (
-		rng = makeRandomNumberGenerator()
+		rng = newRandomNumberGenerator()
 		pop = Population{ID: "42", rng: rng, Individuals: Individuals{}}
 	)
 	for i := 0; i < 7; i++ {

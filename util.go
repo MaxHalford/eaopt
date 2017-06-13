@@ -107,9 +107,9 @@ func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
 	return
 }
 
-// makeRandomNumberGenerator returns a new random number generator with a random
+// newRandomNumberGenerator returns a new random number generator with a random
 // seed.
-func makeRandomNumberGenerator() *rand.Rand {
+func newRandomNumberGenerator() *rand.Rand {
 	return rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 

@@ -24,7 +24,7 @@ func TestInitUnifFloat64(t *testing.T) {
 				upper: 1,
 			},
 		}
-		rng = makeRandomNumberGenerator()
+		rng = newRandomNumberGenerator()
 	)
 	for _, n := range N {
 		for _, b := range bounds {
@@ -46,7 +46,7 @@ func TestInitUnifFloat64(t *testing.T) {
 func TestInitJaggFloat64(t *testing.T) {
 	var (
 		N   = []int{0, 1, 2, 42}
-		rng = makeRandomNumberGenerator()
+		rng = newRandomNumberGenerator()
 	)
 	for _, n := range N {
 		var (
@@ -74,7 +74,7 @@ func TestInitJaggFloat64(t *testing.T) {
 }
 
 func TestInitNormFloat64(t *testing.T) {
-	var rng = makeRandomNumberGenerator()
+	var rng = newRandomNumberGenerator()
 	for _, n := range []int{0, 1, 2, 42} {
 		if len(InitNormFloat64(n, 0, 1, rng)) != n {
 			t.Error("InitNormFloat64 didn't produce the right number of values")
@@ -84,7 +84,7 @@ func TestInitNormFloat64(t *testing.T) {
 
 func TestInitUnifString(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
+		rng    = newRandomNumberGenerator()
 		corpus = strings.Split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
 	)
 	for _, n := range []int{0, 1, 2, 42} {
@@ -110,7 +110,7 @@ func TestInitUnifString(t *testing.T) {
 
 func TestInitUniqueString(t *testing.T) {
 	var (
-		rng    = makeRandomNumberGenerator()
+		rng    = newRandomNumberGenerator()
 		corpus = strings.Split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
 	)
 	for _, n := range []int{0, 1, 2, 42} {

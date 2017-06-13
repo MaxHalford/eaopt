@@ -9,9 +9,9 @@ import (
 
 var (
 	ga = GA{
-		MakeGenome: MakeVector,
-		NPops:      2,
-		PopSize:    50,
+		GenomeFactory: NewVector,
+		NPops:         2,
+		PopSize:       50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NParticipants: 3,
@@ -63,7 +63,7 @@ func (X Vector) Len() int {
 	return len(X)
 }
 
-func MakeVector(rng *rand.Rand) Genome {
+func NewVector(rng *rand.Rand) Genome {
 	return Vector(InitUnifFloat64(4, -10, 10, rng))
 }
 

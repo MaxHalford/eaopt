@@ -159,8 +159,8 @@ var (
 // producing the desired number of offsprings.
 func TestGenerateOffsprings(t *testing.T) {
 	var (
-		rng   = makeRandomNumberGenerator()
-		indis = makeIndividuals(20, MakeVector, rng)
+		rng   = newRandomNumberGenerator()
+		indis = newIndividuals(20, NewVector, rng)
 	)
 	for _, n := range []int{0, 1, 3, 10} {
 		var offsprings = generateOffsprings(n, indis, SelTournament{1}, rng)
@@ -190,10 +190,10 @@ func TestModelsValidate(t *testing.T) {
 // TestModelsConstantSize checks that each model doesn't change the size of a
 // population when applied.
 func TestModelsConstantSize(t *testing.T) {
-	var rng = makeRandomNumberGenerator()
+	var rng = newRandomNumberGenerator()
 	for _, n := range []int{1, 2, 3, 42} {
 		for _, model := range validModels {
-			var pop = makePopulation(n, MakeVector, randString(3, rng))
+			var pop = newPopulation(n, NewVector, randString(3, rng))
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)

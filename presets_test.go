@@ -3,9 +3,9 @@ package gago
 import "testing"
 
 var presets = []GA{
-	Generational(MakeVector),
-	SimulatedAnnealing(MakeVector),
-	HillClimbing(MakeVector),
+	Generational(NewVector),
+	SimulatedAnnealing(NewVector),
+	HillClimbing(NewVector),
 }
 
 func TestPresetsValid(t *testing.T) {

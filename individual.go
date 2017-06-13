@@ -14,8 +14,9 @@ type Genome interface {
 	Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
 }
 
-// A GenomeMaker is a method that generates a new Genome with random properties.
-type GenomeMaker func(rng *rand.Rand) Genome
+// A GenomeFactory is a method that generates a new Genome with random
+// properties.
+type GenomeFactory func(rng *rand.Rand) Genome
 
 // An Individual wraps a Genome and contains the fitness assigned to the Genome.
 type Individual struct {
@@ -25,8 +26,8 @@ type Individual struct {
 	ID        string  `json:"id"`
 }
 
-// MakeIndividual returns a fresh individual.
-func MakeIndividual(genome Genome, rng *rand.Rand) Individual {
+// NewIndividual returns a fresh individual.
+func NewIndividual(genome Genome, rng *rand.Rand) Individual {
 	return Individual{
 		Genome:    genome,
 		Fitness:   math.Inf(1),
@@ -65,8 +66,8 @@ func (indi *Individual) Mutate(rng *rand.Rand) {
 func (indi Individual) Crossover(mate Individual, rng *rand.Rand) (Individual, Individual) {
 	var (
 		genome1, genome2 = indi.Genome.Crossover(mate.Genome, rng)
-		offspring1       = MakeIndividual(genome1, rng)
-		offspring2       = MakeIndividual(genome2, rng)
+		offspring1       = NewIndividual(genome1, rng)
+		offspring2       = NewIndividual(genome2, rng)
 	)
 	return offspring1, offspring2
 }
@@ -99,10 +100,10 @@ func (indis Individuals) Clone(rng *rand.Rand) Individuals {
 }
 
 // Generate a slice of n new individuals.
-func makeIndividuals(n int, gm GenomeMaker, rng *rand.Rand) Individuals {
+func newIndividuals(n int, gf GenomeFactory, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, n)
 	for i := range indis {
-		indis[i] = MakeIndividual(gm(rng), rng)
+		indis[i] = NewIndividual(gf(rng), rng)
 	}
 	return indis
 }

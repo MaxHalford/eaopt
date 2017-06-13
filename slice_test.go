@@ -21,7 +21,7 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func TestMakeIndexLookup(t *testing.T) {
+func TestNewIndexLookup(t *testing.T) {
 	var testCases = []struct {
 		slice  Slice
 		lookup map[interface{}]int
@@ -36,7 +36,7 @@ func TestMakeIndexLookup(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		var lookup = makeIndexLookup(test.slice)
+		var lookup = newIndexLookup(test.slice)
 		for k, v := range lookup {
 			if v != test.lookup[k] {
 				t.Error("createLookup didn't work as expected")

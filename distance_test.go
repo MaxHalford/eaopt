@@ -6,7 +6,7 @@ import (
 
 func TestDistanceMemoizer(t *testing.T) {
 	var (
-		dm = makeDistanceMemoizer(l1Distance)
+		dm = newDistanceMemoizer(l1Distance)
 		a  = Individual{Genome: Vector{1, 1, 1}, ID: "1"}
 		b  = Individual{Genome: Vector{3, 3, 3}, ID: "2"}
 		c  = Individual{Genome: Vector{6, 6, 6}, ID: "3"}
