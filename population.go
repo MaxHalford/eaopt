@@ -33,7 +33,7 @@ func newPopulation(size int, gf GenomeFactory, id string) Population {
 // Log a Population's current statistics with a provided log.Logger.
 func (pop Population) Log(logger *log.Logger) {
 	logger.Printf(
-		"id=%s min=%f max=%f avg=%f std=%f",
+		"popid=%s min=%f max=%f avg=%f std=%f",
 		pop.ID,
 		pop.Individuals.FitMin(),
 		pop.Individuals.FitMax(),
