@@ -15,16 +15,19 @@ var (
 // applied to generate two offsprings. The selection and crossover process is
 // repeated until n offsprings have been generated. If n is uneven then the
 // second offspring of the last crossover is discarded.
-func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) Individuals {
+func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) (Individuals, error) {
 	var (
 		offsprings = make(Individuals, n)
 		i          = 0
 	)
 	for i < len(offsprings) {
-		var (
-			parents, _             = sel.Apply(2, indis, rng)
-			offspring1, offspring2 = parents[0].Crossover(parents[1], rng)
-		)
+		// Select 2 parents
+		var parents, _, err = sel.Apply(2, indis, rng)
+		if err != nil {
+			return nil, err
+		}
+		// Generate 2 offsprings from the parents
+		var offspring1, offspring2 = parents[0].Crossover(parents[1], rng)
 		if i < len(offsprings) {
 			offsprings[i] = offspring1
 			i++
@@ -34,14 +37,14 @@ func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) 
 			i++
 		}
 	}
-	return offsprings
+	return offsprings, nil
 }
 
 // A Model specifies a protocol for applying genetic operators to a
 // population at generation i in order for it obtain better individuals at
 // generation i+1.
 type Model interface {
-	Apply(pop *Population)
+	Apply(pop *Population) error
 	Validate() error
 }
 
@@ -52,20 +55,24 @@ type ModGenerational struct {
 }
 
 // Apply ModGenerational.
-func (mod ModGenerational) Apply(pop *Population) {
+func (mod ModGenerational) Apply(pop *Population) error {
 	// Generate as many offsprings as there are of individuals in the current population
-	var offsprings = generateOffsprings(
+	var offsprings, err = generateOffsprings(
 		len(pop.Individuals),
 		pop.Individuals,
 		mod.Selector,
 		pop.rng,
 	)
+	if err != nil {
+		return err
+	}
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		offsprings.Mutate(mod.MutRate, pop.rng)
 	}
 	// Replace the old population with the new one
 	copy(pop.Individuals, offsprings)
+	return nil
 }
 
 // Validate ModGenerational fields.
@@ -94,11 +101,12 @@ type ModSteadyState struct {
 }
 
 // Apply ModSteadyState.
-func (mod ModSteadyState) Apply(pop *Population) {
-	var (
-		parents, indexes       = mod.Selector.Apply(2, pop.Individuals, pop.rng)
-		offspring1, offspring2 = parents[0].Crossover(parents[1], pop.rng)
-	)
+func (mod ModSteadyState) Apply(pop *Population) error {
+	var parents, indexes, err = mod.Selector.Apply(2, pop.Individuals, pop.rng)
+	if err != nil {
+		return err
+	}
+	var offspring1, offspring2 = parents[0].Crossover(parents[1], pop.rng)
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		if pop.rng.Float64() < mod.MutRate {
@@ -122,6 +130,7 @@ func (mod ModSteadyState) Apply(pop *Population) {
 		pop.Individuals[indexes[0]] = offspring1
 		pop.Individuals[indexes[1]] = offspring2
 	}
+	return nil
 }
 
 // Validate ModSteadyState fields.
@@ -151,13 +160,16 @@ type ModDownToSize struct {
 }
 
 // Apply ModDownToSize.
-func (mod ModDownToSize) Apply(pop *Population) {
-	var offsprings = generateOffsprings(
+func (mod ModDownToSize) Apply(pop *Population) error {
+	var offsprings, err = generateOffsprings(
 		mod.NOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
 		pop.rng,
 	)
+	if err != nil {
+		return err
+	}
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		offsprings.Mutate(mod.MutRate, pop.rng)
@@ -166,9 +178,10 @@ func (mod ModDownToSize) Apply(pop *Population) {
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size
-	var selected, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.rng)
+	var selected, _, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.rng)
 	// Replace the current population of individuals
 	copy(pop.Individuals, selected)
+	return nil
 }
 
 // Validate ModDownToSize fields.
@@ -209,7 +222,7 @@ type ModRing struct {
 }
 
 // Apply ModRing.
-func (mod ModRing) Apply(pop *Population) {
+func (mod ModRing) Apply(pop *Population) error {
 	for i, indi := range pop.Individuals {
 		var (
 			neighbour              = pop.Individuals[i%len(pop.Individuals)]
@@ -228,10 +241,16 @@ func (mod ModRing) Apply(pop *Population) {
 		offspring2.Evaluate()
 		// Select an individual out of the original individual and the
 		// offsprings
-		var indis = Individuals{indi, offspring1, offspring2}
-		var selected, _ = mod.Selector.Apply(1, indis, pop.rng)
+		var (
+			indis            = Individuals{indi, offspring1, offspring2}
+			selected, _, err = mod.Selector.Apply(1, indis, pop.rng)
+		)
+		if err != nil {
+			return err
+		}
 		pop.Individuals[i] = selected[0]
 	}
+	return nil
 }
 
 // Validate ModRing fields.
@@ -263,7 +282,7 @@ type ModSimAnn struct {
 }
 
 // Apply ModSimAnn.
-func (mod ModSimAnn) Apply(pop *Population) {
+func (mod ModSimAnn) Apply(pop *Population) error {
 	// Continue until having reached the minimum temperature
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
@@ -282,6 +301,7 @@ func (mod ModSimAnn) Apply(pop *Population) {
 		}
 		mod.T *= mod.Alpha // Reduce the temperature
 	}
+	return nil
 }
 
 // Validate ModSimAnn fields.
@@ -302,9 +322,9 @@ func (mod ModSimAnn) Validate() error {
 }
 
 // ModMutationOnly implements the mutation only model. Each generation,
-// NChosen are chosen and are replaced with mutants. Mutants are obtained by
-// mutating the chosen. If Strict is set to true, then the mutants replace the
-// chosen individuals only if they have a lower fitness.
+// NChosen are selected and are replaced with mutants. Mutants are obtained by
+// mutating the selected Individuals. If Strict is set to true, then the mutants
+// replace the chosen individuals only if they have a lower fitness.
 type ModMutationOnly struct {
 	NChosen  int // Number of individuals that are mutated each generation
 	Selector Selector
@@ -312,9 +332,12 @@ type ModMutationOnly struct {
 }
 
 // Apply ModMutationOnly.
-func (mod ModMutationOnly) Apply(pop *Population) {
-	var chosen, positions = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
-	for i, indi := range chosen {
+func (mod ModMutationOnly) Apply(pop *Population) error {
+	var selected, positions, err = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
+	if err != nil {
+		return err
+	}
+	for i, indi := range selected {
 		var mutant = indi.Clone(pop.rng)
 		mutant.Mutate(pop.rng)
 		mutant.Evaluate()
@@ -322,6 +345,7 @@ func (mod ModMutationOnly) Apply(pop *Population) {
 			pop.Individuals[positions[i]] = mutant
 		}
 	}
+	return nil
 }
 
 // Validate ModMutationOnly fields.

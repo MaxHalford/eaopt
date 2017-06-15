@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // A GA contains population which themselves contain individuals.
@@ -116,7 +118,7 @@ func (ga *GA) Initialize() {
 // Enhance each population in the GA. The population level operations are done
 // in parallel with a wait group. After all the population operations have been
 // run, the GA level operations are run.
-func (ga *GA) Enhance() {
+func (ga *GA) Enhance() error {
 	var start = time.Now()
 	ga.Generations++
 	// Migrate the individuals between the populations if there are enough
@@ -125,37 +127,46 @@ func (ga *GA) Enhance() {
 	if len(ga.Populations) > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations, ga.rng)
 	}
-	// Use a wait group to enhance the populations in parallel
-	var wg sync.WaitGroup
+	var g errgroup.Group
 	for i := range ga.Populations {
-		wg.Add(1)
-		go func(j int) {
-			defer wg.Done()
+		i := i // https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
+			var err error
 			// Apply speciation if a positive number of species has been speficied
 			if ga.Speciator != nil {
-				ga.Populations[j].speciateEvolveMerge(ga.Speciator, ga.Model)
+				err = ga.Populations[i].speciateEvolveMerge(ga.Speciator, ga.Model)
+				if err != nil {
+					return err
+				}
 			} else {
 				// Else apply the evolution model to the entire population
-				ga.Model.Apply(&ga.Populations[j])
+				err = ga.Model.Apply(&ga.Populations[i])
+				if err != nil {
+					return err
+				}
 			}
 			// Evaluate and sort
-			ga.Populations[j].Individuals.Evaluate()
-			ga.Populations[j].Individuals.SortByFitness()
-			ga.Populations[j].Age += time.Since(start)
-			ga.Populations[j].Generations++
+			ga.Populations[i].Individuals.Evaluate()
+			ga.Populations[i].Individuals.SortByFitness()
+			ga.Populations[i].Age += time.Since(start)
+			ga.Populations[i].Generations++
 			// Log current statistics if a logger has been provided
 			if ga.Logger != nil {
-				go ga.Populations[j].Log(ga.Logger)
+				go ga.Populations[i].Log(ga.Logger)
 			}
-		}(i)
+			return err
+		})
 	}
-	wg.Wait()
+	if err := g.Wait(); err != nil {
+		return err
+	}
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
 	ga.Age += time.Since(start)
+	return nil
 }
 
-func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
+func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 	var (
 		species = spec.Apply(pop.Individuals, pop.rng)
 		pops    = make([]Population, len(species))
@@ -169,7 +180,10 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
 			ID:          randString(len(pop.ID), pop.rng),
 			rng:         pop.rng,
 		}
-		model.Apply(&pops[i])
+		var err = model.Apply(&pops[i])
+		if err != nil {
+			return err
+		}
 	}
 	// Merge each species back into the original population
 	var i int
@@ -177,4 +191,5 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) {
 		copy(pop.Individuals[i:i+len(subpop.Individuals)], subpop.Individuals)
 		i += len(subpop.Individuals)
 	}
+	return nil
 }

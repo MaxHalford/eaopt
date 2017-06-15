@@ -56,6 +56,13 @@ func (indi *Individual) Evaluate() {
 	}
 }
 
+// GetFitness returns the fitness of an Individual after making sure it has been
+// evaluated.
+func (indi *Individual) GetFitness() float64 {
+	indi.Evaluate()
+	return indi.Fitness
+}
+
 // Mutate an individual by calling the Mutate method of it's Genome.
 func (indi *Individual) Mutate(rng *rand.Rand) {
 	indi.Genome.Mutate(rng)
@@ -134,26 +141,6 @@ func (indis Individuals) SortByFitness() {
 func (indis Individuals) IsSortedByFitness() bool {
 	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
 	return sort.SliceIsSorted(indis, less)
-}
-
-// Sample k unique individuals from a slice of n individuals.
-func (indis Individuals) sample(k int, rng *rand.Rand) (sample Individuals, indexes []int) {
-	// No need to sample if there are less than k+1 individuals
-	if len(indis) <= k {
-		sample = make(Individuals, len(indis))
-		indexes = make([]int, len(indis))
-		for i, indi := range indis {
-			sample[i] = indi
-			indexes[i] = i
-		}
-		return
-	}
-	sample = make(Individuals, k)
-	indexes = randomInts(k, 0, len(indis), rng)
-	for i := 0; i < k; i++ {
-		sample[i] = indis[indexes[i]]
-	}
-	return
 }
 
 // Extract the fitness of a slice of individuals into a float64 slice.

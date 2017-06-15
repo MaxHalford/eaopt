@@ -1,5 +1,7 @@
 ## Ideas
 
+- Enhance TS tests
+- Make errors for selection and propagate them up so that `initialize` and `enhance` can spit errors
 - Add more example usage
 - Make it easier to test models. Also make sure they work as expected.
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf

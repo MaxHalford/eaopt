@@ -37,10 +37,6 @@
   <a href="https://codeclimate.com/github/MaxHalford/gago">
     <img src="https://codeclimate.com/github/MaxHalford/gago/badges/gpa.svg" alt="Code Climate" />
   </a>
-  <!-- Dependencies -->
-  <a href="https://godoc.org/github.com/MaxHalford/gago?imports">
-    <img src="https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square" alt="dependencies" />
-  </a>
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
     <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="license"/>
@@ -443,15 +439,14 @@ As mentioned earlier, some problems can simply not be written down as [closed-fo
 
 **How can I contribute?**
 
-Feel free to implement your own operators or to make suggestions! Check out the [contributing file](CONTRIBUTING.md) for some guidelines.
+Feel free to implement your own operators or to make suggestions! Check out the [HACKME file](HACKME.md) for some guidelines.
 
 
-## Golang alternatives
+## Dependencies
 
-- [GeneticGo](https://github.com/handcraftsman/GeneticGo)
-- [goga](https://github.com/tomcraven/goga)
-- [go-galib](https://github.com/thoj/go-galib)
+You can see the list of dependencies [here](https://godoc.org/github.com/MaxHalford/gago?imports) and a graph view [here](https://godoc.org/github.com/MaxHalford/gago?import-graph). Here is the list of external dependencies:
 
+- [golang.org/x/sync/errgroup](https://godoc.org/golang.org/x/sync/errgroup)
 
 ## License
 

@@ -50,7 +50,7 @@ func TestValidationModel(t *testing.T) {
 	// Check invalid model raises error
 	ga.Model = ModGenerational{
 		Selector: SelTournament{
-			NParticipants: 3,
+			NContestants: 3,
 		},
 		MutRate: -1,
 	}

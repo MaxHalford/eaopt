@@ -14,7 +14,7 @@ var (
 		PopSize:       50,
 		Model: ModGenerational{
 			Selector: SelTournament{
-				NParticipants: 3,
+				NContestants: 3,
 			},
 			MutRate: 0.5,
 		},
@@ -81,5 +81,5 @@ func l1Distance(x1, x2 Individual) (dist float64) {
 
 type ModIdentity struct{}
 
-func (mod ModIdentity) Apply(pop *Population) {}
-func (mod ModIdentity) Validate() error       { return nil }
+func (mod ModIdentity) Apply(pop *Population) error { return nil }
+func (mod ModIdentity) Validate() error             { return nil }

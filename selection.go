@@ -2,6 +2,8 @@ package gago
 
 import (
 	"errors"
+	"fmt"
+	"math"
 	"math/rand"
 	"sort"
 )
@@ -9,7 +11,7 @@ import (
 // Selector chooses a subset of size n from a group of individuals. The group of
 // individuals a Selector is applied to is expected to be sorted.
 type Selector interface {
-	Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int)
+	Apply(n int, indis Individuals, rng *rand.Rand) (selected Individuals, indexes []int, err error)
 	Validate() error
 }
 
@@ -17,12 +19,8 @@ type Selector interface {
 type SelElitism struct{}
 
 // Apply SelElitism.
-func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
-	var indexes = make([]int, n)
-	for i := 0; i < n; i++ {
-		indexes[i] = i
-	}
-	return indis[:n], indexes
+func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+	return indis[:n], newInts(n), nil
 }
 
 // Validate SelElitism fields.
@@ -33,30 +31,49 @@ func (sel SelElitism) Validate() error {
 // SelTournament samples individuals through tournament selection. The
 // tournament is composed of randomly chosen individuals. The winner of the
 // tournament is the chosen individual with the lowest fitness. The obtained
-// individuals are not necessarily unique.
+// individuals are all distinct.
 type SelTournament struct {
-	NParticipants int
+	NContestants int
 }
 
 // Apply SelTournament.
-func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
-	var (
-		selected = make(Individuals, n)
-		indexes  = make([]int, n)
-	)
-	for i := range selected {
-		var sample, roundIndexes = indis.sample(sel.NParticipants, rng)
-		sample.SortByFitness()
-		indexes[i] = roundIndexes[0]
-		selected[i] = sample[0]
+func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+	// Check that the number of individuals is large enough
+	if len(indis)-n < sel.NContestants-1 {
+		return nil, nil, fmt.Errorf("Not enough individuals to select %d "+
+			"with NContestants = %d, have %d individuals and need at least %d",
+			n, sel.NContestants, len(indis), sel.NContestants+n-1)
 	}
-	return selected, indexes
+	var (
+		winners         = make(Individuals, n)
+		indexes         = make([]int, n)
+		notSelectedIdxs = newInts(len(indis))
+	)
+	for i := range winners {
+		// Sample contestants
+		var (
+			contestants, idxs, _ = sampleInts(notSelectedIdxs, sel.NContestants, rng)
+			winnerIdx            int
+		)
+		// Find the best contestant
+		winners[i].Fitness = math.Inf(1)
+		for j, k := range contestants {
+			if indis[k].GetFitness() < winners[i].Fitness {
+				winners[i] = indis[k]
+				indexes[i] = k
+				winnerIdx = idxs[j]
+			}
+		}
+		// Ban the winner from re-participating
+		notSelectedIdxs = append(notSelectedIdxs[:winnerIdx], notSelectedIdxs[winnerIdx+1:]...)
+	}
+	return winners, indexes, nil
 }
 
 // Validate SelTournament fields.
 func (sel SelTournament) Validate() error {
-	if sel.NParticipants < 1 {
-		return errors.New("NParticipants should be higher than 0")
+	if sel.NContestants < 1 {
+		return errors.New("NContestants should be higher than 0")
 	}
 	return nil
 }
@@ -77,7 +94,7 @@ func getWeights(fitnesses []float64) []float64 {
 }
 
 // Apply SelRoulette.
-func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int) {
+func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
 	var (
 		selected = make(Individuals, n)
 		indexes  = make([]int, n)
@@ -91,7 +108,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 		indexes[i] = index
 		selected[i] = winner
 	}
-	return selected, indexes
+	return selected, indexes, nil
 }
 
 // Validate SelRoulette fields.

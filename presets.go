@@ -8,7 +8,7 @@ func Generational(GenomeFactory GenomeFactory) GA {
 		PopSize:       50,
 		Model: ModGenerational{
 			Selector: SelTournament{
-				NParticipants: 3,
+				NContestants: 3,
 			},
 			MutRate: 0.5,
 		},

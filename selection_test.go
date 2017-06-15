@@ -24,14 +24,14 @@ func TestSelectionSize(t *testing.T) {
 		indis     = newIndividuals(30, NewVector, rng)
 		selectors = []Selector{
 			SelTournament{
-				NParticipants: 3,
+				NContestants: 3,
 			},
 			SelElitism{},
 		}
 	)
 	for _, selector := range selectors {
-		for _, n := range []int{1, 2, 10, 30} {
-			var selected, _ = selector.Apply(n, indis, rng)
+		for _, n := range []int{3, 10, 20} {
+			var selected, _, _ = selector.Apply(n, indis, rng)
 			if len(selected) != n {
 				t.Error("Selector didn't select the expected number of individuals")
 			}
@@ -47,7 +47,7 @@ func TestSelElitism(t *testing.T) {
 	)
 	indis.Evaluate()
 	for _, n := range []int{1, 2, 10, 30} {
-		var _, indexes = selector.Apply(n, indis, rng)
+		var _, indexes, _ = selector.Apply(n, indis, rng)
 		for i, index := range indexes {
 			if index != i {
 				t.Error("SelElitism didn't select the expected individuals")
@@ -58,13 +58,11 @@ func TestSelElitism(t *testing.T) {
 
 func TestSelTournament(t *testing.T) {
 	var (
-		rng        = newRandomNumberGenerator()
-		indis      = newIndividuals(30, NewVector, rng)
-		sel        = SelTournament{len(indis)}
-		_, indexes = sel.Apply(1, indis, rng)
+		rng            = newRandomNumberGenerator()
+		indis          = newIndividuals(30, NewVector, rng)
+		selected, _, _ = SelTournament{len(indis)}.Apply(1, indis, rng)
 	)
-	indis.Evaluate()
-	if indexes[0] != 0 {
+	if selected[0].Fitness != indis.FitMin() {
 		t.Error("Full SelTournament didn't select the best individual")
 	}
 }
@@ -96,7 +94,7 @@ func TestSelRoulette(t *testing.T) {
 	)
 	indis.Evaluate()
 	for _, n := range []int{0, 1, 10, 30} {
-		var selected, _ = sel.Apply(n, indis, rng)
+		var selected, _, _ = sel.Apply(n, indis, rng)
 		if len(selected) != n {
 			t.Error("SelRoulette didn't select the right number of individuals")
 		}
