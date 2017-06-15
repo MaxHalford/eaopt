@@ -2,7 +2,7 @@ language: go
 sudo: false
 go:
   - tip
-install:
+before_install:
   - go get github.com/mattn/goveralls
 script:
   - go test -v -cover -race -coverprofile=coverage.out
