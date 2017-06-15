@@ -5,7 +5,7 @@ go:
 before_install:
   - go get github.com/mattn/goveralls
 script:
-  - go test -v -cover -race -coverprofile=coverage.out
+  - go test -v -cover -coverprofile=coverage.out
   - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci
 branches:
   only:
