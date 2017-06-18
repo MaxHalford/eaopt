@@ -76,11 +76,14 @@ func meanFloat64s(floats []float64) float64 {
 
 // Compute the variance of a float64 slice.
 func varianceFloat64s(floats []float64) float64 {
-	var squares = make([]float64, len(floats))
-	for i, f := range floats {
-		squares[i] = math.Pow(f, 2)
+	var (
+		m  = meanFloat64s(floats)
+		ss float64
+	)
+	for _, x := range floats {
+		ss += math.Pow(x-m, 2)
 	}
-	return meanFloat64s(squares) - math.Pow(meanFloat64s(floats), 2)
+	return ss / float64(len(floats))
 }
 
 type set map[interface{}]bool
