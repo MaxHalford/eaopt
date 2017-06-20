@@ -8,7 +8,6 @@ import (
 var (
 	validSelectors = []Selector{
 		SelElitism{},
-		SelTournament{1},
 		SelTournament{3},
 		SelRoulette{},
 	}
@@ -102,7 +101,7 @@ func TestSelRoulette(t *testing.T) {
 }
 
 // TestSelectorsValidate checks that each selector's Validate method doesn't
-// return an error in case of a valid model and vice-versa
+// return an error in case of a valid model and that it does for invalid models.
 func TestSelectorsValidate(t *testing.T) {
 	// Check valid selectors do not raise an error
 	for _, sel := range validSelectors {

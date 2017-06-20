@@ -20,7 +20,7 @@ type SelElitism struct{}
 
 // Apply SelElitism.
 func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
-	return indis[:n], newInts(n), nil
+	return indis[:n].Clone(rng), newInts(n), nil
 }
 
 // Validate SelElitism fields.
