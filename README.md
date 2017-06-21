@@ -109,9 +109,9 @@ func (X Vector) Mutate(rng *rand.Rand) {
     gago.MutNormalFloat64(X, 0.8, rng)
 }
 
-// Crossover a Vector with another Vector by applying 1-point crossover.
+// Crossover a Vector with another Vector by applying uniform crossover.
 func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-    var o1, o2 = gago.CrossGNXFloat64(X, Y.(Vector), 2, rng) // Returns two float64 slices
+    var o1, o2 = gago.CrossUniformFloat64(X, Y.(Vector), rng) // Returns two float64 slices
     return Vector(o1), Vector(o2)
 }
 
@@ -244,7 +244,7 @@ type Slice interface {
 }
 ```
 
-Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and [`examples/tsp_grid/main.go`](examples/tsp_grid/main.go)).
+Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators which slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and the [TSP example](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid).
 
 
 ### Instantiating a GA struct
