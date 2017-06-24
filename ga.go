@@ -14,13 +14,14 @@ import (
 type GA struct {
 	// Fields that are provided by the user
 	GenomeFactory GenomeFactory `json:"-"`
-	NPops         int           `json:"-"`
-	PopSize       int           `json:"-"`
+	NPops         int           `json:"-"` // Number of Populations
+	PopSize       int           `json:"-"` // Number of Individuls per Population
 	Model         Model         `json:"-"`
 	Migrator      Migrator      `json:"-"`
 	MigFrequency  int           `json:"-"` // Frequency at which migrations occur
 	Speciator     Speciator     `json:"-"`
 	Logger        *log.Logger   `json:"-"`
+	Callback      func(ga GA)   `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -113,6 +114,10 @@ func (ga *GA) Initialize() {
 	var rng = newRandomNumberGenerator()
 	ga.Best = NewIndividual(ga.GenomeFactory(rng), rng)
 	ga.findBest()
+	// Execute the callback if it has been set
+	if ga.Callback != nil {
+		ga.Callback(*ga)
+	}
 }
 
 // Enhance each population in the GA. The population level operations are done
@@ -163,6 +168,11 @@ func (ga *GA) Enhance() error {
 	// Check if there is an individual that is better than the current one
 	ga.findBest()
 	ga.Age += time.Since(start)
+	// Execute the callback if it has been set
+	if ga.Callback != nil {
+		ga.Callback(*ga)
+	}
+	// No error
 	return nil
 }
 

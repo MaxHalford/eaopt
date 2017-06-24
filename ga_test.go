@@ -155,3 +155,21 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 		}
 	}
 }
+
+func TestCallback(t *testing.T) {
+	var (
+		counter          int
+		incrementCounter = func(ga GA) {
+			counter++
+		}
+	)
+	ga.Callback = incrementCounter
+	ga.Initialize()
+	if counter != 1 {
+		t.Error("Counter was not incremented by the callback at initialization")
+	}
+	ga.Enhance()
+	if counter != 2 {
+		t.Error("Counter was not incremented by the callback at enhancement")
+	}
+}

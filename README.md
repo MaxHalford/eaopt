@@ -262,6 +262,7 @@ type GA struct {
     MigFrequency int // Frequency at which migrations occur
     Speciator    Speciator
     Logger       *log.Logger
+    Callback     func(ga GA)
 
     // Fields that are generated at runtime
     Populations Populations
@@ -280,7 +281,8 @@ You have to fill in the first 5 fields, the rest are generated when calling the 
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
 - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
-- `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
+- `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
+- `Callback` is optional will execute any piece of code you wish every time `ga.Enhance()` is called. `Callback` will also be called when `ga.Initialize()` is. Adding a callback can be useful for example for calculating specific population statistics that are not provided by the logger.
 
 Essentially, only `GenomeFactory`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
 
