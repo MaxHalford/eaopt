@@ -21,7 +21,7 @@ func TestSpecKMedoidsApply(t *testing.T) {
 			NewIndividual(Vector{8, 5}, rng),
 			NewIndividual(Vector{7, 6}, rng),
 		}
-		species = SpecKMedoids{2, l1Distance, 10}.Apply(pop, rng)
+		species, _ = SpecKMedoids{2, 1, l1Distance, 10}.Apply(pop, rng)
 	)
 	// Check the number of species is correct
 	if len(species) != 2 {
@@ -37,7 +37,7 @@ func TestSpecKMedoidsApply(t *testing.T) {
 }
 
 func TestSpecKMedoidsValidate(t *testing.T) {
-	var spec = SpecKMedoids{2, l1Distance, 1}
+	var spec = SpecKMedoids{2, 1, l1Distance, 1}
 	if err := spec.Validate(); err != nil {
 		t.Error("Validation should not have raised error")
 	}
@@ -69,10 +69,10 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {
 			var (
-				m       = min(int(math.Ceil(float64(nbi/nbs))), nbi)
-				indis   = newIndividuals(nbi, NewVector, rng)
-				spec    = SpecFitnessInterval{K: nbs}
-				species = spec.Apply(indis, rng)
+				m          = min(int(math.Ceil(float64(nbi/nbs))), nbi)
+				indis      = newIndividuals(nbi, NewVector, rng)
+				spec       = SpecFitnessInterval{K: nbs}
+				species, _ = spec.Apply(indis, rng)
 			)
 			// Check the cluster sizes are equal to min(n-i, m) where i is a
 			// multiple of m

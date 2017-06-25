@@ -1,7 +1,6 @@
 package gago
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -66,20 +65,19 @@ func TestSelTournament(t *testing.T) {
 	}
 }
 
-func TestGetWeights(t *testing.T) {
+func TestBuildWheel(t *testing.T) {
 	var testCases = []struct {
 		fitnesses []float64
 		weights   []float64
 	}{
-		{[]float64{-10, -8, -5}, []float64{5.0 / 8, 1, 1}},
-		{[]float64{-2, 0, 2, 3}, []float64{5.0 / 9, 8.0 / 9, 1, 1}},
+		{[]float64{-10, -8, -5}, []float64{6.0 / 11, 10.0 / 11, 1}},
+		{[]float64{-2, 0, 2, 3}, []float64{6.0 / 13, 10.0 / 13, 12.0 / 13, 1}},
 	}
 	for _, test := range testCases {
-		var weights = getWeights(test.fitnesses)
+		var weights = buildWheel(test.fitnesses)
 		for i := range weights {
 			if weights[i] != test.weights[i] {
-				fmt.Println(weights[i], test.weights[i])
-				t.Error("getWeights didn't work as expected")
+				t.Error("buildWheel didn't work as expected")
 			}
 		}
 	}

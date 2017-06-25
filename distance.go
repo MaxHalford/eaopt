@@ -1,5 +1,10 @@
 package gago
 
+import (
+	"fmt"
+	"math"
+)
+
 // A Metric returns the distance between two genomes.
 type Metric func(a, b Individual) float64
 
@@ -48,7 +53,9 @@ func (dm *DistanceMemoizer) GetDistance(a, b Individual) float64 {
 	return dist
 }
 
-// Return the average distance between a Individual and a slice of Individuals.
+// calcAvgDistances returns a map that associates the ID of each provided
+// Individual with the average distance the Individual has with the rest of the
+// Individuals.
 func calcAvgDistances(indis Individuals, dm DistanceMemoizer) map[string]float64 {
 	var avgDistances = make(map[string]float64)
 	for _, a := range indis {
@@ -58,4 +65,64 @@ func calcAvgDistances(indis Individuals, dm DistanceMemoizer) map[string]float64
 		avgDistances[a.ID] /= float64(len(indis) - 1)
 	}
 	return avgDistances
+}
+
+func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluster int) ([]Individuals, error) {
+	// Calculate the number of missing Individuals per cluster for each cluster
+	// to reach at least minPerCluster Individuals.
+	var missing = make([]int, len(clusters))
+	for i, cluster := range clusters {
+		// Check that the cluster has at least on Individual
+		if len(cluster) == 0 {
+			return nil, fmt.Errorf("Cluster %d has 0 individuals", i)
+		}
+		// Calculate the number of missing Individual in the cluster to reach minPerCluster
+		missing[i] = minPerCluster - len(cluster)
+	}
+	// Check if there are enough Individuals to rebalance the clusters.
+	if sumInts(missing) >= 0 {
+		return nil, fmt.Errorf("Missing %d individuals to be able to rebalance the clusters",
+			sumInts(missing))
+	}
+	// Loop through the clusters that are missing Individuals
+	for i, cluster := range clusters {
+		// Check if the cluster is missing Individuals
+		if missing[i] <= 0 {
+			continue
+		}
+		// Assign new Individuals to the cluster while it is missing some
+		for missing[i] > 0 {
+			// Determine the medoid
+			cluster.SortByDistanceToMedoid(dm)
+			var medoid = cluster[0]
+			// Go through the Individuals of the other clusters and find the one
+			// closest to the computed medoid
+			var (
+				cci     int // Closest cluster index
+				cii     int // Closest Individual index
+				minDist = math.Inf(1)
+			)
+			for j := range clusters {
+				// Check that the cluster has Individuals to spare
+				if i == j || missing[j] >= 0 {
+					continue
+				}
+				// Find the closest Individual to the medoid inside the cluster
+				for k, indi := range clusters[j] {
+					var dist = dm.GetDistance(indi, medoid)
+					if dist < minDist {
+						cci = j
+						cii = k
+						minDist = dist
+					}
+				}
+			}
+			// Add the closest Individual to the cluster
+			clusters[i] = append(clusters[i], clusters[cci][cii])
+			// Remove the closest Individual from the cluster it belonged to
+			clusters[cci] = append(clusters[cci][:cii], clusters[cci][cii+1:]...)
+			missing[i]--
+		}
+	}
+	return clusters, nil
 }
