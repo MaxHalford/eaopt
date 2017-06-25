@@ -39,6 +39,14 @@ func min(a, b int) int {
 	return b
 }
 
+// Compute the sum of an int slice.
+func sumInts(ints []int) (sum int) {
+	for _, v := range ints {
+		sum += v
+	}
+	return
+}
+
 // Compute the sum of a float64 slice.
 func sumFloat64s(floats []float64) (sum float64) {
 	for _, v := range floats {

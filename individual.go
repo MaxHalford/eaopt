@@ -131,6 +131,19 @@ func (indis Individuals) IsSortedByFitness() bool {
 	return sort.SliceIsSorted(indis, less)
 }
 
+// SortByDistanceToMedoid sorts Individuals according to their distance to the
+// medoid. The medoid is the Individual that has the lowest average distance to
+// the rest of the Individuals.
+func (indis Individuals) SortByDistanceToMedoid(dm DistanceMemoizer) {
+	var (
+		avgDists = calcAvgDistances(indis, dm)
+		less     = func(i, j int) bool {
+			return avgDists[indis[i].ID] < avgDists[indis[j].ID]
+		}
+	)
+	sort.Slice(indis, less)
+}
+
 // Extract the fitness of a slice of individuals into a float64 slice.
 func (indis Individuals) getFitnesses() []float64 {
 	var fitnesses = make([]float64, len(indis))
