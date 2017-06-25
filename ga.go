@@ -77,7 +77,7 @@ func (ga *GA) findBest() {
 	for _, pop := range ga.Populations {
 		var best = pop.Individuals[0]
 		if best.Fitness < ga.Best.Fitness {
-			ga.Best = best
+			ga.Best = best.Clone(pop.rng)
 		}
 	}
 }

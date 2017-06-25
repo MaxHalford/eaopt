@@ -240,7 +240,7 @@ type Slice interface {
     Split(k int) (Slice, Slice)
     Append(Slice) Slice
     Replace(Slice)
-    Clone() Slice
+    Copy() Slice
 }
 ```
 

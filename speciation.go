@@ -25,13 +25,12 @@ type SpecKMedoids struct {
 // Apply SpecKMedoids.
 func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) []Individuals {
 	var (
-		individuals = make(Individuals, len(indis))
-		species     = make([]Individuals, spec.K)
-		medoids     = make(Individuals, spec.K)
-		dm          = newDistanceMemoizer(spec.Metric)
+		species = make([]Individuals, spec.K)
+		medoids = make(Individuals, spec.K)
+		dm      = newDistanceMemoizer(spec.Metric)
 	)
 	// Make a copy of the provided individuals to avoid side effects
-	copy(individuals, indis)
+	var individuals = indis.Clone(rng)
 	// Initialize the clusters with the individuals having the lowest average
 	// distances with the other individuals
 	var (
