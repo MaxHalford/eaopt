@@ -12,7 +12,7 @@ type Slice interface {
 	Split(k int) (Slice, Slice)
 	Append(Slice) Slice
 	Replace(Slice)
-	Clone() Slice
+	Copy() Slice
 }
 
 // Search for the first index of an element in a Slice.
@@ -120,10 +120,10 @@ func (s IntSlice) Replace(t Slice) {
 }
 
 // Clone method from Slice
-func (s IntSlice) Clone() Slice {
-	var clone = make(IntSlice, len(s))
-	copy(clone, s)
-	return clone
+func (s IntSlice) Copy() Slice {
+	var t = make(IntSlice, len(s))
+	copy(t, s)
+	return t
 }
 
 // Float64Slice attaches the methods of Slice to []float64
@@ -170,10 +170,10 @@ func (s Float64Slice) Replace(t Slice) {
 }
 
 // Clone method from Slice
-func (s Float64Slice) Clone() Slice {
-	var clone = make(Float64Slice, len(s))
-	copy(clone, s)
-	return clone
+func (s Float64Slice) Copy() Slice {
+	var t = make(Float64Slice, len(s))
+	copy(t, s)
+	return t
 }
 
 // StringSlice attaches the methods of Slice to []float64
@@ -220,8 +220,8 @@ func (s StringSlice) Replace(t Slice) {
 }
 
 // Clone method from Slice
-func (s StringSlice) Clone() Slice {
-	var clone = make(StringSlice, len(s))
-	copy(clone, s)
-	return clone
+func (s StringSlice) Copy() Slice {
+	var t = make(StringSlice, len(s))
+	copy(t, s)
+	return t
 }

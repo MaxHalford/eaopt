@@ -59,7 +59,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 		winners[i].Fitness = math.Inf(1)
 		for j, k := range contestants {
 			if indis[k].GetFitness() < winners[i].Fitness {
-				winners[i] = indis[k]
+				winners[i] = indis[k].Clone(rng)
 				indexes[i] = k
 				winnerIdx = idxs[j]
 			}
@@ -106,7 +106,7 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 			winner = indis[index]
 		)
 		indexes[i] = index
-		selected[i] = winner
+		selected[i] = winner.Clone(rng)
 	}
 	return selected, indexes, nil
 }

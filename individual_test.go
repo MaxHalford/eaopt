@@ -129,47 +129,6 @@ func TestIndividualsSortByFitness(t *testing.T) {
 	}
 }
 
-// func TestIndividualsSample(t *testing.T) {
-// 	var (
-// 		rng         = newRandomNumberGenerator()
-// 		nIndis      = 10
-// 		indis       = newIndividuals(nIndis, NewVector, rng)
-// 		sampleSizes = []int{0, 1, nIndis - 1, nIndis, nIndis + 1}
-// 	)
-// 	for _, sampleSize := range sampleSizes {
-// 		var sample, _ = indis.sample(sampleSize, rng)
-// 		if len(sample) != min(sampleSize, nIndis) {
-// 			t.Error("Wrong sample size")
-// 		}
-// 		// Check the sampled individuals come from the original population
-// 		for _, a := range sample {
-// 			var exists = false
-// 			for _, b := range indis {
-// 				if a.ID == b.ID {
-// 					exists = true
-// 					break
-// 				}
-// 			}
-// 			if exists == false {
-// 				t.Error("Sampled individuals should come from the original population")
-// 			}
-// 		}
-// 		// Check the sampled individuals have new references
-// 		for _, a := range sample {
-// 			var referenced = false
-// 			for _, b := range indis {
-// 				if &a == &b {
-// 					referenced = true
-// 					break
-// 				}
-// 			}
-// 			if referenced == true {
-// 				t.Error("Sampled individuals shouln't share pointers with original population")
-// 			}
-// 		}
-// 	}
-// }
-
 func TestGetFitnesses(t *testing.T) {
 	var (
 		indis = Individuals{
