@@ -126,9 +126,9 @@ func (ga *GA) Initialize() {
 func (ga *GA) Enhance() error {
 	var start = time.Now()
 	ga.Generations++
-	// Migrate the individuals between the populations if there are enough
-	// populations, there is a migrator and the migration frequency divides the
-	// generation count
+	// Migrate the individuals between the populations if there are at least 2
+	// Populations and that there is a migrator and that the migration frequency
+	// divides the generation count
 	if len(ga.Populations) > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations, ga.rng)
 	}
@@ -178,10 +178,14 @@ func (ga *GA) Enhance() error {
 
 func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 	var (
-		species = spec.Apply(pop.Individuals, pop.rng)
-		pops    = make([]Population, len(species))
+		species, err = spec.Apply(pop.Individuals, pop.rng)
+		pops         = make([]Population, len(species))
 	)
-	// Create a slice of population from the obtained species and evolve each one separately
+	if err != nil {
+		return err
+	}
+	// Create a subpopulation from each specie so that the evolution Model can
+	// be applied to it.
 	for i, specie := range species {
 		pops[i] = Population{
 			Individuals: specie,
@@ -190,7 +194,7 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 			ID:          randString(len(pop.ID), pop.rng),
 			rng:         pop.rng,
 		}
-		var err = model.Apply(&pops[i])
+		err = model.Apply(&pops[i])
 		if err != nil {
 			return err
 		}

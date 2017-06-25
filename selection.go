@@ -20,6 +20,7 @@ type SelElitism struct{}
 
 // Apply SelElitism.
 func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+	indis.SortByFitness()
 	return indis[:n].Clone(rng), newInts(n), nil
 }
 
@@ -82,27 +83,28 @@ func (sel SelTournament) Validate() error {
 // as fitness proportionate selection).
 type SelRoulette struct{}
 
-func getWeights(fitnesses []float64) []float64 {
+func buildWheel(fitnesses []float64) []float64 {
 	var (
-		n       = len(fitnesses)
-		weights = make([]float64, n)
+		n     = len(fitnesses)
+		wheel = make([]float64, n)
 	)
 	for i, v := range fitnesses {
-		weights[i] = fitnesses[n-1] - v
+		wheel[i] = fitnesses[n-1] - v + 1
 	}
-	return cumsum(divide(weights, sumFloat64s(weights)))
+	return cumsum(divide(wheel, sumFloat64s(wheel)))
 }
 
 // Apply SelRoulette.
 func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+
 	var (
 		selected = make(Individuals, n)
 		indexes  = make([]int, n)
-		weights  = getWeights(indis.getFitnesses())
+		wheel    = buildWheel(indis.getFitnesses())
 	)
 	for i := range selected {
 		var (
-			index  = sort.SearchFloat64s(weights, rand.Float64())
+			index  = sort.SearchFloat64s(wheel, rand.Float64())
 			winner = indis[index]
 		)
 		indexes[i] = index

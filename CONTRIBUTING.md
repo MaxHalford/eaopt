@@ -74,13 +74,7 @@ Genetic algorithms are notorious for being [embarrassingly parallel](http://www.
 
 Talking about parallelism, there is a reason why the populations are run in parallel and not the individuals. First of all for parallelism at an individual level each individual would have to be assigned a new random number generator, which isn't very efficient. Second of all, even though Golang has an efficient concurrency model, spawning routines nonetheless has an overhead. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
 
-## Editing the documentation
-
-- The documentation is built with [mkdocs](https://mkdocs.readthedocs.io).
-- Each page has an associated markdown file in the `docs/` folder.
-- You can `mkdocs serve` to enable live editing of the documentation.
-
 ## Performance
 
 1. `go test -bench . -cpuprofile=cpu.prof`
-2. `go tool pprof main.test cpu.prof or `go-torch main.test cpu.prof`
+2. `go tool pprof main.test cpu.prof` or `go-torch main.test cpu.prof`

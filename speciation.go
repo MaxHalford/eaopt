@@ -2,49 +2,47 @@ package gago
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
-	"sort"
 )
 
 // A Speciator partitions a population into n smaller subpopulations. Each
 // subpopulation shares the same random number generator inherited from the
 // initial population.
 type Speciator interface {
-	Apply(indis Individuals, rng *rand.Rand) []Individuals
+	Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error)
 	Validate() error
 }
 
 // SpecKMedoids (k-medoid clustering).
 type SpecKMedoids struct {
-	K             int    // Number of medoids
+	K             int // Number of medoids
+	MinPerCluster int
 	Metric        Metric // Dissimimilarity measure
 	MaxIterations int
 }
 
 // Apply SpecKMedoids.
-func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) []Individuals {
+func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
+	// Check there are at least K Individuals
+	if len(indis) < spec.K {
+		return nil, fmt.Errorf("SpecKMedoids: have %d individuals and need at least %d",
+			len(indis), spec.K)
+	}
 	var (
 		species = make([]Individuals, spec.K)
 		medoids = make(Individuals, spec.K)
 		dm      = newDistanceMemoizer(spec.Metric)
 	)
-	// Make a copy of the provided individuals to avoid side effects
-	var individuals = indis.Clone(rng)
 	// Initialize the clusters with the individuals having the lowest average
 	// distances with the other individuals
-	var (
-		avgDists = calcAvgDistances(individuals, dm)
-		less     = func(i, j int) bool {
-			return avgDists[individuals[i].ID] < avgDists[individuals[j].ID]
-		}
-	)
-	sort.Slice(individuals, less)
-	copy(medoids, individuals[:spec.K])
+	indis.SortByDistanceToMedoid(dm)
+	copy(medoids, indis[:spec.K])
 	// Keep track of the total distance from the medoid to each of the cluster's members
 	var total float64
 	// Assign each individual to the closest initial medoid
-	for _, indi := range individuals {
+	for _, indi := range indis {
 		var i = indi.IdxOfClosest(medoids, dm)
 		species[i] = append(species[i], indi)
 		total += dm.GetDistance(medoids[i], indi)
@@ -58,14 +56,10 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) []Individuals 
 		)
 		// Recompute the new medoid inside each specie
 		for i, specie := range species {
-			avgDists = calcAvgDistances(specie, dm)
-			less = func(i, j int) bool {
-				return avgDists[specie[i].ID] < avgDists[specie[j].ID]
-			}
-			sort.Slice(specie, less)
+			specie.SortByDistanceToMedoid(dm)
 			medoids[i] = specie[0]
 		}
-		// Reassign each individual to the closest initial medoid
+		// Reassign each individual to the closest new medoid
 		for _, indi := range indis {
 			var i = indi.IdxOfClosest(medoids, dm)
 			newSpecies[i] = append(newSpecies[i], indi)
@@ -78,7 +72,9 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) []Individuals 
 		copy(species, newSpecies)
 		total = newTotal
 	}
-	return species
+	// Rebalance the species so that their are at least
+	rebalanceClusters(species, dm, spec.MinPerCluster)
+	return species, nil
 }
 
 // Validate SpecKMedoids fields.
@@ -106,7 +102,7 @@ type SpecFitnessInterval struct {
 }
 
 // Apply SpecFitnessInterval.
-func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) []Individuals {
+func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)
@@ -116,7 +112,7 @@ func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) []Indiv
 		var a, b = i * m, min((i+1)*m, n)
 		species[i] = indis[a:b]
 	}
-	return species
+	return species, nil
 }
 
 // Validate SpecFitnessInterval fields.
