@@ -156,14 +156,14 @@ func TestIntSliceReplace(t *testing.T) {
 	}
 }
 
-func TestIntSliceClone(t *testing.T) {
+func TestIntSliceCopy(t *testing.T) {
 	var (
 		ints  = IntSlice{1}
-		clone = ints.Clone()
+		clone = ints.Copy()
 	)
 	clone.Replace(IntSlice{2})
 	if ints.At(0) != 1 {
-		t.Error("IntSlice Clone method has unexpected behavior")
+		t.Error("IntSlice Copy method has unexpected behavior")
 	}
 }
 
@@ -218,14 +218,14 @@ func TestFloat64SliceReplace(t *testing.T) {
 	}
 }
 
-func TestFloat64SliceClone(t *testing.T) {
+func TestFloat64SliceCopy(t *testing.T) {
 	var (
 		floats = Float64Slice{1}
-		clone  = floats.Clone()
+		clone  = floats.Copy()
 	)
 	clone.Replace(Float64Slice{2})
 	if floats.At(0) != 1.0 {
-		t.Error("IntSlice Clone method has unexpected behavior")
+		t.Error("IntSlice Copy method has unexpected behavior")
 	}
 }
 
@@ -280,13 +280,13 @@ func TestStringSliceReplace(t *testing.T) {
 	}
 }
 
-func TestStringSliceClone(t *testing.T) {
+func TestStringSliceCopy(t *testing.T) {
 	var (
 		strings = StringSlice{"a"}
-		clone   = strings.Clone()
+		clone   = strings.Copy()
 	)
 	clone.Replace(StringSlice{"b"})
 	if strings.At(0) == "b" {
-		t.Error("StringSlice Clone method has unexpected behavior")
+		t.Error("StringSlice Copy method has unexpected behavior")
 	}
 }

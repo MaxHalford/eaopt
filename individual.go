@@ -6,18 +6,6 @@ import (
 	"sort"
 )
 
-// A Genome is an object that can have any number and kinds of properties. As
-// long as it can be evaluated, mutated and crossedover then it can evolved.
-type Genome interface {
-	Evaluate() float64
-	Mutate(rng *rand.Rand)
-	Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
-}
-
-// A GenomeFactory is a method that generates a new Genome with random
-// properties.
-type GenomeFactory func(rng *rand.Rand) Genome
-
 // An Individual wraps a Genome and contains the fitness assigned to the Genome.
 type Individual struct {
 	Genome    Genome  `json:"genome"`
@@ -40,7 +28,7 @@ func NewIndividual(genome Genome, rng *rand.Rand) Individual {
 // a different ID.
 func (indi Individual) Clone(rng *rand.Rand) Individual {
 	return Individual{
-		Genome:    indi.Genome,
+		Genome:    indi.Genome.Clone(),
 		Fitness:   indi.Fitness,
 		Evaluated: indi.Evaluated,
 		ID:        randString(6, rng),

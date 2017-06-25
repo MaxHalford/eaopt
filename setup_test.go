@@ -53,14 +53,10 @@ func (X Vector) Crossover(Y Genome, rng *rand.Rand) (Genome, Genome) {
 	return Vector(o1), Vector(o2)
 }
 
-// Implement the Slice interface
-
-func (X Vector) Swap(i, j int) {
-	X[i], X[j] = X[j], X[i]
-}
-
-func (X Vector) Len() int {
-	return len(X)
+func (X Vector) Clone() Genome {
+	var XX = make(Vector, len(X))
+	copy(XX, X)
+	return XX
 }
 
 func NewVector(rng *rand.Rand) Genome {

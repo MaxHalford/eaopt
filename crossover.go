@@ -31,8 +31,8 @@ func CrossUniformFloat64(p1 []float64, p2 []float64, rng *rand.Rand) (o1 []float
 func gnx(p1, p2 Slice, indexes []int) (Slice, Slice) {
 	var (
 		n      = p1.Len()
-		o1     = p1.Clone()
-		o2     = p2.Clone()
+		o1     = p1.Copy()
+		o2     = p2.Copy()
 		toggle = true
 	)
 	// Add the first and last indexes
@@ -83,8 +83,8 @@ func CrossGNXString(s1 []string, s2 []string, n int, rng *rand.Rand) ([]string, 
 func pmx(p1, p2 Slice, a, b int) (Slice, Slice) {
 	var (
 		n  = p1.Len()
-		o1 = p1.Clone()
-		o2 = p2.Clone()
+		o1 = p1.Copy()
+		o2 = p2.Copy()
 	)
 	// Create lookup maps to quickly see if a gene has been visited
 	var (
@@ -163,8 +163,8 @@ func CrossPMXString(s1 []string, s2 []string, rng *rand.Rand) ([]string, []strin
 func ox(p1, p2 Slice, a, b int) (Slice, Slice) {
 	var (
 		n  = p1.Len()
-		o1 = p1.Clone()
-		o2 = p2.Clone()
+		o1 = p1.Copy()
+		o2 = p2.Copy()
 	)
 	// Create lookup maps to quickly see if a gene has been copied from a parent or not
 	var p1Visited, p2Visited = make(set), make(set)
@@ -223,8 +223,8 @@ func CrossOXString(s1 []string, s2 []string, rng *rand.Rand) ([]string, []string
 // deterministic and preserves gene uniqueness.
 func CrossCX(p1, p2 Slice) (Slice, Slice) {
 	var (
-		o1     = p1.Clone()
-		o2     = p2.Clone()
+		o1     = p1.Copy()
+		o2     = p2.Copy()
 		cycles = getCycles(p1, p2)
 		toggle = true
 	)
@@ -265,8 +265,8 @@ func CrossCXString(s1 []string, s2 []string) ([]string, []string) {
 func CrossERX(p1, p2 Slice) (Slice, Slice) {
 	var (
 		n            = p1.Len()
-		o1           = p1.Clone()
-		o2           = p2.Clone()
+		o1           = p1.Copy()
+		o2           = p2.Copy()
 		parents      = []Slice{p1, p2}
 		offsprings   = []Slice{o1, o2}
 		p1Neighbours = getNeighbours(p1)
