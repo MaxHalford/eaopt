@@ -21,7 +21,7 @@ type GA struct {
 	MigFrequency  int           `json:"-"` // Frequency at which migrations occur
 	Speciator     Speciator     `json:"-"`
 	Logger        *log.Logger   `json:"-"`
-	Callback      func(ga GA)   `json:"-"`
+	Callback      func(ga *GA)  `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -116,7 +116,7 @@ func (ga *GA) Initialize() {
 	ga.findBest()
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
-		ga.Callback(*ga)
+		ga.Callback(ga)
 	}
 }
 
@@ -170,7 +170,7 @@ func (ga *GA) Enhance() error {
 	ga.Age += time.Since(start)
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
-		ga.Callback(*ga)
+		ga.Callback(ga)
 	}
 	// No error
 	return nil

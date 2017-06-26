@@ -159,7 +159,7 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 func TestCallback(t *testing.T) {
 	var (
 		counter          int
-		incrementCounter = func(ga GA) {
+		incrementCounter = func(ga *GA) {
 			counter++
 		}
 	)
