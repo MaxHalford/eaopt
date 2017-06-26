@@ -1,9 +1,9 @@
 ## Ideas
 
 - Enhance TS tests
-- Make errors for selection and propagate them up so that `initialize` and `enhance` can spit errors
+- Add more context to errors (at least the method/struct name)
 - Add more example usage
-- Make it easier to test models. Also make sure they work as expected.
+- Make it easier to test models
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
 - Implement Particle Swarm Optimization
 - http://deap.readthedocs.io/en/master/
@@ -27,42 +27,6 @@ x := 42
 var x = 42
 ```
 
-The `:=` operator works in the following case.
-
-```go
-val1, err := getVal1()
-val2, err := getVal2()
-```
-
-However the following will not work.
-
-```go
-var val1, err = getVal1()
-var val2, err = getVal2()
-```
-
-That's the only reason why I prefer to stick to `:=` for variable declaration.
-
-
-### Variable declaration in returning functions
-
-Avoid declaring returning returning variables inside the function. They are already declared if they are named at the end of the first line of the function.
-
-```go
-// Good
-func lengthOfList(list []float64) length int {
-    length = len(list)
-    return
-}
-
-// Bad
-func lengthOfList(list []float64) int {
-    var length int
-    length = len(list)
-    return length
-}
-```
-
 ## Naming convention
 
 Please inspire yourself from the existing algorithms before implementing, the naming conventions are easy to grasp.
@@ -77,4 +41,4 @@ Talking about parallelism, there is a reason why the populations are run in para
 ## Performance
 
 1. `go test -bench . -cpuprofile=cpu.prof`
-2. `go tool pprof main.test cpu.prof` or `go-torch main.test cpu.prof`
+2. `go tool pprof -pdf gago.test cpu.prof > profile.pdf`

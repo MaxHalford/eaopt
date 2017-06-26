@@ -56,10 +56,11 @@ func TestSelElitism(t *testing.T) {
 
 func TestSelTournament(t *testing.T) {
 	var (
-		rng            = newRandomNumberGenerator()
-		indis          = newIndividuals(30, NewVector, rng)
-		selected, _, _ = SelTournament{len(indis)}.Apply(1, indis, rng)
+		rng   = newRandomNumberGenerator()
+		indis = newIndividuals(30, NewVector, rng)
 	)
+	indis.Evaluate()
+	var selected, _, _ = SelTournament{len(indis)}.Apply(1, indis, rng)
 	if selected[0].Fitness != indis.FitMin() {
 		t.Error("Full SelTournament didn't select the best individual")
 	}

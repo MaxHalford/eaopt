@@ -3,7 +3,6 @@ package gago
 import (
 	"errors"
 	"fmt"
-	"math"
 	"math/rand"
 	"sort"
 )
@@ -57,18 +56,19 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 			winnerIdx            int
 		)
 		// Find the best contestant
-		winners[i].Fitness = math.Inf(1)
-		for j, k := range contestants {
-			if indis[k].GetFitness() < winners[i].Fitness {
-				winners[i] = indis[k].Clone(rng)
-				indexes[i] = k
+		winners[i] = indis[contestants[0]]
+		winners[i].Evaluate()
+		for j, idx := range contestants[1:] {
+			if indis[idx].GetFitness() < winners[i].Fitness {
+				winners[i] = indis[idx]
+				indexes[i] = idx
 				winnerIdx = idxs[j]
 			}
 		}
 		// Ban the winner from re-participating
 		notSelectedIdxs = append(notSelectedIdxs[:winnerIdx], notSelectedIdxs[winnerIdx+1:]...)
 	}
-	return winners, indexes, nil
+	return winners.Clone(rng), indexes, nil
 }
 
 // Validate SelTournament fields.
@@ -96,7 +96,6 @@ func buildWheel(fitnesses []float64) []float64 {
 
 // Apply SelRoulette.
 func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
-
 	var (
 		selected = make(Individuals, n)
 		indexes  = make([]int, n)
@@ -108,9 +107,9 @@ func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individu
 			winner = indis[index]
 		)
 		indexes[i] = index
-		selected[i] = winner.Clone(rng)
+		selected[i] = winner
 	}
-	return selected, indexes, nil
+	return selected.Clone(rng), indexes, nil
 }
 
 // Validate SelRoulette fields.
