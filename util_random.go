@@ -12,6 +12,22 @@ func newRandomNumberGenerator() *rand.Rand {
 	return rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
+// Sample k unique integers in range [min, max) using reservoir sampling,
+// specifically Vitter's Algorithm R.
+func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
+	ints = make([]int, k)
+	for i := 0; i < k; i++ {
+		ints[i] = i + min
+	}
+	for i := k; i < max-min; i++ {
+		var j = rng.Intn(i + 1)
+		if j < k {
+			ints[j] = i + min
+		}
+	}
+	return
+}
+
 // Sample k unique integers from a slice of n integers without replacement.
 func sampleInts(ints []int, k int, rng *rand.Rand) ([]int, []int, error) {
 	if k > len(ints) {
@@ -40,22 +56,6 @@ func randomWeights(size int) []float64 {
 	}
 	var normalized = divide(weights, total)
 	return normalized
-}
-
-// Sample k unique integers in range [min, max) using reservoir sampling,
-// specifically Vitter's Algorithm R.
-func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
-	ints = make([]int, k)
-	for i := 0; i < k; i++ {
-		ints[i] = i + min
-	}
-	for i := k; i < max-min; i++ {
-		var j = rng.Intn(i + 1)
-		if j < k {
-			ints[j] = i + min
-		}
-	}
-	return
 }
 
 const (

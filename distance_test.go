@@ -85,7 +85,11 @@ func TestRebalanceClusters(t *testing.T) {
 		}
 		dm = newDistanceMemoizer(l1Distance)
 	)
-	rebalanceClusters(clusters, dm, 2)
+	var err = rebalanceClusters(clusters, dm, 2)
+	// Check there is not error
+	if err != nil {
+		t.Error("rebalanceClusters should not have returned an error")
+	}
 	// Check the second cluster
 	if len(clusters[1]) != 2 || clusters[1][1].ID != "4" {
 		t.Error("rebalanceClusters didn't work as expected")
@@ -93,5 +97,49 @@ func TestRebalanceClusters(t *testing.T) {
 	// Check the third cluster
 	if len(clusters[2]) != 2 || clusters[2][1].ID != "5" {
 		t.Error("rebalanceClusters didn't work as expected")
+	}
+}
+
+// If a cluster is empty then rebalancing is impossible
+func TestRebalanceClustersEmptyCluster(t *testing.T) {
+	var (
+		clusters = []Individuals{
+			Individuals{
+				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
+			},
+			Individuals{},
+		}
+		dm = newDistanceMemoizer(l1Distance)
+	)
+	var err = rebalanceClusters(clusters, dm, 2)
+	if err == nil {
+		t.Error("rebalanceClusters should have returned an error")
+	}
+}
+
+// It's impossible to put 2 Individuals inside each cluster if there are 3
+// clusters and 5 individuals in total
+func TestRebalanceClustersTooManyMissing(t *testing.T) {
+	var (
+		clusters = []Individuals{
+			Individuals{
+				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
+			},
+			Individuals{
+				Individual{Genome: Vector{2, 2, 2}, ID: "6"},
+			},
+			Individuals{
+				Individual{Genome: Vector{3, 3, 3}, ID: "7"},
+			},
+		}
+		dm = newDistanceMemoizer(l1Distance)
+	)
+	var err = rebalanceClusters(clusters, dm, 2)
+	if err == nil {
+		t.Error("rebalanceClusters should have returned an error")
 	}
 }
