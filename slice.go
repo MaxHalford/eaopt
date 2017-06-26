@@ -119,7 +119,7 @@ func (s IntSlice) Replace(t Slice) {
 	copy(s, t.(IntSlice))
 }
 
-// Clone method from Slice
+// Copy method from Slice
 func (s IntSlice) Copy() Slice {
 	var t = make(IntSlice, len(s))
 	copy(t, s)
@@ -169,7 +169,7 @@ func (s Float64Slice) Replace(t Slice) {
 	copy(s, t.(Float64Slice))
 }
 
-// Clone method from Slice
+// Copy method from Slice
 func (s Float64Slice) Copy() Slice {
 	var t = make(Float64Slice, len(s))
 	copy(t, s)
@@ -219,7 +219,7 @@ func (s StringSlice) Replace(t Slice) {
 	copy(s, t.(StringSlice))
 }
 
-// Clone method from Slice
+// Copy method from Slice
 func (s StringSlice) Copy() Slice {
 	var t = make(StringSlice, len(s))
 	copy(t, s)

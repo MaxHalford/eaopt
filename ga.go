@@ -104,7 +104,7 @@ func (ga *GA) Initialize() {
 			ga.Populations[j].Individuals.SortByFitness()
 			// Log current statistics if a logger has been provided
 			if ga.Logger != nil {
-				go ga.Populations[j].Log(ga.Logger)
+				ga.Populations[j].Log(ga.Logger)
 			}
 		}(i)
 	}
@@ -152,7 +152,7 @@ func (ga *GA) Enhance() error {
 			ga.Populations[i].Generations++
 			// Log current statistics if a logger has been provided
 			if ga.Logger != nil {
-				go ga.Populations[i].Log(ga.Logger)
+				ga.Populations[i].Log(ga.Logger)
 			}
 			return err
 		})
