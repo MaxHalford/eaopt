@@ -262,7 +262,7 @@ type GA struct {
     MigFrequency int // Frequency at which migrations occur
     Speciator    Speciator
     Logger       *log.Logger
-    Callback     func(ga GA)
+    Callback     func(ga *GA)
 
     // Fields that are generated at runtime
     Populations Populations
