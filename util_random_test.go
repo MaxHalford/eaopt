@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"testing"
@@ -42,9 +43,54 @@ func TestRandomInts(t *testing.T) {
 	}
 }
 
+func TestSampleInts(t *testing.T) {
+	var testCases = []struct {
+		ints []int
+		k    int
+		err  error
+	}{
+		{
+			ints: []int{1, 2, 3},
+			k:    0,
+			err:  nil,
+		},
+		{
+			ints: []int{1, 2, 3},
+			k:    1,
+			err:  nil,
+		},
+		{
+			ints: []int{1, 2, 3},
+			k:    2,
+			err:  nil,
+		},
+		{
+			ints: []int{1, 2, 3},
+			k:    3,
+			err:  nil,
+		},
+		{
+			ints: []int{1, 2, 3},
+			k:    4,
+			err:  errors.New("k > len(ints)"),
+		},
+	}
+	var rng = newRandomNumberGenerator()
+	for i, tc := range testCases {
+		var ints, idxs, err = sampleInts(tc.ints, tc.k, rng)
+		if (err == nil) != (tc.err == nil) {
+			t.Errorf("Error in test case number %d", i)
+		} else {
+			if err == nil && (len(ints) != tc.k || len(idxs) != tc.k) {
+				t.Errorf("Error in test case number %d", i)
+			}
+		}
+	}
+}
+
 func TestRandomWeights(t *testing.T) {
 	var (
-		sizes = []int{1, 30, 10000}
+		sizes = []int{1, 30, 500}
 		limit = math.Pow(1, -10)
 	)
 	for _, size := range sizes {
