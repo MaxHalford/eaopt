@@ -109,6 +109,11 @@ type SpecFitnessInterval struct {
 
 // Apply SpecFitnessInterval.
 func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
+	// Check there are at least K Individuals
+	if len(indis) < spec.K {
+		return nil, fmt.Errorf("SpecFitnessInterval: have %d individuals and need at least %d",
+			len(indis), spec.K)
+	}
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)

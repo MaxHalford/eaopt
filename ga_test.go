@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"errors"
 	"math"
 	"testing"
 	"time"
@@ -145,16 +146,77 @@ func TestDuration(t *testing.T) {
 
 func TestSpeciateEvolveMerge(t *testing.T) {
 	var (
-		rng = newRandomNumberGenerator()
-		pop = Population{ID: "42", rng: rng, Individuals: Individuals{}}
+		rng       = newRandomNumberGenerator()
+		testCases = []struct {
+			pop       Population
+			speciator Speciator
+			model     Model
+			err       error
+		}{
+			{
+				pop: Population{
+					ID:  "42",
+					rng: rng,
+					Individuals: Individuals{
+						Individual{Fitness: 0},
+						Individual{Fitness: 1},
+						Individual{Fitness: 2},
+						Individual{Fitness: 3},
+						Individual{Fitness: 4},
+					},
+				},
+				speciator: SpecFitnessInterval{3},
+				model:     ModIdentity{},
+				err:       nil,
+			},
+			{
+				pop: Population{
+					ID:  "42",
+					rng: rng,
+					Individuals: Individuals{
+						Individual{Fitness: 0},
+						Individual{Fitness: 1},
+						Individual{Fitness: 2},
+					},
+				},
+				speciator: SpecFitnessInterval{4},
+				model:     ModIdentity{},
+				err:       errors.New("Invalid speciator"),
+			},
+			{
+				pop: Population{
+					ID:  "42",
+					rng: rng,
+					Individuals: Individuals{
+						Individual{Fitness: 0},
+						Individual{Fitness: 1},
+						Individual{Fitness: 2},
+						Individual{Fitness: 3},
+						Individual{Fitness: 4},
+					},
+				},
+				speciator: SpecFitnessInterval{3},
+				model: ModGenerational{
+					Selector: SelTournament{6},
+					MutRate:  0.5,
+				},
+				err: errors.New("Invalid model"),
+			},
+		}
 	)
-	for i := 0; i < 7; i++ {
-		pop.Individuals = append(pop.Individuals, Individual{Fitness: float64(i)})
-	}
-	pop.speciateEvolveMerge(SpecFitnessInterval{3}, ModIdentity{})
-	for i := 0; i < 7; i++ {
-		if pop.Individuals[i].Fitness != float64(i) {
-			t.Error("speciateEvolveMerge did not work as expected")
+	for i, tc := range testCases {
+		var err = tc.pop.speciateEvolveMerge(tc.speciator, tc.model)
+		if (err == nil) != (tc.err == nil) {
+			t.Errorf("Wrong error in test case number %d", i)
+		}
+		// If there is no error check the individuals are ordered as they were
+		// at they were initially
+		if err == nil {
+			for j, indi := range tc.pop.Individuals {
+				if indi.Fitness != float64(j) {
+					t.Errorf("Wrong result in test case number %d", i)
+				}
+			}
 		}
 	}
 }

@@ -1,9 +1,9 @@
 ## Ideas
 
-- Enhance TS tests
+- Improve tournament selection testing
+- Refactor models testings
 - Add more context to errors (at least the method/struct name) (https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully)
 - Add more example usage
-- Make it easier to test models
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
 - Implement Particle Swarm Optimization
 - http://deap.readthedocs.io/en/master/
