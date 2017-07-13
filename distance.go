@@ -67,21 +67,21 @@ func calcAvgDistances(indis Individuals, dm DistanceMemoizer) map[string]float64
 	return avgDistances
 }
 
-func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluster int) ([]Individuals, error) {
+func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluster int) error {
 	// Calculate the number of missing Individuals per cluster for each cluster
 	// to reach at least minPerCluster Individuals.
 	var missing = make([]int, len(clusters))
 	for i, cluster := range clusters {
-		// Check that the cluster has at least on Individual
+		// Check that the cluster has at least one Individual
 		if len(cluster) == 0 {
-			return nil, fmt.Errorf("Cluster %d has 0 individuals", i)
+			return fmt.Errorf("Cluster %d has 0 individuals", i)
 		}
 		// Calculate the number of missing Individual in the cluster to reach minPerCluster
 		missing[i] = minPerCluster - len(cluster)
 	}
 	// Check if there are enough Individuals to rebalance the clusters.
 	if sumInts(missing) >= 0 {
-		return nil, fmt.Errorf("Missing %d individuals to be able to rebalance the clusters",
+		return fmt.Errorf("Missing %d individuals to be able to rebalance the clusters",
 			sumInts(missing))
 	}
 	// Loop through the clusters that are missing Individuals
@@ -124,5 +124,5 @@ func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluste
 			missing[i]--
 		}
 	}
-	return clusters, nil
+	return nil
 }

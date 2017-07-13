@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -67,14 +68,108 @@ func TestSortByDistanceToMedoid(t *testing.T) {
 }
 
 func TestRebalanceClusters(t *testing.T) {
+	var testCases = []struct {
+		clusters        []Individuals
+		dm              DistanceMemoizer
+		minClusterSize  int
+		newClusterSizes []int
+		err             error
+	}{
+		{
+			clusters: []Individuals{
+				Individuals{
+					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+					Individual{Genome: Vector{1, 1, 1}, ID: "3"},
+					Individual{Genome: Vector{2, 2, 2}, ID: "4"}, // Second furthest away from the cluster
+					Individual{Genome: Vector{3, 3, 3}, ID: "5"}, // Furthest away from the cluster
+				},
+				Individuals{
+					Individual{Genome: Vector{2, 2, 2}, ID: "6"},
+				},
+				Individuals{
+					Individual{Genome: Vector{3, 3, 3}, ID: "7"},
+				},
+			},
+			dm:              newDistanceMemoizer(l1Distance),
+			minClusterSize:  2,
+			newClusterSizes: []int{3, 2, 2},
+			err:             nil,
+		},
+		{
+			clusters: []Individuals{
+				Individuals{
+					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+				},
+				Individuals{},
+			},
+			dm:              newDistanceMemoizer(l1Distance),
+			minClusterSize:  1,
+			newClusterSizes: []int{2, 0},
+			err:             errors.New("Cluster number 2 is empty"),
+		},
+		{
+			clusters: []Individuals{
+				Individuals{
+					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+				},
+				Individuals{
+					Individual{Genome: Vector{1, 1, 1}, ID: "3"},
+				},
+			},
+			dm:              newDistanceMemoizer(l1Distance),
+			minClusterSize:  2,
+			newClusterSizes: []int{2, 0},
+			err:             errors.New("Not enough individuals to rebalance"),
+		},
+	}
+	for i, tc := range testCases {
+		var err = rebalanceClusters(tc.clusters, tc.dm, tc.minClusterSize)
+		// Check if the error is nil or not
+		if (err == nil) != (tc.err == nil) {
+			t.Errorf("Wrong error in test case number %d", i)
+		}
+		// Check new cluster sizes
+		if err == nil {
+			for j, cluster := range tc.clusters {
+				if len(cluster) != tc.newClusterSizes[j] {
+					t.Errorf("Wrong new cluster size in test case number %d", i)
+				}
+			}
+		}
+	}
+}
+
+// If a cluster is empty then rebalancing is impossible
+func TestRebalanceClustersEmptyCluster(t *testing.T) {
 	var (
 		clusters = []Individuals{
 			Individuals{
 				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
-				Individual{Genome: Vector{2, 2, 2}, ID: "4"}, // Second furthest away from the cluster
-				Individual{Genome: Vector{3, 3, 3}, ID: "5"}, // Furthest away from the cluster
+			},
+			Individuals{},
+		}
+		dm = newDistanceMemoizer(l1Distance)
+	)
+	var err = rebalanceClusters(clusters, dm, 2)
+	if err == nil {
+		t.Error("rebalanceClusters should have returned an error")
+	}
+}
+
+// It's impossible to put 2 Individuals inside each cluster if there are 3
+// clusters and 5 individuals in total
+func TestRebalanceClustersTooManyMissing(t *testing.T) {
+	var (
+		clusters = []Individuals{
+			Individuals{
+				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
+				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
 			},
 			Individuals{
 				Individual{Genome: Vector{2, 2, 2}, ID: "6"},
@@ -85,13 +180,8 @@ func TestRebalanceClusters(t *testing.T) {
 		}
 		dm = newDistanceMemoizer(l1Distance)
 	)
-	rebalanceClusters(clusters, dm, 2)
-	// Check the second cluster
-	if len(clusters[1]) != 2 || clusters[1][1].ID != "4" {
-		t.Error("rebalanceClusters didn't work as expected")
-	}
-	// Check the third cluster
-	if len(clusters[2]) != 2 || clusters[2][1].ID != "5" {
-		t.Error("rebalanceClusters didn't work as expected")
+	var err = rebalanceClusters(clusters, dm, 2)
+	if err == nil {
+		t.Error("rebalanceClusters should have returned an error")
 	}
 }

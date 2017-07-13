@@ -1,38 +1,76 @@
 package gago
 
 import (
+	"errors"
 	"math"
 	"testing"
 )
 
 func TestSpecKMedoidsApply(t *testing.T) {
-	// Example dataset from https://www.wikiwand.com/en/K-medoids
 	var (
-		rng = newRandomNumberGenerator()
-		pop = Individuals{
-			NewIndividual(Vector{2, 6}, rng),
-			NewIndividual(Vector{3, 4}, rng),
-			NewIndividual(Vector{3, 8}, rng),
-			NewIndividual(Vector{4, 7}, rng),
-			NewIndividual(Vector{6, 2}, rng),
-			NewIndividual(Vector{6, 4}, rng),
-			NewIndividual(Vector{7, 3}, rng),
-			NewIndividual(Vector{7, 4}, rng),
-			NewIndividual(Vector{8, 5}, rng),
-			NewIndividual(Vector{7, 6}, rng),
+		rng       = newRandomNumberGenerator()
+		testCases = []struct {
+			indis        Individuals
+			kmeds        SpecKMedoids
+			speciesSizes []int
+			err          error
+		}{
+			// Example dataset from https://www.wikiwand.com/en/K-medoids
+			{
+				indis: Individuals{
+					NewIndividual(Vector{2, 6}, rng),
+					NewIndividual(Vector{3, 4}, rng),
+					NewIndividual(Vector{3, 8}, rng),
+					NewIndividual(Vector{4, 7}, rng),
+					NewIndividual(Vector{6, 2}, rng),
+					NewIndividual(Vector{6, 4}, rng),
+					NewIndividual(Vector{7, 3}, rng),
+					NewIndividual(Vector{7, 4}, rng),
+					NewIndividual(Vector{8, 5}, rng),
+					NewIndividual(Vector{7, 6}, rng),
+				},
+				kmeds:        SpecKMedoids{2, 1, l1Distance, 10},
+				speciesSizes: []int{4, 6},
+				err:          nil,
+			},
+			{
+				indis: Individuals{
+					NewIndividual(Vector{1, 1}, rng),
+					NewIndividual(Vector{1, 1}, rng),
+				},
+				kmeds:        SpecKMedoids{2, 1, l1Distance, 10},
+				speciesSizes: []int{1, 1},
+				err:          nil,
+			},
+			{
+				indis: Individuals{
+					NewIndividual(Vector{1, 1}, rng),
+					NewIndividual(Vector{1, 2}, rng),
+				},
+				kmeds:        SpecKMedoids{3, 1, l1Distance, 10},
+				speciesSizes: []int{1, 1},
+				err:          errors.New("K > len(indis)"),
+			},
 		}
-		species, _ = SpecKMedoids{2, 1, l1Distance, 10}.Apply(pop, rng)
 	)
-	// Check the number of species is correct
-	if len(species) != 2 {
-		t.Error("Wrong number of species")
-	}
-	// Check the size of each specie
-	if len(species[0]) != 4 {
-		t.Error("Wrong number of individuals in first specie")
-	}
-	if len(species[1]) != 6 {
-		t.Error("Wrong number of individuals in second specie")
+	for i, tc := range testCases {
+		var species, err = tc.kmeds.Apply(tc.indis, rng)
+		// Check the number of species is correct
+		if err == nil && len(species) != tc.kmeds.K {
+			t.Errorf("Wrong number of species in test case number %d", i)
+		}
+		// Check size of each specie
+		if err == nil {
+			for j, specie := range species {
+				if len(specie) != tc.speciesSizes[j] {
+					t.Errorf("Wrong specie size test case number %d", i)
+				}
+			}
+		}
+		// Check error is nil or not
+		if (err == nil) != (tc.err == nil) {
+			t.Errorf("Wrong error in test case number %d", i)
+		}
 	}
 }
 

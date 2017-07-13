@@ -39,10 +39,16 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 	// distances with the other individuals
 	indis.SortByDistanceToMedoid(dm)
 	copy(medoids, indis[:spec.K])
-	// Keep track of the total distance from the medoid to each of the cluster's members
+	// Add each medoid to a cluster
+	for i, medoid := range medoids {
+		species[i] = append(species[i], medoid)
+	}
+	// Keep track of the total distance from the medoid to each of the cluster's
+	// members, this total will then be used to compare with different cluster
+	// dispositions
 	var total float64
-	// Assign each individual to the closest initial medoid
-	for _, indi := range indis {
+	// Assign each individual that is not a medoid to the closest initial medoid
+	for _, indi := range indis[spec.K:] {
 		var i = indi.IdxOfClosest(medoids, dm)
 		species[i] = append(species[i], indi)
 		total += dm.GetDistance(medoids[i], indi)

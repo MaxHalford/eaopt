@@ -137,7 +137,7 @@ func (ga *GA) Enhance() error {
 		i := i // https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
 			var err error
-			// Apply speciation if a positive number of species has been speficied
+			// Apply speciation if a positive number of species has been specified
 			if ga.Speciator != nil {
 				err = ga.Populations[i].speciateEvolveMerge(ga.Speciator, ga.Model)
 				if err != nil {
