@@ -115,14 +115,21 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
     return Vector(o1), Vector(o2)
 }
 
-// NewVector returns a random vector by generating 2 values uniformally
+// Clone a Vector to produce a new one that points to a different slice.
+func (X Vector) Clone() gago.Genome {
+    var Y = make(Vector, len(X))
+    copy(Y, X)
+    return Y
+}
+
+// VectorFactory returns a random vector by generating 2 values uniformally
 // distributed between -10 and 10.
-func NewVector(rng *rand.Rand) gago.Genome {
+func VectorFactory(rng *rand.Rand) gago.Genome {
     return Vector(gago.InitUnifFloat64(2, -10, 10, rng))
 }
 
 func main() {
-    var ga = gago.Generational(NewVector)
+    var ga = gago.Generational(VectorFactory)
     ga.Initialize()
 
     fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
@@ -215,6 +222,7 @@ type Genome interface {
     Evaluate() float64
     Mutate(rng *rand.Rand)
     Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
+    Clone() Genome
 }
 ```
 
@@ -223,6 +231,8 @@ The `Evaluate()` method assigns a score to a given genome. The sweet thing is th
 The `Mutate(rng *rand.Rand)` method is where you can mutate a solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use to not reinvent the wheel; this is what is being done in most of the provided examples.
 
 The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces two new individuals (called offsprings) by applying some kind of mixture between the parent's attributes. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
+
+The `Genome()` method is there to produce independent copies of the struct you want to evolve. This is necessary for internal reasons and ensures that pointer fields are not pointing to same values memory addresses. Usually this is not too difficult implement; you just have to make sure that the clones you produce are totally independent from the genome they have been produced with. This is also not too difficult to unit test.
 
 Once you have implemented the `Genome` you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
 
@@ -262,6 +272,7 @@ type GA struct {
     MigFrequency int // Frequency at which migrations occur
     Speciator    Speciator
     Logger       *log.Logger
+    Callback     func(ga *GA)
 
     // Fields that are generated at runtime
     Populations Populations
@@ -280,7 +291,11 @@ You have to fill in the first 5 fields, the rest are generated when calling the 
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
 - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
 - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
-- `Logger` is optional, you can read more about in the [logging section](#logging-population-statistics).
+- `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
+- `Callback` is optional will execute any piece of code you wish every time `ga.Enhance()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
+    - Calculating specific population statistics that are not provided by the logger
+    - Changing parameters of the GA after a certain number of generations
+    - Monitoring for converging populations
 
 Essentially, only `GenomeFactory`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
 
