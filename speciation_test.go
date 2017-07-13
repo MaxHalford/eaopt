@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"errors"
 	"math"
 	"testing"
 )
@@ -41,18 +42,29 @@ func TestSpecKMedoidsApply(t *testing.T) {
 				speciesSizes: []int{1, 1},
 				err:          nil,
 			},
+			{
+				indis: Individuals{
+					NewIndividual(Vector{1, 1}, rng),
+					NewIndividual(Vector{1, 2}, rng),
+				},
+				kmeds:        SpecKMedoids{3, 1, l1Distance, 10},
+				speciesSizes: []int{1, 1},
+				err:          errors.New("K > len(indis)"),
+			},
 		}
 	)
 	for i, tc := range testCases {
 		var species, err = tc.kmeds.Apply(tc.indis, rng)
 		// Check the number of species is correct
-		if len(species) != tc.kmeds.K {
+		if err == nil && len(species) != tc.kmeds.K {
 			t.Errorf("Wrong number of species in test case number %d", i)
 		}
 		// Check size of each specie
-		for j, specie := range species {
-			if len(specie) != tc.speciesSizes[j] {
-				t.Errorf("Wrong specie size test case number %d", i)
+		if err == nil {
+			for j, specie := range species {
+				if len(specie) != tc.speciesSizes[j] {
+					t.Errorf("Wrong specie size test case number %d", i)
+				}
 			}
 		}
 		// Check error is nil or not

@@ -83,6 +83,15 @@ func TestValidationSpeciator(t *testing.T) {
 	ga.Speciator = speciator
 }
 
+func TestApplyWithSpeciator(t *testing.T) {
+	var speciator = ga.Speciator
+	ga.Speciator = SpecFitnessInterval{4}
+	if ga.Enhance() != nil {
+		t.Error("Calling Apply with a valid Speciator should not return an error")
+	}
+	ga.Speciator = speciator
+}
+
 func TestRandomNumberGenerators(t *testing.T) {
 	for i, pop1 := range ga.Populations {
 		for j, pop2 := range ga.Populations {
@@ -119,12 +128,6 @@ func TestFindBest(t *testing.T) {
 		t.Error("Best individual shares a pointer with an individual in the populations")
 	}
 	ga.Best.Fitness = fitness
-}
-
-func TestGenerations(t *testing.T) {
-	if ga.Generations != nbrGenerations {
-		t.Error("Generations counter wasn't incremented")
-	}
 }
 
 // TestDuration verifies the sum of the duration of each population is higher

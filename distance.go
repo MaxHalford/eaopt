@@ -72,7 +72,7 @@ func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluste
 	// to reach at least minPerCluster Individuals.
 	var missing = make([]int, len(clusters))
 	for i, cluster := range clusters {
-		// Check that the cluster has at least on Individual
+		// Check that the cluster has at least one Individual
 		if len(cluster) == 0 {
 			return fmt.Errorf("Cluster %d has 0 individuals", i)
 		}
