@@ -454,7 +454,7 @@ As mentioned earlier, some problems can simply not be written down as [closed-fo
 
 **How can I contribute?**
 
-Feel free to implement your own operators or to make suggestions! Check out the [HACKME file](HACKME.md) for some guidelines.
+Feel free to implement your own operators or to make suggestions! Check out the [CONTRIBUTING file](CONTRIBUTING.md) for some guidelines.
 
 
 ## Dependencies
