@@ -64,12 +64,15 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 		for i, specie := range species {
 			specie.SortByDistanceToMedoid(dm)
 			medoids[i] = specie[0]
+			newSpecies[i] = append(newSpecies[i], specie[0])
 		}
 		// Reassign each individual to the closest new medoid
-		for _, indi := range indis {
-			var i = indi.IdxOfClosest(medoids, dm)
-			newSpecies[i] = append(newSpecies[i], indi)
-			newTotal += dm.GetDistance(medoids[i], indi)
+		for _, specie := range species {
+			for _, indi := range specie[1:] {
+				var i = indi.IdxOfClosest(medoids, dm)
+				newSpecies[i] = append(newSpecies[i], indi)
+				newTotal += dm.GetDistance(medoids[i], indi)
+			}
 		}
 		// No more iterations are needed if the new total is worse
 		if newTotal >= total {
