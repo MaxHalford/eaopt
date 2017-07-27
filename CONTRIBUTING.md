@@ -9,6 +9,7 @@
 - http://deap.readthedocs.io/en/master/
 - http://pyevolve.sourceforge.net/intro.html#ga-features
 - http://www.dmi.unict.it/mpavone/nc-cs/materiale/moscato89.pdf
+- Serialize with http://labix.org/gobson, maybe
 
 ## Code style
 
