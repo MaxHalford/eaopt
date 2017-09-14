@@ -4,11 +4,21 @@ import (
 	"math"
 	"math/rand"
 	"sort"
+	"strings"
 )
 
 // Individuals is a convenience type, methods that belong to an Individual can
 // be called declaratively.
 type Individuals []Individual
+
+// String representation of a slice of Individuals.
+func (indis Individuals) String() string {
+	var str string
+	for _, indi := range indis {
+		str += indi.String() + "\n"
+	}
+	return strings.TrimSuffix(str, "\n")
+}
 
 // Clone returns the same exact same slice of individuals but with different
 // pointers and ID fields.
