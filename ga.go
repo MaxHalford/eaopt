@@ -25,7 +25,8 @@ type GA struct {
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
-	Best        Individual    `json:"best"` // Overall best individual
+	Best        Individual    `json:"overall_best"`
+	CurrentBest Individual    `json:"generation_best"`
 	Age         time.Duration `json:"duration"`
 	Generations int           `json:"generations"`
 	rng         *rand.Rand
@@ -69,16 +70,21 @@ func (ga GA) Validate() error {
 	return nil
 }
 
-// Find the best individual in each population and then compare the best overall
-// individual to the current best individual. This method supposes that the
-// populations have been preemptively ascendingly sorted by fitness so that
-// checking the first individual of each population is sufficient.
+// Find the best current Individual in each Population and then compare the best
+// overall Individual to the current best Individual. This method supposes that
+// the Populations have been preemptively ascendingly sorted by fitness so that
+// checking the first Individual of each Population is sufficient.
 func (ga *GA) findBest() {
-	for _, pop := range ga.Populations {
-		var best = pop.Individuals[0]
-		if best.Fitness < ga.Best.Fitness {
-			ga.Best = best.Clone(pop.rng)
+	// Start by finding the current best Individual
+	ga.CurrentBest = ga.Populations[0].Individuals[0].Clone(ga.rng)
+	for _, pop := range ga.Populations[1:] {
+		if pop.Individuals[0].Fitness < ga.CurrentBest.Fitness {
+			ga.CurrentBest = pop.Individuals[0].Clone(pop.rng)
 		}
+	}
+	// Compare the current best Individual to the overall Individual
+	if ga.CurrentBest.Fitness < ga.Best.Fitness {
+		ga.Best = ga.CurrentBest.Clone(ga.rng)
 	}
 }
 
