@@ -82,6 +82,14 @@ func (ga *GA) findBest() {
 	}
 }
 
+// Initialized indicates if the GA has been initialized or not.
+func (ga GA) Initialized() bool {
+	if ga.rng == nil {
+		return false
+	}
+	return true
+}
+
 // Initialize each population in the GA and assign an initial fitness to each
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
@@ -110,9 +118,8 @@ func (ga *GA) Initialize() {
 		}(i)
 	}
 	wg.Wait()
-	// The initial best individual is initialized randomly
-	var rng = newRandomNumberGenerator()
-	ga.Best = NewIndividual(ga.GenomeFactory(rng), rng)
+	// Find the initial best Individual
+	ga.Best = ga.Populations[0].Individuals[0]
 	ga.findBest()
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
