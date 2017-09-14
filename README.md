@@ -275,11 +275,12 @@ type GA struct {
     Callback     func(ga *GA)
 
     // Fields that are generated at runtime
-    Populations Populations
-    Best        Individual // Overall best individual (dummy initialization at the beginning)
-    Age         time.Duration
-    Generations int
-    rng         *rand.Rand
+    Populations        Populations
+    Best               Individual
+    CurrentBest        Individual
+    Age                time.Duration
+    Generations        int
+    rng                *rand.Rand
 }
 ```
 
@@ -304,7 +305,7 @@ Essentially, only `GenomeFactory`, `NPops`, `PopSize` and `Model` are required t
 
 Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Enhance` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Enhance` method multiple by using a loop or by imposing a time limit. The `Enhance` method will return an `error` which you should handle. If your population is evolving when you call `Enhance` it's most likely because `Enhance` did not return a `nil` error.
 
-At any time you have access to the `GA`'s `Best` field which is an internal representation of your genome. The `Best` field itself contains a `Fitness` field and a `Genome` field respectively indicating the best obtained solution and the parameters of that solution.
+At any time you have access to the `GA`'s `Best` field which contains a `Fitness` field and a `Genome` field respectively indicating the overall best obtained solution and the parameters of that solution. Moreover, the `GA`'s`CurrentBest` field contains the best solution and parameters obtained by the current generation.
 
 ### Models
 
