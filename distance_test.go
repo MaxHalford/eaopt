@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
@@ -126,19 +127,21 @@ func TestRebalanceClusters(t *testing.T) {
 		},
 	}
 	for i, tc := range testCases {
-		var err = rebalanceClusters(tc.clusters, tc.dm, tc.minClusterSize)
-		// Check if the error is nil or not
-		if (err == nil) != (tc.err == nil) {
-			t.Errorf("Wrong error in test case number %d", i)
-		}
-		// Check new cluster sizes
-		if err == nil {
-			for j, cluster := range tc.clusters {
-				if len(cluster) != tc.newClusterSizes[j] {
-					t.Errorf("Wrong new cluster size in test case number %d", i)
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var err = rebalanceClusters(tc.clusters, tc.dm, tc.minClusterSize)
+			// Check if the error is nil or not
+			if (err == nil) != (tc.err == nil) {
+				t.Errorf("Wrong error in test case number %d", i)
+			}
+			// Check new cluster sizes
+			if err == nil {
+				for j, cluster := range tc.clusters {
+					if len(cluster) != tc.newClusterSizes[j] {
+						t.Errorf("Wrong new cluster size in test case number %d", i)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 

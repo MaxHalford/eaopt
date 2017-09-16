@@ -264,7 +264,7 @@ Let's have a look at the GA struct.
 ```go
 type GA struct {
     // Fields that are provided by the user
-    GenomeFactory   GenomeFactory
+    NewGenome   NewGenome
     NPops        int
     PopSize      int
     Model        Model
@@ -286,7 +286,7 @@ type GA struct {
 
 You have to fill in the first 5 fields, the rest are generated when calling the `GA`'s `Initialize()` method.
 
-- `GenomeFactory` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
+- `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
 - `NPops` determines the number of populations that will be used.
 - `PopSize` determines the number of individuals inside each population.
 - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
@@ -298,7 +298,7 @@ You have to fill in the first 5 fields, the rest are generated when calling the 
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
 
-Essentially, only `GenomeFactory`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
+Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
 
 
 ### Running a GA

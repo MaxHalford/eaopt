@@ -9,9 +9,9 @@ import (
 
 var (
 	ga = GA{
-		GenomeFactory: NewVector,
-		NPops:         2,
-		PopSize:       50,
+		NewGenome: NewVector,
+		NPops:     2,
+		PopSize:   50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NContestants: 3,

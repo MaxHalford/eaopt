@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"testing"
 )
@@ -54,23 +55,25 @@ func TestSpecKMedoidsApply(t *testing.T) {
 		}
 	)
 	for i, tc := range testCases {
-		var species, err = tc.kmeds.Apply(tc.indis, rng)
-		// Check the number of species is correct
-		if err == nil && len(species) != tc.kmeds.K {
-			t.Errorf("Wrong number of species in test case number %d", i)
-		}
-		// Check size of each specie
-		if err == nil {
-			for j, specie := range species {
-				if len(specie) != tc.speciesSizes[j] {
-					t.Errorf("Wrong specie size test case number %d", i)
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var species, err = tc.kmeds.Apply(tc.indis, rng)
+			// Check the number of species is correct
+			if err == nil && len(species) != tc.kmeds.K {
+				t.Error("Wrong number of species")
+			}
+			// Check size of each specie
+			if err == nil {
+				for j, specie := range species {
+					if len(specie) != tc.speciesSizes[j] {
+						t.Error("Wrong specie size")
+					}
 				}
 			}
-		}
-		// Check error is nil or not
-		if (err == nil) != (tc.err == nil) {
-			t.Errorf("Wrong error in test case number %d", i)
-		}
+			// Check error is nil or not
+			if (err == nil) != (tc.err == nil) {
+				t.Error("Wrong error")
+			}
+		})
 	}
 }
 

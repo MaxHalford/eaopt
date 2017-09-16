@@ -1,6 +1,9 @@
 package gago
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestSearch(t *testing.T) {
 	var s = StringSlice{"イ", "ー", "ス", "タ", "ー"}
@@ -35,13 +38,15 @@ func TestNewIndexLookup(t *testing.T) {
 			},
 		},
 	}
-	for _, test := range testCases {
-		var lookup = newIndexLookup(test.slice)
-		for k, v := range lookup {
-			if v != test.lookup[k] {
-				t.Error("createLookup didn't work as expected")
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var lookup = newIndexLookup(tc.slice)
+			for k, v := range lookup {
+				if v != tc.lookup[k] {
+					t.Error("createLookup didn't work as expected")
+				}
 			}
-		}
+		})
 	}
 }
 
@@ -61,15 +66,17 @@ func TestGetCycles(t *testing.T) {
 			},
 		},
 	}
-	for _, test := range testCases {
-		var cycles = getCycles(IntSlice(test.x), IntSlice(test.y))
-		for i, cycle := range cycles {
-			for j, c := range cycle {
-				if c != test.cycles[i][j] {
-					t.Error("getCycles didn't work as expected")
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var cycles = getCycles(IntSlice(tc.x), IntSlice(tc.y))
+			for i, cycle := range cycles {
+				for j, c := range cycle {
+					if c != tc.cycles[i][j] {
+						t.Error("getCycles didn't work as expected")
+					}
 				}
 			}
-		}
+		})
 	}
 }
 
@@ -93,15 +100,17 @@ func TestGetNeighbours(t *testing.T) {
 			},
 		},
 	}
-	for _, test := range testCases {
-		var neighbours = getNeighbours(test.x)
-		for i, set := range neighbours {
-			for j := range set {
-				if !test.neighbours[i][j] {
-					t.Error("getNeighbours didn't work as expected")
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var neighbours = getNeighbours(tc.x)
+			for i, set := range neighbours {
+				for j := range set {
+					if !tc.neighbours[i][j] {
+						t.Error("getNeighbours didn't work as expected")
+					}
 				}
 			}
-		}
+		})
 	}
 }
 

@@ -111,6 +111,10 @@ var (
 			MutRate:     -1,
 		},
 		ModRing{
+			Selector: nil,
+			MutRate:  0.2,
+		},
+		ModRing{
 			Selector: SelTournament{0},
 			MutRate:  0.2,
 		},

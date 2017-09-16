@@ -1,45 +1,58 @@
 package gago
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
 
 func TestInitUnifFloat64(t *testing.T) {
 	var (
-		N      = []int{0, 1, 2, 42}
-		bounds = []struct {
-			lower, upper float64
+		testCases = []struct {
+			n      int
+			bounds struct{ lower, upper float64 }
 		}{
 			{
-				lower: -1,
-				upper: 0,
+				n:      0,
+				bounds: struct{ lower, upper float64 }{-1, 0},
 			},
 			{
-				lower: 0,
-				upper: 1,
+				n:      1,
+				bounds: struct{ lower, upper float64 }{-1, 0},
 			},
 			{
-				lower: -1,
-				upper: 1,
+				n:      2,
+				bounds: struct{ lower, upper float64 }{-1, 0},
+			},
+			{
+				n:      42,
+				bounds: struct{ lower, upper float64 }{-1, 0},
+			},
+			{
+				n:      3,
+				bounds: struct{ lower, upper float64 }{0, 1},
+			},
+			{
+				n:      3,
+				bounds: struct{ lower, upper float64 }{-1, 1},
 			},
 		}
 		rng = newRandomNumberGenerator()
 	)
-	for _, n := range N {
-		for _, b := range bounds {
-			var vector = InitUnifFloat64(n, b.lower, b.upper, rng)
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var vector = InitUnifFloat64(tc.n, tc.bounds.lower, tc.bounds.upper, rng)
 			// Check length
-			if len(vector) != n {
+			if len(vector) != tc.n {
 				t.Error("InitUnifFloat64 didn't produce the right number of values")
 			}
 			// Check values are bounded
 			for _, v := range vector {
-				if v <= b.lower || v >= b.upper {
+				if v <= tc.bounds.lower || v >= tc.bounds.upper {
 					t.Error("InitUnifFloat64 produced out of bound values")
 				}
 			}
-		}
+		})
 	}
 }
 

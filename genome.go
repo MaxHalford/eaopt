@@ -11,6 +11,6 @@ type Genome interface {
 	Clone() Genome
 }
 
-// A GenomeFactory is a method that generates a new Genome with random
+// A NewGenome is a method that generates a new Genome with random
 // properties.
-type GenomeFactory func(rng *rand.Rand) Genome
+type NewGenome func(rng *rand.Rand) Genome

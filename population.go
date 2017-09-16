@@ -18,7 +18,7 @@ type Population struct {
 }
 
 // Generate a new population.
-func newPopulation(size int, gf GenomeFactory, id string) Population {
+func newPopulation(size int, gf NewGenome, id string) Population {
 	var (
 		rng = newRandomNumberGenerator()
 		pop = Population{

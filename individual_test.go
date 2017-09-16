@@ -1,8 +1,42 @@
 package gago
 
 import (
+	"fmt"
 	"testing"
 )
+
+func TestIndividualString(t *testing.T) {
+	var testCases = []struct {
+		indi Individual
+		str  string
+	}{
+		{
+			indi: Individual{
+				Genome:    Vector{0, 1, 2},
+				Fitness:   42,
+				Evaluated: true,
+				ID:        "bob",
+			},
+			str: "bob - 42.000 - [0 1 2] ✔",
+		},
+		{
+			indi: Individual{
+				Genome:    Vector{0, 1, 2},
+				Fitness:   42,
+				Evaluated: false,
+				ID:        "ALICE",
+			},
+			str: "ALICE - 42.000 - [0 1 2] ✘",
+		},
+	}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indi.String() != tc.str {
+				t.Errorf("Expected %s, got %s", tc.str, tc.indi.String())
+			}
+		})
+	}
+}
 
 func TestCloneIndividual(t *testing.T) {
 	var (

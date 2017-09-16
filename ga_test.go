@@ -2,10 +2,26 @@ package gago
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"testing"
 	"time"
 )
+
+func TestInitialized(t *testing.T) {
+	var ga = GA{
+		NewGenome: NewVector,
+		NPops:     1,
+		PopSize:   10,
+	}
+	if ga.Initialized() {
+		t.Error("GA should not yet be initialized")
+	}
+	ga.Initialize()
+	if !ga.Initialized() {
+		t.Error("GA should be initialized")
+	}
+}
 
 func TestValidationSuccess(t *testing.T) {
 	var err = ga.Validate()
@@ -14,13 +30,13 @@ func TestValidationSuccess(t *testing.T) {
 	}
 }
 
-func TestValidationGenomeFactory(t *testing.T) {
-	var genomeFactory = ga.GenomeFactory
-	ga.GenomeFactory = nil
+func TestValidationNewGenome(t *testing.T) {
+	var genomeFactory = ga.NewGenome
+	ga.NewGenome = nil
 	if ga.Validate() == nil {
-		t.Error("Nil GenomeFactory should return an error")
+		t.Error("Nil NewGenome should return an error")
 	}
-	ga.GenomeFactory = genomeFactory
+	ga.NewGenome = genomeFactory
 }
 
 func TestValidationNPopulations(t *testing.T) {
@@ -205,19 +221,21 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 		}
 	)
 	for i, tc := range testCases {
-		var err = tc.pop.speciateEvolveMerge(tc.speciator, tc.model)
-		if (err == nil) != (tc.err == nil) {
-			t.Errorf("Wrong error in test case number %d", i)
-		}
-		// If there is no error check the individuals are ordered as they were
-		// at they were initially
-		if err == nil {
-			for j, indi := range tc.pop.Individuals {
-				if indi.Fitness != float64(j) {
-					t.Errorf("Wrong result in test case number %d", i)
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var err = tc.pop.speciateEvolveMerge(tc.speciator, tc.model)
+			if (err == nil) != (tc.err == nil) {
+				t.Errorf("Wrong error in test case number %d", i)
+			}
+			// If there is no error check the individuals are ordered as they were
+			// at they were initially
+			if err == nil {
+				for j, indi := range tc.pop.Individuals {
+					if indi.Fitness != float64(j) {
+						t.Errorf("Wrong result in test case number %d", i)
+					}
 				}
 			}
-		}
+		})
 	}
 }
 

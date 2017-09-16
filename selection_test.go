@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -74,13 +75,15 @@ func TestBuildWheel(t *testing.T) {
 		{[]float64{-10, -8, -5}, []float64{6.0 / 11, 10.0 / 11, 1}},
 		{[]float64{-2, 0, 2, 3}, []float64{6.0 / 13, 10.0 / 13, 12.0 / 13, 1}},
 	}
-	for _, test := range testCases {
-		var weights = buildWheel(test.fitnesses)
-		for i := range weights {
-			if weights[i] != test.weights[i] {
-				t.Error("buildWheel didn't work as expected")
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var weights = buildWheel(tc.fitnesses)
+			for i := range weights {
+				if weights[i] != tc.weights[i] {
+					t.Error("buildWheel didn't work as expected")
+				}
 			}
-		}
+		})
 	}
 }
 

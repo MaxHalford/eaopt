@@ -2,6 +2,7 @@ package gago
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -20,26 +21,28 @@ func TestRandomInts(t *testing.T) {
 			{2, 0, 2},
 		}
 	)
-	for _, test := range testCases {
-		var ints = randomInts(test.k, test.min, test.max, rng)
-		// Check the number of generated integers
-		if len(ints) != test.k {
-			t.Error("randomInts didn't generate the right number of integers")
-		}
-		// Check the bounds of each generated integer
-		for _, integer := range ints {
-			if integer < test.min || integer >= test.max {
-				t.Error("randomInts didn't generate integers in the desired range")
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var ints = randomInts(tc.k, tc.min, tc.max, rng)
+			// Check the number of generated integers
+			if len(ints) != tc.k {
+				t.Error("randomInts didn't generate the right number of integers")
 			}
-		}
-		// Check the generated integers are unique
-		for i, a := range ints {
-			for j, b := range ints {
-				if i != j && a == b {
-					t.Error("randomInts didn't generate unique integers")
+			// Check the bounds of each generated integer
+			for _, integer := range ints {
+				if integer < tc.min || integer >= tc.max {
+					t.Error("randomInts didn't generate integers in the desired range")
 				}
 			}
-		}
+			// Check the generated integers are unique
+			for i, a := range ints {
+				for j, b := range ints {
+					if i != j && a == b {
+						t.Error("randomInts didn't generate unique integers")
+					}
+				}
+			}
+		})
 	}
 }
 
@@ -77,14 +80,16 @@ func TestSampleInts(t *testing.T) {
 	}
 	var rng = newRandomNumberGenerator()
 	for i, tc := range testCases {
-		var ints, idxs, err = sampleInts(tc.ints, tc.k, rng)
-		if (err == nil) != (tc.err == nil) {
-			t.Errorf("Error in test case number %d", i)
-		} else {
-			if err == nil && (len(ints) != tc.k || len(idxs) != tc.k) {
-				t.Errorf("Error in test case number %d", i)
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			var ints, idxs, err = sampleInts(tc.ints, tc.k, rng)
+			if (err == nil) != (tc.err == nil) {
+				t.Error("Error")
+			} else {
+				if err == nil && (len(ints) != tc.k || len(idxs) != tc.k) {
+					t.Error("Error")
+				}
 			}
-		}
+		})
 	}
 }
 

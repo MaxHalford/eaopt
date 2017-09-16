@@ -1,9 +1,42 @@
 package gago
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
+
+func TestIndividualsString(t *testing.T) {
+	var testCases = []struct {
+		indis Individuals
+		str   string
+	}{
+		{
+			indis: Individuals{
+				Individual{
+					Genome:    Vector{0, 1, 2},
+					Fitness:   42,
+					Evaluated: true,
+					ID:        "bob",
+				},
+				Individual{
+					Genome:    Vector{0, 1, 2},
+					Fitness:   42,
+					Evaluated: false,
+					ID:        "ALICE",
+				},
+			},
+			str: "bob - 42.000 - [0 1 2] ✔\nALICE - 42.000 - [0 1 2] ✘",
+		},
+	}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indis.String() != tc.str {
+				t.Errorf("Expected %s, got %s", tc.str, tc.indis.String())
+			}
+		})
+	}
+}
 
 func TestNewIndividuals(t *testing.T) {
 	var rng = newRandomNumberGenerator()
@@ -108,10 +141,12 @@ func TestFitMin(t *testing.T) {
 			Individual{Fitness: -1.0},
 		}, -1.0},
 	}
-	for _, test := range testCases {
-		if test.indis.FitMin() != test.min {
-			t.Error("FitMin didn't work as expected")
-		}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indis.FitMin() != tc.min {
+				t.Error("FitMin didn't work as expected")
+			}
+		})
 	}
 }
 
@@ -132,10 +167,12 @@ func TestFitMax(t *testing.T) {
 			Individual{Fitness: -1.0},
 		}, 1.0},
 	}
-	for _, test := range testCases {
-		if test.indis.FitMax() != test.max {
-			t.Error("FitMax didn't work as expected")
-		}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indis.FitMax() != tc.max {
+				t.Error("FitMax didn't work as expected")
+			}
+		})
 	}
 }
 
@@ -156,10 +193,12 @@ func TestFitAvg(t *testing.T) {
 			Individual{Fitness: 1.0},
 		}, 0.0},
 	}
-	for _, test := range testCases {
-		if test.indis.FitAvg() != test.mean {
-			t.Error("FitAvg didn't work as expected")
-		}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indis.FitAvg() != tc.mean {
+				t.Error("FitAvg didn't work as expected")
+			}
+		})
 	}
 }
 
@@ -180,9 +219,11 @@ func TestFitStd(t *testing.T) {
 			Individual{Fitness: 2.0},
 		}, 4.0},
 	}
-	for _, test := range testCases {
-		if test.indis.FitStd() != math.Sqrt(test.variance) {
-			t.Error("FitStd didn't work as expected")
-		}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			if tc.indis.FitStd() != math.Sqrt(tc.variance) {
+				t.Error("FitStd didn't work as expected")
+			}
+		})
 	}
 }

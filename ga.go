@@ -13,15 +13,15 @@ import (
 // A GA contains population which themselves contain individuals.
 type GA struct {
 	// Fields that are provided by the user
-	GenomeFactory GenomeFactory `json:"-"`
-	NPops         int           `json:"-"` // Number of Populations
-	PopSize       int           `json:"-"` // Number of Individuls per Population
-	Model         Model         `json:"-"`
-	Migrator      Migrator      `json:"-"`
-	MigFrequency  int           `json:"-"` // Frequency at which migrations occur
-	Speciator     Speciator     `json:"-"`
-	Logger        *log.Logger   `json:"-"`
-	Callback      func(ga *GA)  `json:"-"`
+	NewGenome    NewGenome    `json:"-"`
+	NPops        int          `json:"-"` // Number of Populations
+	PopSize      int          `json:"-"` // Number of Individuls per Population
+	Model        Model        `json:"-"`
+	Migrator     Migrator     `json:"-"`
+	MigFrequency int          `json:"-"` // Frequency at which migrations occur
+	Speciator    Speciator    `json:"-"`
+	Logger       *log.Logger  `json:"-"`
+	Callback     func(ga *GA) `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -35,9 +35,9 @@ type GA struct {
 // Validate the parameters of a GA to ensure it will run correctly; some
 // settings or combination of settings may be incoherent during runtime.
 func (ga GA) Validate() error {
-	// Check the GenomeFactory presence
-	if ga.GenomeFactory == nil {
-		return errors.New("GenomeFactory cannot be nil")
+	// Check the NewGenome presence
+	if ga.NewGenome == nil {
+		return errors.New("NewGenome cannot be nil")
 	}
 	// Check the number of populations is higher than 0
 	if ga.NPops < 1 {
@@ -110,7 +110,7 @@ func (ga *GA) Initialize() {
 			// Generate a population
 			ga.Populations[j] = newPopulation(
 				ga.PopSize,
-				ga.GenomeFactory,
+				ga.NewGenome,
 				randString(3, ga.rng),
 			)
 			// Evaluate its individuals

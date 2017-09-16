@@ -1,11 +1,11 @@
 package gago
 
 // Generational returns a GA instance that uses the generational model.
-func Generational(GenomeFactory GenomeFactory) GA {
+func Generational(NewGenome NewGenome) GA {
 	return GA{
-		GenomeFactory: GenomeFactory,
-		NPops:         2,
-		PopSize:       50,
+		NewGenome: NewGenome,
+		NPops:     2,
+		PopSize:   50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NContestants: 3,
@@ -17,11 +17,11 @@ func Generational(GenomeFactory GenomeFactory) GA {
 
 // SimulatedAnnealing returns a GA instance that mimicks a basic simulated
 // annealing procedure.
-func SimulatedAnnealing(GenomeFactory GenomeFactory) GA {
+func SimulatedAnnealing(NewGenome NewGenome) GA {
 	return GA{
-		GenomeFactory: GenomeFactory,
-		NPops:         1,
-		PopSize:       1,
+		NewGenome: NewGenome,
+		NPops:     1,
+		PopSize:   1,
 		Model: ModSimAnn{
 			T:     100,  // Starting temperature
 			Tmin:  1,    // Stopping temperature
@@ -32,11 +32,11 @@ func SimulatedAnnealing(GenomeFactory GenomeFactory) GA {
 
 // HillClimbing returns a GA instance that mimicks a basic hill-climbing
 // procedure.
-func HillClimbing(GenomeFactory GenomeFactory) GA {
+func HillClimbing(NewGenome NewGenome) GA {
 	return GA{
-		GenomeFactory: GenomeFactory,
-		NPops:         1,
-		PopSize:       1,
+		NewGenome: NewGenome,
+		NPops:     1,
+		PopSize:   1,
 		Model: ModMutationOnly{
 			NChosen:  1,
 			Selector: SelElitism{},
