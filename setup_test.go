@@ -1,6 +1,7 @@
 package gago
 
 import (
+	"errors"
 	"log"
 	"math"
 	"math/rand"
@@ -79,3 +80,10 @@ type ModIdentity struct{}
 
 func (mod ModIdentity) Apply(pop *Population) error { return nil }
 func (mod ModIdentity) Validate() error             { return nil }
+
+// Runtime error model
+
+type ModRuntimeError struct{}
+
+func (mod ModRuntimeError) Apply(pop *Population) error { return errors.New("") }
+func (mod ModRuntimeError) Validate() error             { return nil }

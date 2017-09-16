@@ -256,3 +256,18 @@ func TestCallback(t *testing.T) {
 		t.Error("Counter was not incremented by the callback at enhancement")
 	}
 }
+
+func TestGAEnhanceModelRuntimeError(t *testing.T) {
+	var model = ga.Model
+	ga.Model = ModRuntimeError{}
+	// Check invalid model doesn't raise error
+	if ga.Validate() != nil {
+		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+	}
+	// Enhance
+	var err = ga.Enhance()
+	if err == nil {
+		t.Error("An error should have been raised")
+	}
+	ga.Model = model
+}
