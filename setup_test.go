@@ -87,3 +87,12 @@ type ModRuntimeError struct{}
 
 func (mod ModRuntimeError) Apply(pop *Population) error { return errors.New("") }
 func (mod ModRuntimeError) Validate() error             { return nil }
+
+// Runtime error speciator
+
+type SpecRuntimeError struct{}
+
+func (spec SpecRuntimeError) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
+	return []Individuals{indis, indis}, errors.New("")
+}
+func (spec SpecRuntimeError) Validate() error { return nil }

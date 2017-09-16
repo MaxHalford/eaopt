@@ -271,3 +271,18 @@ func TestGAEnhanceModelRuntimeError(t *testing.T) {
 	}
 	ga.Model = model
 }
+
+func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
+	var speciator = ga.Speciator
+	ga.Speciator = SpecRuntimeError{}
+	// Check invalid speciator doesn't raise error
+	if ga.Validate() != nil {
+		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+	}
+	// Enhance
+	var err = ga.Enhance()
+	if err == nil {
+		t.Error("An error should have been raised")
+	}
+	ga.Speciator = speciator
+}
