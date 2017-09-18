@@ -31,10 +31,10 @@ func (indis Individuals) Clone(rng *rand.Rand) Individuals {
 }
 
 // Generate a slice of n new individuals.
-func newIndividuals(n int, gf NewGenome, rng *rand.Rand) Individuals {
+func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, n)
 	for i := range indis {
-		indis[i] = NewIndividual(gf(rng), rng)
+		indis[i] = NewIndividual(newGenome(rng), rng)
 	}
 	return indis
 }

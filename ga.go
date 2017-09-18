@@ -108,11 +108,7 @@ func (ga *GA) Initialize() {
 		go func(j int) {
 			defer wg.Done()
 			// Generate a population
-			ga.Populations[j] = newPopulation(
-				ga.PopSize,
-				ga.NewGenome,
-				randString(3, ga.rng),
-			)
+			ga.Populations[j] = newPopulation(ga.PopSize, ga.NewGenome)
 			// Evaluate its individuals
 			ga.Populations[j].Individuals.Evaluate()
 			// Sort its individuals
