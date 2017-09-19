@@ -284,7 +284,7 @@ type GA struct {
 }
 ```
 
-You have to fill in the first 5 fields, the rest are generated when calling the `GA`'s `Initialize()` method.
+You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method.
 
 - `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
 - `NPops` determines the number of populations that will be used.
