@@ -3,6 +3,7 @@ package gago
 import (
 	"errors"
 	"log"
+	"math"
 	"math/rand"
 	"sync"
 	"time"
@@ -71,13 +72,14 @@ func (ga GA) Validate() error {
 }
 
 // Find the best current Individual in each Population and then compare the best
-// overall Individual to the current best Individual. This method supposes that
-// the Populations have been preemptively ascendingly sorted by fitness so that
-// checking the first Individual of each Population is sufficient.
+// overall Individual to the current best Individual.
 func (ga *GA) findBest() {
 	// Start by finding the current best Individual
-	ga.CurrentBest = ga.Populations[0].Individuals[0].Clone(ga.rng)
-	for _, pop := range ga.Populations[1:] {
+	ga.CurrentBest = Individual{Fitness: math.Inf(1)}
+	for _, pop := range ga.Populations {
+		if !pop.Individuals.IsSortedByFitness() {
+			pop.Individuals.SortByFitness()
+		}
 		if pop.Individuals[0].Fitness < ga.CurrentBest.Fitness {
 			ga.CurrentBest = pop.Individuals[0].Clone(pop.rng)
 		}
