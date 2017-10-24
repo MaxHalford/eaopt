@@ -1,5 +1,6 @@
 ## Ideas
 
+- Add example with penalty
 - Add hall of fame field to GA
 - Improve tournament selection testing
 - Refactor models testings
