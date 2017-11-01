@@ -156,8 +156,11 @@ func main() {
 
 **More examples**
 
+All the examples can be found [here](https://github.com/MaxHalford/gago-examples).
+
 - [Cross-in-Tray (speciation)](https://github.com/MaxHalford/gago-examples/tree/master/cross_in_tray)
 - [Grid TSP](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid)
+- [Including constraint](https://github.com/MaxHalford/gago-examples/tree/master/constraint)
 - [One Max problem](https://github.com/MaxHalford/gago-examples/tree/master/one_max)
 - [N-queens problem](https://github.com/MaxHalford/gago-examples/tree/master/n_queens)
 - [String matching](https://github.com/MaxHalford/gago-examples/tree/master/string_matching)
