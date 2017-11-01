@@ -1,5 +1,7 @@
 ## Ideas
 
+- Add example with penalty
+- Add hall of fame field to GA
 - Improve tournament selection testing
 - Refactor models testings
 - Add more context to errors (at least the method/struct name) (https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully)
