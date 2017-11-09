@@ -39,7 +39,7 @@ func TestIndividualsString(t *testing.T) {
 }
 
 func TestNewIndividuals(t *testing.T) {
-	var rng = newRandomNumberGenerator()
+	var rng = newRand()
 	for _, n := range []int{1, 2, 42} {
 		var indis = newIndividuals(n, NewVector, rng)
 		if len(indis) != n {
@@ -50,7 +50,7 @@ func TestNewIndividuals(t *testing.T) {
 
 func TestCloneIndividuals(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		indis  = newIndividuals(20, NewVector, rng)
 		clones = indis.Clone(rng)
 	)
@@ -64,7 +64,7 @@ func TestCloneIndividuals(t *testing.T) {
 }
 
 func TestEvaluateIndividuals(t *testing.T) {
-	var indis = newIndividuals(10, NewVector, newRandomNumberGenerator())
+	var indis = newIndividuals(10, NewVector, newRand())
 	for _, indi := range indis {
 		if indi.Evaluated {
 			t.Error("Individual shouldn't have Evaluated set to True")
@@ -80,7 +80,7 @@ func TestEvaluateIndividuals(t *testing.T) {
 
 func TestMutateIndividuals(t *testing.T) {
 	var (
-		rng   = newRandomNumberGenerator()
+		rng   = newRand()
 		indis = newIndividuals(10, NewVector, rng)
 	)
 	indis.Evaluate()
@@ -93,7 +93,7 @@ func TestMutateIndividuals(t *testing.T) {
 }
 
 func TestIndividualsSortByFitness(t *testing.T) {
-	var indis = newIndividuals(10, NewVector, newRandomNumberGenerator())
+	var indis = newIndividuals(10, NewVector, newRand())
 	// Assign a fitness to each individual in decreasing order
 	for i := range indis {
 		indis[i].Fitness = float64(len(indis) - i)

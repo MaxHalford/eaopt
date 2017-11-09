@@ -159,7 +159,7 @@ var (
 // producing the desired number of offsprings.
 func TestGenerateOffsprings(t *testing.T) {
 	var (
-		rng   = newRandomNumberGenerator()
+		rng   = newRand()
 		indis = newIndividuals(20, NewVector, rng)
 	)
 	for _, n := range []int{0, 1, 3, 10} {
@@ -190,9 +190,10 @@ func TestModelsValidate(t *testing.T) {
 // TestModelsConstantSize checks that each model doesn't change the size of a
 // population when applied.
 func TestModelsConstantSize(t *testing.T) {
+	var rng = newRand()
 	for _, n := range []int{1, 2, 3, 42} {
 		for _, model := range validModels {
-			var pop = newPopulation(n, NewVector)
+			var pop = newPopulation(n, NewVector, rng)
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"testing"
 	"time"
 )
@@ -162,7 +163,7 @@ func TestDuration(t *testing.T) {
 
 func TestSpeciateEvolveMerge(t *testing.T) {
 	var (
-		rng       = newRandomNumberGenerator()
+		rng       = newRand()
 		testCases = []struct {
 			pop       Population
 			speciator Speciator
@@ -285,4 +286,41 @@ func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
 		t.Error("An error should have been raised")
 	}
 	ga.Speciator = speciator
+}
+
+func TestGAConsistentResults(t *testing.T) {
+	var (
+		rng = rand.New(rand.NewSource(42)) //newRand()
+		ga  = GA{
+			NewGenome: NewVector,
+			NPops:     1,
+			PopSize:   10,
+			Model: ModGenerational{
+				Selector: SelTournament{
+					NContestants: 3,
+				},
+				MutRate: 0.5,
+			},
+			RNG: rng,
+		}
+	)
+
+	fmt.Println(rng.Int31())
+
+	// Run a first time
+	ga.Initialize()
+	for i := 0; i < 20; i++ {
+		ga.Enhance()
+	}
+	var firstBest = ga.Best.Clone(rng)
+
+	// Run a second time
+	ga.Initialize()
+	for i := 0; i < 20; i++ {
+		ga.Enhance()
+	}
+	var secondBest = ga.Best.Clone(rng)
+
+	fmt.Println(firstBest)
+	fmt.Println(secondBest)
 }

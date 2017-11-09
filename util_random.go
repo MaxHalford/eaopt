@@ -3,14 +3,7 @@ package gago
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
-
-// newRandomNumberGenerator returns a new random number generator with a random
-// seed.
-func newRandomNumberGenerator() *rand.Rand {
-	return rand.New(rand.NewSource(time.Now().UnixNano()))
-}
 
 // Sample k unique integers in range [min, max) using reservoir sampling,
 // specifically Vitter's Algorithm R.

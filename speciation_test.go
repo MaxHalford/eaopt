@@ -9,7 +9,7 @@ import (
 
 func TestSpecKMedoidsApply(t *testing.T) {
 	var (
-		rng       = newRandomNumberGenerator()
+		rng       = newRand()
 		testCases = []struct {
 			indis        Individuals
 			kmeds        SpecKMedoids
@@ -105,7 +105,7 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 	var (
 		nIndividuals = []int{1, 2, 3}
 		nSpecies     = []int{1, 2, 3}
-		rng          = newRandomNumberGenerator()
+		rng          = newRand()
 	)
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {

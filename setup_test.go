@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"time"
 )
 
 var (
@@ -25,6 +26,11 @@ var (
 	}
 	nbrGenerations = 5 // Initial number of generations to enhance
 )
+
+// newRand returns a new random number generator with a random seed.
+func newRand() *rand.Rand {
+	return rand.New(rand.NewSource(time.Now().UnixNano()))
+}
 
 func init() {
 	ga.Initialize()

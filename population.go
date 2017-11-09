@@ -18,13 +18,13 @@ type Population struct {
 }
 
 // Generate a new population.
-func newPopulation(size int, newGenome NewGenome) Population {
+func newPopulation(size int, newGenome NewGenome, rng *rand.Rand) Population {
 	var (
-		rng = newRandomNumberGenerator()
-		pop = Population{
-			Individuals: newIndividuals(size, newGenome, rng),
-			ID:          randString(3, rng),
-			rng:         rng,
+		popRNG = rand.New(rand.NewSource(rng.Int63()))
+		pop    = Population{
+			Individuals: newIndividuals(size, newGenome, popRNG),
+			ID:          randString(3, popRNG),
+			rng:         popRNG,
 		}
 	)
 	return pop

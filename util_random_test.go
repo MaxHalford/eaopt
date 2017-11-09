@@ -78,7 +78,7 @@ func TestSampleInts(t *testing.T) {
 			err:  errors.New("k > len(ints)"),
 		},
 	}
-	var rng = newRandomNumberGenerator()
+	var rng = newRand()
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
 			var ints, idxs, err = sampleInts(tc.ints, tc.k, rng)

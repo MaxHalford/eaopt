@@ -4,7 +4,7 @@ import "testing"
 
 func TestMigSizes(t *testing.T) {
 	var (
-		rng       = newRandomNumberGenerator()
+		rng       = newRand()
 		migrators = []Migrator{
 			MigRing{
 				NMigrants: 5,
@@ -18,7 +18,7 @@ func TestMigSizes(t *testing.T) {
 				// Instantiate populations
 				var pops = make([]Population, nbrPops)
 				for i := range pops {
-					pops[i] = newPopulation(nbrIndis, NewVector)
+					pops[i] = newPopulation(nbrIndis, NewVector, rng)
 					pops[i].Individuals.Evaluate()
 					fitnessMeans[i] = pops[i].Individuals.FitAvg()
 				}

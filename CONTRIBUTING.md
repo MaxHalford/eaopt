@@ -23,10 +23,10 @@
 ### Variable declaration
 
 ```go
-// Good
+// Bad
 x := 42
 
-// Bad
+// Good
 var x = 42
 ```
 
