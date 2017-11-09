@@ -278,7 +278,7 @@ func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
 	ga.Speciator = SpecRuntimeError{}
 	// Check invalid speciator doesn't raise error
 	if ga.Validate() != nil {
-		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Enhance
 	var err = ga.Enhance()
