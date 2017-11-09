@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"testing"
 	"time"
 )
@@ -162,7 +163,7 @@ func TestDuration(t *testing.T) {
 
 func TestSpeciateEvolveMerge(t *testing.T) {
 	var (
-		rng       = newRandomNumberGenerator()
+		rng       = newRand()
 		testCases = []struct {
 			pop       Population
 			speciator Speciator
@@ -262,7 +263,7 @@ func TestGAEnhanceModelRuntimeError(t *testing.T) {
 	ga.Model = ModRuntimeError{}
 	// Check invalid model doesn't raise error
 	if ga.Validate() != nil {
-		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Enhance
 	var err = ga.Enhance()
@@ -277,7 +278,7 @@ func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
 	ga.Speciator = SpecRuntimeError{}
 	// Check invalid speciator doesn't raise error
 	if ga.Validate() != nil {
-		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Enhance
 	var err = ga.Enhance()
@@ -285,4 +286,51 @@ func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
 		t.Error("An error should have been raised")
 	}
 	ga.Speciator = speciator
+}
+
+func TestGAConsistentResults(t *testing.T) {
+	var (
+		ga1 = GA{
+			NewGenome: NewVector,
+			NPops:     2,
+			PopSize:   10,
+			Model: ModGenerational{
+				Selector: SelTournament{
+					NContestants: 3,
+				},
+				MutRate: 0.5,
+			},
+			RNG: rand.New(rand.NewSource(42)),
+		}
+		ga2 = GA{
+			NewGenome: NewVector,
+			NPops:     2,
+			PopSize:   10,
+			Model: ModGenerational{
+				Selector: SelTournament{
+					NContestants: 3,
+				},
+				MutRate: 0.5,
+			},
+			RNG: rand.New(rand.NewSource(42)),
+		}
+	)
+
+	// Run the first GA
+	ga1.Initialize()
+	for i := 0; i < 20; i++ {
+		ga1.Enhance()
+	}
+
+	// Run the second GA
+	ga2.Initialize()
+	for i := 0; i < 20; i++ {
+		ga2.Enhance()
+	}
+
+	// Compare best individuals
+	if ga1.Best.Fitness != ga2.Best.Fitness {
+		t.Errorf("Expected %f, got %f", ga1.Best.Fitness, ga2.Best.Fitness)
+	}
+
 }

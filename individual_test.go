@@ -40,7 +40,7 @@ func TestIndividualString(t *testing.T) {
 
 func TestCloneIndividual(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		genome = NewVector(rng)
 		indi1  = NewIndividual(genome, rng)
 		indi2  = indi1.Clone(rng)
@@ -52,7 +52,7 @@ func TestCloneIndividual(t *testing.T) {
 
 func TestEvaluateIndividual(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		genome = NewVector(rng)
 		indi   = NewIndividual(genome, rng)
 	)
@@ -67,7 +67,7 @@ func TestEvaluateIndividual(t *testing.T) {
 
 func TestMutateIndividual(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		genome = NewVector(rng)
 		indi   = NewIndividual(genome, rng)
 	)
@@ -80,7 +80,7 @@ func TestMutateIndividual(t *testing.T) {
 
 func TestCrossoverIndividual(t *testing.T) {
 	var (
-		rng                    = newRandomNumberGenerator()
+		rng                    = newRand()
 		indi1                  = NewIndividual(NewVector(rng), rng)
 		indi2                  = NewIndividual(NewVector(rng), rng)
 		offspring1, offspring2 = indi1.Crossover(indi2, rng)

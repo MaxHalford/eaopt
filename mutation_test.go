@@ -33,7 +33,7 @@ func sliceContainsString(x string, strings []string) bool {
 
 func TestMutNormalFloat64All(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []float64{1, 2, 3}
 		mutated = make([]float64, len(genome))
 	)
@@ -48,7 +48,7 @@ func TestMutNormalFloat64All(t *testing.T) {
 
 func TestMutNormalFloat64None(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []float64{1, 2, 3}
 		mutated = make([]float64, len(genome))
 	)
@@ -63,7 +63,7 @@ func TestMutNormalFloat64None(t *testing.T) {
 
 func TestMutUniformString(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []string{"a", "b", "c"}
 		corpus  = []string{"d", "e", "f"}
 		mutated = make([]string, len(genome))
@@ -96,7 +96,7 @@ func TestMutUniformString(t *testing.T) {
 
 func TestMutPermuteSingleGene(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		genome = []int{42}
 	)
 	MutPermuteInt(genome, 1, rng)
@@ -112,7 +112,7 @@ func TestMutPermuteSingleGene(t *testing.T) {
 
 func TestMutPermuteInt(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []int{1, 2, 3}
 		mutated = make([]int, len(genome))
 	)
@@ -132,7 +132,7 @@ func TestMutPermuteInt(t *testing.T) {
 
 func TestMutPermuteFloat64(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []float64{1, 2, 3}
 		mutated = make([]float64, len(genome))
 	)
@@ -152,7 +152,7 @@ func TestMutPermuteFloat64(t *testing.T) {
 
 func TestMutPermuteString(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []string{"a", "b", "c"}
 		mutated = make([]string, len(genome))
 	)
@@ -172,7 +172,7 @@ func TestMutPermuteString(t *testing.T) {
 
 func TestMutSpliceInt(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []int{1, 2, 3}
 		mutated = make([]int, len(genome))
 	)
@@ -192,7 +192,7 @@ func TestMutSpliceInt(t *testing.T) {
 
 func TestMutSpliceFloat64(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []float64{1, 2, 3}
 		mutated = make([]float64, len(genome))
 	)
@@ -212,7 +212,7 @@ func TestMutSpliceFloat64(t *testing.T) {
 
 func TestMutSpliceString(t *testing.T) {
 	var (
-		rng     = newRandomNumberGenerator()
+		rng     = newRand()
 		genome  = []string{"a", "b", "c"}
 		mutated = make([]string, len(genome))
 	)

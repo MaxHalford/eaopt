@@ -8,7 +8,7 @@ import (
 
 func TestCrossUniformFloat64(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = NewVector(rng).(Vector)
 		p2     = NewVector(rng).(Vector)
 		o1, o2 = CrossUniformFloat64(p1, p2, rng)
@@ -93,7 +93,7 @@ func TestGNX(t *testing.T) {
 
 func TestCrossGNXFloat64(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
 		o1, o2 = CrossGNXFloat64(p1, p2, 2, rng)
@@ -106,7 +106,7 @@ func TestCrossGNXFloat64(t *testing.T) {
 
 func TestCrossGNXInt(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
 		o1, o2 = CrossGNXInt(p1, p2, 2, rng)
@@ -119,7 +119,7 @@ func TestCrossGNXInt(t *testing.T) {
 
 func TestCrossGNXString(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
 		o1, o2 = CrossGNXString(p1, p2, 2, rng)
@@ -181,7 +181,7 @@ func TestPMX(t *testing.T) {
 
 func TestCrossPMXFloat64(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
 		o1, o2 = CrossPMXFloat64(p1, p2, rng)
@@ -194,7 +194,7 @@ func TestCrossPMXFloat64(t *testing.T) {
 
 func TestCrossPMXInt(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
 		o1, o2 = CrossPMXInt(p1, p2, rng)
@@ -207,7 +207,7 @@ func TestCrossPMXInt(t *testing.T) {
 
 func TestCrossPMXString(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
 		o1, o2 = CrossPMXString(p1, p2, rng)
@@ -269,7 +269,7 @@ func TestOX(t *testing.T) {
 
 func TestCrossOXFloat64(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []float64{1, 2, 3}
 		p2     = []float64{3, 2, 1}
 		o1, o2 = CrossOXFloat64(p1, p2, rng)
@@ -282,7 +282,7 @@ func TestCrossOXFloat64(t *testing.T) {
 
 func TestCrossOXInt(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []int{1, 2, 3}
 		p2     = []int{3, 2, 1}
 		o1, o2 = CrossOXInt(p1, p2, rng)
@@ -295,7 +295,7 @@ func TestCrossOXInt(t *testing.T) {
 
 func TestCrossOXString(t *testing.T) {
 	var (
-		rng    = newRandomNumberGenerator()
+		rng    = newRand()
 		p1     = []string{"a", "b", "c"}
 		p2     = []string{"c", "b", "a"}
 		o1, o2 = CrossOXString(p1, p2, rng)

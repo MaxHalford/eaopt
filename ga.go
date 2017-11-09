@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"sync"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -23,6 +22,7 @@ type GA struct {
 	Speciator    Speciator    `json:"-"`
 	Logger       *log.Logger  `json:"-"`
 	Callback     func(ga *GA) `json:"-"`
+	RNG          *rand.Rand   `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -30,7 +30,6 @@ type GA struct {
 	CurrentBest Individual    `json:"generation_best"`
 	Age         time.Duration `json:"duration"`
 	Generations int           `json:"generations"`
-	rng         *rand.Rand
 }
 
 // Validate the parameters of a GA to ensure it will run correctly; some
@@ -86,13 +85,13 @@ func (ga *GA) findBest() {
 	}
 	// Compare the current best Individual to the overall Individual
 	if ga.CurrentBest.Fitness < ga.Best.Fitness {
-		ga.Best = ga.CurrentBest.Clone(ga.rng)
+		ga.Best = ga.CurrentBest.Clone(ga.RNG)
 	}
 }
 
 // Initialized indicates if the GA has been initialized or not.
 func (ga GA) Initialized() bool {
-	if ga.rng == nil {
+	if len(ga.Populations) != ga.NPops {
 		return false
 	}
 	return true
@@ -102,26 +101,23 @@ func (ga GA) Initialized() bool {
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
-	ga.Populations = make([]Population, ga.NPops)
-	ga.rng = newRandomNumberGenerator()
-	var wg sync.WaitGroup
-	for i := range ga.Populations {
-		wg.Add(1)
-		go func(j int) {
-			defer wg.Done()
-			// Generate a population
-			ga.Populations[j] = newPopulation(ga.PopSize, ga.NewGenome)
-			// Evaluate its individuals
-			ga.Populations[j].Individuals.Evaluate()
-			// Sort its individuals
-			ga.Populations[j].Individuals.SortByFitness()
-			// Log current statistics if a logger has been provided
-			if ga.Logger != nil {
-				ga.Populations[j].Log(ga.Logger)
-			}
-		}(i)
+	// Initialize the random number generator if it hasn't been set
+	if ga.RNG == nil {
+		ga.RNG = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
-	wg.Wait()
+	ga.Populations = make([]Population, ga.NPops)
+	for i := range ga.Populations {
+		// Generate a population
+		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
+		// Evaluate its individuals
+		ga.Populations[i].Individuals.Evaluate()
+		// Sort its individuals
+		ga.Populations[i].Individuals.SortByFitness()
+		// Log current statistics if a logger has been provided
+		if ga.Logger != nil {
+			ga.Populations[i].Log(ga.Logger)
+		}
+	}
 	// Find the initial best Individual
 	ga.Best = ga.Populations[0].Individuals[0]
 	ga.findBest()
@@ -137,11 +133,15 @@ func (ga *GA) Initialize() {
 func (ga *GA) Enhance() error {
 	var start = time.Now()
 	ga.Generations++
+	// Check the GA has been initialized
+	if !ga.Initialized() {
+		return errors.New("The GA has not been initialized")
+	}
 	// Migrate the individuals between the populations if there are at least 2
 	// Populations and that there is a migrator and that the migration frequency
 	// divides the generation count
 	if len(ga.Populations) > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
-		ga.Migrator.Apply(ga.Populations, ga.rng)
+		ga.Migrator.Apply(ga.Populations, ga.RNG)
 	}
 	var g errgroup.Group
 	for i := range ga.Populations {

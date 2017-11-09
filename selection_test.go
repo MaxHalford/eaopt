@@ -19,7 +19,7 @@ var (
 
 func TestSelectionSize(t *testing.T) {
 	var (
-		rng       = newRandomNumberGenerator()
+		rng       = newRand()
 		indis     = newIndividuals(30, NewVector, rng)
 		selectors = []Selector{
 			SelTournament{
@@ -40,7 +40,7 @@ func TestSelectionSize(t *testing.T) {
 
 func TestSelElitism(t *testing.T) {
 	var (
-		rng      = newRandomNumberGenerator()
+		rng      = newRand()
 		indis    = newIndividuals(30, NewVector, rng)
 		selector = SelElitism{}
 	)
@@ -57,7 +57,7 @@ func TestSelElitism(t *testing.T) {
 
 func TestSelTournament(t *testing.T) {
 	var (
-		rng   = newRandomNumberGenerator()
+		rng   = newRand()
 		indis = newIndividuals(30, NewVector, rng)
 	)
 	indis.Evaluate()
@@ -89,7 +89,7 @@ func TestBuildWheel(t *testing.T) {
 
 func TestSelRoulette(t *testing.T) {
 	var (
-		rng   = newRandomNumberGenerator()
+		rng   = newRand()
 		indis = newIndividuals(30, NewVector, rng)
 		sel   = SelRoulette{}
 	)
