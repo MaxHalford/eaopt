@@ -263,7 +263,7 @@ func TestGAEnhanceModelRuntimeError(t *testing.T) {
 	ga.Model = ModRuntimeError{}
 	// Check invalid model doesn't raise error
 	if ga.Validate() != nil {
-		t.Errorf("Expected %s, got %s", nil, ga.Validate())
+		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Enhance
 	var err = ga.Enhance()
@@ -290,10 +290,9 @@ func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
 
 func TestGAConsistentResults(t *testing.T) {
 	var (
-		rng = rand.New(rand.NewSource(42)) //newRand()
-		ga  = GA{
+		ga1 = GA{
 			NewGenome: NewVector,
-			NPops:     1,
+			NPops:     2,
 			PopSize:   10,
 			Model: ModGenerational{
 				Selector: SelTournament{
@@ -301,26 +300,37 @@ func TestGAConsistentResults(t *testing.T) {
 				},
 				MutRate: 0.5,
 			},
-			RNG: rng,
+			RNG: rand.New(rand.NewSource(42)),
+		}
+		ga2 = GA{
+			NewGenome: NewVector,
+			NPops:     2,
+			PopSize:   10,
+			Model: ModGenerational{
+				Selector: SelTournament{
+					NContestants: 3,
+				},
+				MutRate: 0.5,
+			},
+			RNG: rand.New(rand.NewSource(42)),
 		}
 	)
 
-	fmt.Println(rng.Int31())
-
-	// Run a first time
-	ga.Initialize()
+	// Run the first GA
+	ga1.Initialize()
 	for i := 0; i < 20; i++ {
-		ga.Enhance()
+		ga1.Enhance()
 	}
-	var firstBest = ga.Best.Clone(rng)
 
-	// Run a second time
-	ga.Initialize()
+	// Run the second GA
+	ga2.Initialize()
 	for i := 0; i < 20; i++ {
-		ga.Enhance()
+		ga2.Enhance()
 	}
-	var secondBest = ga.Best.Clone(rng)
 
-	fmt.Println(firstBest)
-	fmt.Println(secondBest)
+	// Compare best individuals
+	if ga1.Best.Fitness != ga2.Best.Fitness {
+		t.Errorf("Expected %f, got %f", ga1.Best.Fitness, ga2.Best.Fitness)
+	}
+
 }

@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"sync"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -106,26 +105,19 @@ func (ga *GA) Initialize() {
 	if ga.RNG == nil {
 		ga.RNG = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
-	// Initialize the populations asynchronously
 	ga.Populations = make([]Population, ga.NPops)
-	var wg sync.WaitGroup
 	for i := range ga.Populations {
-		wg.Add(1)
-		go func(j int) {
-			defer wg.Done()
-			// Generate a population
-			ga.Populations[j] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
-			// Evaluate its individuals
-			ga.Populations[j].Individuals.Evaluate()
-			// Sort its individuals
-			ga.Populations[j].Individuals.SortByFitness()
-			// Log current statistics if a logger has been provided
-			if ga.Logger != nil {
-				ga.Populations[j].Log(ga.Logger)
-			}
-		}(i)
+		// Generate a population
+		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
+		// Evaluate its individuals
+		ga.Populations[i].Individuals.Evaluate()
+		// Sort its individuals
+		ga.Populations[i].Individuals.SortByFitness()
+		// Log current statistics if a logger has been provided
+		if ga.Logger != nil {
+			ga.Populations[i].Log(ga.Logger)
+		}
 	}
-	wg.Wait()
 	// Find the initial best Individual
 	ga.Best = ga.Populations[0].Individuals[0]
 	ga.findBest()
