@@ -277,6 +277,7 @@ type GA struct {
     Logger       *log.Logger
     Callback     func(ga *GA)
     RNG          *rand.Rand
+    ParallelEval bool
 
     // Fields that are generated at runtime
     Populations        Populations
@@ -301,6 +302,7 @@ You have to fill in the first set of fields, the rest are generated when calling
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
 - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
+- `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [FAQ](#faq) for more details on parallelism.
 
 Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA. The other fields are optional.
 
@@ -451,6 +453,14 @@ func (n *Name) Mutate(rng *rand.Rand) {
 }
 ```
 
+
+**How can I make the most out of parallelism?**
+
+The Go provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are "heavy". If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
+
+By default gago will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
+
+
 **When are genetic algorithms good to apply?**
 
 Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
@@ -464,10 +474,10 @@ Feel free to implement your own operators or to make suggestions! Check out the 
 
 ## Dependencies
 
-You can see the list of dependencies [here](https://godoc.org/github.com/MaxHalford/gago?imports) and a graph view [here](https://godoc.org/github.com/MaxHalford/gago?import-graph). Here is the list of external dependencies:
+You can see the list of dependencies [here](https://godoc.org/github.com/MaxHalford/gago?imports) and the graph view [here](https://godoc.org/github.com/MaxHalford/gago?import-graph). Here is the list of external dependencies:
 
 - [golang.org/x/sync/errgroup](https://godoc.org/golang.org/x/sync/errgroup)
 
 ## License
 
-The MIT License (MIT). Please see the [license file](LICENSE) for more information.
+The MIT License (MIT). Please see the [LICENSE file](LICENSE) for more information.

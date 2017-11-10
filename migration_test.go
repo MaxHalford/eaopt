@@ -19,7 +19,7 @@ func TestMigSizes(t *testing.T) {
 				var pops = make([]Population, nbrPops)
 				for i := range pops {
 					pops[i] = newPopulation(nbrIndis, NewVector, rng)
-					pops[i].Individuals.Evaluate()
+					pops[i].Individuals.Evaluate(false)
 					fitnessMeans[i] = pops[i].Individuals.FitAvg()
 				}
 				migrator.Apply(pops, rng)

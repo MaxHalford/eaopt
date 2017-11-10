@@ -174,7 +174,7 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 	if mod.MutRate > 0 {
 		offsprings.Mutate(mod.MutRate, pop.rng)
 	}
-	offsprings.Evaluate()
+	offsprings.Evaluate(false)
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size

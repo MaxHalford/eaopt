@@ -23,6 +23,7 @@ type GA struct {
 	Logger       *log.Logger  `json:"-"`
 	Callback     func(ga *GA) `json:"-"`
 	RNG          *rand.Rand   `json:"-"`
+	ParallelEval bool         `json:"-"`
 
 	// Fields that are generated at runtime
 	Populations Populations   `json:"pops"`
@@ -110,7 +111,7 @@ func (ga *GA) Initialize() {
 		// Generate a population
 		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
 		// Evaluate its individuals
-		ga.Populations[i].Individuals.Evaluate()
+		ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 		// Sort its individuals
 		ga.Populations[i].Individuals.SortByFitness()
 		// Log current statistics if a logger has been provided
@@ -162,7 +163,7 @@ func (ga *GA) Enhance() error {
 				}
 			}
 			// Evaluate and sort
-			ga.Populations[i].Individuals.Evaluate()
+			ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 			ga.Populations[i].Individuals.SortByFitness()
 			ga.Populations[i].Age += time.Since(start)
 			ga.Populations[i].Generations++
