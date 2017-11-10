@@ -302,7 +302,7 @@ You have to fill in the first set of fields, the rest are generated when calling
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
 - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
-- `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [FAQ](#faq) for more details on parallelism.
+- `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
 
 Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA. The other fields are optional.
 
@@ -412,9 +412,10 @@ If a logger is provided, each row in the log output will include
 
 Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run independently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
 
-One approach I considered was to run the individual operations in parallel. Basically a parallel loop would apply all the necessary operations to a set of individuals. First of all this isn't as simple as it seems, the prime issue being the [race condition](https://www.wikiwand.com/en/Embarrassingly_parallel) that can occur when applying crossover. Moreover the initialization overhead was relatively too large, mainly because mutation and evaluation can be *too* fast for a thread to be viable.
+The Go language provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are "heavy". If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
 
-The current approach is to run the populations in parallel. This works very nicely because the only non-parallel operation is migration; all the other operations are population specific and no communication between populations has to be made. Basically if you have n cores, then running a GA with n populations will take the same time as running it for 1.
+By default gago will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
+
 
 ## FAQ
 
@@ -452,13 +453,6 @@ func (n *Name) Mutate(rng *rand.Rand) {
     n = randomName()
 }
 ```
-
-
-**How can I make the most out of parallelism?**
-
-The Go provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are "heavy". If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
-
-By default gago will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
 
 
 **When are genetic algorithms good to apply?**
