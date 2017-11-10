@@ -272,10 +272,11 @@ type GA struct {
     PopSize      int
     Model        Model
     Migrator     Migrator
-    MigFrequency int // Frequency at which migrations occur
+    MigFrequency int
     Speciator    Speciator
     Logger       *log.Logger
     Callback     func(ga *GA)
+    RNG          *rand.Rand
 
     // Fields that are generated at runtime
     Populations        Populations
@@ -283,11 +284,10 @@ type GA struct {
     CurrentBest        Individual
     Age                time.Duration
     Generations        int
-    rng                *rand.Rand
 }
 ```
 
-You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method.
+You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method. Check out the examples in `presets.go` to get an idea of how to fill them out.
 
 - `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
 - `NPops` determines the number of populations that will be used.
@@ -300,8 +300,9 @@ You have to fill in the first set of fields, the rest are generated when calling
     - Calculating specific population statistics that are not provided by the logger
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
+- `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to want to reproduce your results set it with a fixed source, e.g. `rand.New(rand.NewSource(42))`.
 
-Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA.
+Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA. The other fields are optional.
 
 
 ### Running a GA
