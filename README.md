@@ -300,7 +300,7 @@ You have to fill in the first set of fields, the rest are generated when calling
     - Calculating specific population statistics that are not provided by the logger
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
-- `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to want to reproduce your results set it with a fixed source, e.g. `rand.New(rand.NewSource(42))`.
+- `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
 
 Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA. The other fields are optional.
 
