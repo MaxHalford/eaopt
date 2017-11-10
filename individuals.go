@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"sort"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Individuals is a convenience type, methods that belong to an Individual can
@@ -39,11 +41,30 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 	return indis
 }
 
-// Evaluate each individual.
-func (indis Individuals) Evaluate() {
-	for i := range indis {
-		indis[i].Evaluate()
+// Evaluate each individual. If parallel is true then each Individual will be
+// evaluated in parallel thanks to the golang.org/x/sync/errgroup package. If
+// not then a simple sequential loop will be used. Evaluating in parallel is
+// only recommended for cases where evaluating an Individual takes a "long"
+// time. Indeed there won't necessarily be a speed-up when evaluating in
+// parallel. In fact performance can be degraded if evaluating an Individual is
+// too cheap.
+func (indis Individuals) Evaluate(parallel bool) {
+	// Evaluate sequentially
+	if !parallel {
+		for _, indi := range indis {
+			indi.Evaluate()
+		}
 	}
+	// Evaluate in parallel
+	var g errgroup.Group
+	for i := range indis {
+		i := i // https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
+			indis[i].Evaluate()
+			return nil
+		})
+	}
+	g.Wait()
 }
 
 // Mutate each individual.

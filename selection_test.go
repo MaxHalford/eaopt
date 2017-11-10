@@ -44,7 +44,7 @@ func TestSelElitism(t *testing.T) {
 		indis    = newIndividuals(30, NewVector, rng)
 		selector = SelElitism{}
 	)
-	indis.Evaluate()
+	indis.Evaluate(false)
 	for _, n := range []int{1, 2, 10, 30} {
 		var _, indexes, _ = selector.Apply(n, indis, rng)
 		for i, index := range indexes {
@@ -60,7 +60,7 @@ func TestSelTournament(t *testing.T) {
 		rng   = newRand()
 		indis = newIndividuals(30, NewVector, rng)
 	)
-	indis.Evaluate()
+	indis.Evaluate(false)
 	var selected, _, _ = SelTournament{len(indis)}.Apply(1, indis, rng)
 	if selected[0].Fitness != indis.FitMin() {
 		t.Error("Full SelTournament didn't select the best individual")
@@ -93,7 +93,7 @@ func TestSelRoulette(t *testing.T) {
 		indis = newIndividuals(30, NewVector, rng)
 		sel   = SelRoulette{}
 	)
-	indis.Evaluate()
+	indis.Evaluate(false)
 	for _, n := range []int{0, 1, 10, 30} {
 		var selected, _, _ = sel.Apply(n, indis, rng)
 		if len(selected) != n {
