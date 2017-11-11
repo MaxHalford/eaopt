@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"sort"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -12,11 +13,14 @@ import (
 
 // A GA contains population which themselves contain individuals.
 type GA struct {
-	// Fields that are provided by the user
-	NewGenome    NewGenome    `json:"-"`
-	NPops        int          `json:"-"` // Number of Populations
-	PopSize      int          `json:"-"` // Number of Individuls per Population
-	Model        Model        `json:"-"`
+	// Required fields
+	NewGenome NewGenome `json:"-"`
+	NPops     int       `json:"-"` // Number of Populations
+	PopSize   int       `json:"-"` // Number of Individuls per Population
+	Model     Model     `json:"-"`
+
+	// Optional fields
+	NBest        int          `json:"-"` // Length of HallOfFame
 	Migrator     Migrator     `json:"-"`
 	MigFrequency int          `json:"-"` // Frequency at which migrations occur
 	Speciator    Speciator    `json:"-"`
@@ -25,12 +29,11 @@ type GA struct {
 	RNG          *rand.Rand   `json:"-"`
 	ParallelEval bool         `json:"-"`
 
-	// Fields that are generated at runtime
-	Populations Populations   `json:"pops"`
-	Best        Individual    `json:"overall_best"`
-	CurrentBest Individual    `json:"generation_best"`
-	Age         time.Duration `json:"duration"`
-	Generations int           `json:"generations"`
+	// Fields generated at runtime
+	Populations Populations   `json:"populations"`
+	HallOfFame  Individuals   `json:"hall_of_fame"` // Sorted best Individuals ever encountered
+	Age         time.Duration `json:"duration"`     // Duration during which the GA has been evolved
+	Generations int           `json:"generations"`  // Number of generations the GA has been evolved
 }
 
 // Validate the parameters of a GA to ensure it will run correctly; some
@@ -71,22 +74,24 @@ func (ga GA) Validate() error {
 	return nil
 }
 
-// Find the best current Individual in each Population and then compare the best
-// overall Individual to the current best Individual.
-func (ga *GA) findBest() {
+// Find the best current Individual in each population and then compare the best
+// overall Individual to the current best Individual. The Individuals in each
+// population are expected to be sorted.
+func updateHallOfFame(hof Individuals, indis Individuals) {
+	var k = len(hof)
 	// Start by finding the current best Individual
-	ga.CurrentBest = Individual{Fitness: math.Inf(1)}
-	for _, pop := range ga.Populations {
-		if !pop.Individuals.IsSortedByFitness() {
-			pop.Individuals.SortByFitness()
+	for _, indi := range indis[:min(k, len(indis))] {
+		// Find if and where the Individual should fit in the hall of fame
+		var (
+			f = func(i int) bool { return indi.Fitness < hof[i].Fitness }
+			i = sort.Search(k, f)
+		)
+		if i < k {
+			// Shift the hall of fame to the right
+			copy(hof[i+1:], hof[i:])
+			// Insert the new Individual
+			hof[i] = indi
 		}
-		if pop.Individuals[0].Fitness < ga.CurrentBest.Fitness {
-			ga.CurrentBest = pop.Individuals[0].Clone(pop.rng)
-		}
-	}
-	// Compare the current best Individual to the overall Individual
-	if ga.CurrentBest.Fitness < ga.Best.Fitness {
-		ga.Best = ga.CurrentBest.Clone(ga.RNG)
 	}
 }
 
@@ -102,26 +107,35 @@ func (ga GA) Initialized() bool {
 // individual in each population. Running Initialize after running Enhance will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
+	// Check the NBest field
+	if ga.NBest < 1 {
+		ga.NBest = 1
+	}
 	// Initialize the random number generator if it hasn't been set
 	if ga.RNG == nil {
 		ga.RNG = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
 	ga.Populations = make([]Population, ga.NPops)
 	for i := range ga.Populations {
-		// Generate a population
+		// Generate a Population
 		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
-		// Evaluate its individuals
+		// Evaluate its Individuals
 		ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
-		// Sort its individuals
+		// Sort it's Individuals
 		ga.Populations[i].Individuals.SortByFitness()
 		// Log current statistics if a logger has been provided
 		if ga.Logger != nil {
 			ga.Populations[i].Log(ga.Logger)
 		}
 	}
-	// Find the initial best Individual
-	ga.Best = ga.Populations[0].Individuals[0]
-	ga.findBest()
+	// Initialize HallOfFame
+	ga.HallOfFame = make(Individuals, ga.NBest)
+	for i := range ga.HallOfFame {
+		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
+	}
+	for _, pop := range ga.Populations {
+		updateHallOfFame(ga.HallOfFame, pop.Individuals)
+	}
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
 		ga.Callback(ga)
@@ -177,13 +191,15 @@ func (ga *GA) Enhance() error {
 	if err := g.Wait(); err != nil {
 		return err
 	}
-	// Check if there is an individual that is better than the current one
-	ga.findBest()
-	ga.Age += time.Since(start)
+	// Update HallOfFame
+	for _, pop := range ga.Populations {
+		updateHallOfFame(ga.HallOfFame, pop.Individuals)
+	}
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
 		ga.Callback(ga)
 	}
+	ga.Age += time.Since(start)
 	// No error
 	return nil
 }

@@ -123,29 +123,57 @@ func TestRandomNumberGenerators(t *testing.T) {
 func TestBest(t *testing.T) {
 	for _, pop := range ga.Populations {
 		for _, indi := range pop.Individuals {
-			if ga.Best.Fitness > indi.Fitness {
+			if ga.HallOfFame[0].Fitness > indi.Fitness {
 				t.Error("The current best individual is not the overall best")
 			}
 		}
 	}
 }
 
-func TestFindBest(t *testing.T) {
-	// Check sure the findBest method works as expected
-	var fitness = ga.Populations[0].Individuals[0].Fitness
-	ga.Populations[0].Individuals[0].Fitness = math.Inf(-1)
-	ga.findBest()
-	if ga.Best.Fitness != math.Inf(-1) {
-		t.Error("findBest didn't work")
+func TestUpdateHallOfFame(t *testing.T) {
+	var (
+		testCases = []struct {
+			hofIn  Individuals
+			indis  Individuals
+			hofOut Individuals
+		}{
+			{
+				hofIn: Individuals{
+					Individual{Fitness: math.Inf(1)},
+				},
+				indis: Individuals{
+					Individual{Fitness: 0},
+				},
+				hofOut: Individuals{
+					Individual{Fitness: 0},
+				},
+			},
+			{
+				hofIn: Individuals{
+					Individual{Fitness: 0},
+					Individual{Fitness: math.Inf(1)},
+				},
+				indis: Individuals{
+					Individual{Fitness: 1},
+				},
+				hofOut: Individuals{
+					Individual{Fitness: 0},
+					Individual{Fitness: 1},
+				},
+			},
+		}
+	)
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
+			updateHallOfFame(tc.hofIn, tc.indis)
+			// Compare the obtained hall of fame to the expected one)
+			for i, indi := range tc.hofIn {
+				if indi.Fitness != tc.hofOut[i].Fitness {
+					t.Errorf("Expected %v, got %v", tc.hofOut[i], indi)
+				}
+			}
+		})
 	}
-	ga.Populations[0].Individuals[0].Fitness = fitness
-	// Check the best individual doesn't a share a pointer with anyone
-	fitness = ga.Best.Fitness
-	ga.Best.Fitness = 42
-	if ga.Populations[0].Individuals[0].Fitness == 42 {
-		t.Error("Best individual shares a pointer with an individual in the populations")
-	}
-	ga.Best.Fitness = fitness
 }
 
 // TestDuration verifies the sum of the duration of each population is higher
@@ -329,8 +357,8 @@ func TestGAConsistentResults(t *testing.T) {
 	}
 
 	// Compare best individuals
-	if ga1.Best.Fitness != ga2.Best.Fitness {
-		t.Errorf("Expected %f, got %f", ga1.Best.Fitness, ga2.Best.Fitness)
+	if ga1.HallOfFame[0].Fitness != ga2.HallOfFame[0].Fitness {
+		t.Errorf("Expected %f, got %f", ga1.HallOfFame[0].Fitness, ga2.HallOfFame[0].Fitness)
 	}
 
 }
