@@ -308,7 +308,7 @@ You have to fill in the first set of fields, the rest are generated when calling
     - Monitoring for converging populations
   - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
   - `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
-- Generated at runtime fields
+- Fields populated at runtime
   - `Populations` is where all the current populations and individuals are kept.
   - `HallOfFame` contains the `NBest` individuals ever encountered. This slice is always sorted, meaning that the first element of the slice will be the best individual ever encountered.
   - `Age` indicates the duration the GA has spent calling the `Enhance` method.
