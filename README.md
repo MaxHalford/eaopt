@@ -266,11 +266,14 @@ Let's have a look at the GA struct.
 
 ```go
 type GA struct {
-    // Fields that are provided by the user
+    // Required fields
     NewGenome   NewGenome
     NPops        int
     PopSize      int
     Model        Model
+
+    // Optional fields
+    NBest        int
     Migrator     Migrator
     MigFrequency int
     Speciator    Speciator
@@ -279,10 +282,9 @@ type GA struct {
     RNG          *rand.Rand
     ParallelEval bool
 
-    // Fields that are generated at runtime
+    // Fields generated at runtime
     Populations        Populations
-    Best               Individual
-    CurrentBest        Individual
+    HallOfFame         Individuals
     Age                time.Duration
     Generations        int
 }
@@ -290,21 +292,27 @@ type GA struct {
 
 You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method. Check out the examples in `presets.go` to get an idea of how to fill them out.
 
-- `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
-- `NPops` determines the number of populations that will be used.
-- `PopSize` determines the number of individuals inside each population.
-- `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
-- `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
-- `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
-- `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
-- `Callback` is optional will execute any piece of code you wish every time `ga.Enhance()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
+- Required fields
+  - `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
+  - `NPops` determines the number of populations that will be used.
+  - `PopSize` determines the number of individuals inside each population.
+  - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
+- Optional fields
+  - `NBest` determines how many of the best individuals encountered should be regarded in the `HallOfFame` field. This defaults to 1.
+  - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
+  - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
+  - `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
+  - `Callback` is optional will execute any piece of code you wish every time `ga.Enhance()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
     - Calculating specific population statistics that are not provided by the logger
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
-- `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
-- `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
-
-Essentially, only `NewGenome`, `NPops`, `PopSize` and `Model` are required to initialize and run a GA. The other fields are optional.
+  - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
+  - `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
+- Generated at runtime fields
+  - `Populations` is where all the current populations and individuals are kept.
+  - `HallOfFame` contains the `NBest` individuals ever encountered. This slice is always sorted, meaning that the first element of the slice will be the best individual ever encountered.
+  - `Age` indicates the duration the GA has spent calling the `Enhance` method.
+  - `Generations` indicates how many times the `Enhance` method has been called.
 
 
 ### Running a GA
