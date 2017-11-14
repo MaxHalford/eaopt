@@ -51,9 +51,10 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 func (indis Individuals) Evaluate(parallel bool) {
 	// Evaluate sequentially
 	if !parallel {
-		for _, indi := range indis {
-			indi.Evaluate()
+		for i := range indis {
+			indis[i].Evaluate()
 		}
+		return
 	}
 	// Evaluate in parallel
 	var g errgroup.Group
