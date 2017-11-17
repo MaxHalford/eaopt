@@ -113,7 +113,7 @@ func TestApplyWithSpeciator(t *testing.T) {
 func TestRandomNumberGenerators(t *testing.T) {
 	for i, pop1 := range ga.Populations {
 		for j, pop2 := range ga.Populations {
-			if i != j && &pop1.rng == &pop2.rng {
+			if i != j && &pop1.RNG == &pop2.RNG {
 				t.Error("Population should not share random number generators")
 			}
 		}
@@ -201,7 +201,7 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 			{
 				pop: Population{
 					ID:  "42",
-					rng: rng,
+					RNG: rng,
 					Individuals: Individuals{
 						Individual{Fitness: 0},
 						Individual{Fitness: 1},
@@ -217,7 +217,7 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 			{
 				pop: Population{
 					ID:  "42",
-					rng: rng,
+					RNG: rng,
 					Individuals: Individuals{
 						Individual{Fitness: 0},
 						Individual{Fitness: 1},
@@ -231,7 +231,7 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 			{
 				pop: Population{
 					ID:  "42",
-					rng: rng,
+					RNG: rng,
 					Individuals: Individuals{
 						Individual{Fitness: 0},
 						Individual{Fitness: 1},

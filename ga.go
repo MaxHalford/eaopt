@@ -206,7 +206,7 @@ func (ga *GA) Enhance() error {
 
 func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 	var (
-		species, err = spec.Apply(pop.Individuals, pop.rng)
+		species, err = spec.Apply(pop.Individuals, pop.RNG)
 		pops         = make([]Population, len(species))
 	)
 	if err != nil {
@@ -219,8 +219,8 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 			Individuals: specie,
 			Age:         pop.Age,
 			Generations: pop.Generations,
-			ID:          randString(len(pop.ID), pop.rng),
-			rng:         pop.rng,
+			ID:          randString(len(pop.ID), pop.RNG),
+			RNG:         pop.RNG,
 		}
 		err = model.Apply(&pops[i])
 		if err != nil {

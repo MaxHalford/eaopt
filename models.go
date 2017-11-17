@@ -61,14 +61,14 @@ func (mod ModGenerational) Apply(pop *Population) error {
 		len(pop.Individuals),
 		pop.Individuals,
 		mod.Selector,
-		pop.rng,
+		pop.RNG,
 	)
 	if err != nil {
 		return err
 	}
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
-		offsprings.Mutate(mod.MutRate, pop.rng)
+		offsprings.Mutate(mod.MutRate, pop.RNG)
 	}
 	// Replace the old population with the new one
 	copy(pop.Individuals, offsprings)
@@ -102,19 +102,19 @@ type ModSteadyState struct {
 
 // Apply ModSteadyState.
 func (mod ModSteadyState) Apply(pop *Population) error {
-	var selected, indexes, err = mod.Selector.Apply(2, pop.Individuals, pop.rng)
+	var selected, indexes, err = mod.Selector.Apply(2, pop.Individuals, pop.RNG)
 	if err != nil {
 		return err
 	}
-	var offsprings = selected.Clone(pop.rng)
-	offsprings[0].Crossover(offsprings[1], pop.rng)
+	var offsprings = selected.Clone(pop.RNG)
+	offsprings[0].Crossover(offsprings[1], pop.RNG)
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
-		if pop.rng.Float64() < mod.MutRate {
-			offsprings[0].Mutate(pop.rng)
+		if pop.RNG.Float64() < mod.MutRate {
+			offsprings[0].Mutate(pop.RNG)
 		}
-		if pop.rng.Float64() < mod.MutRate {
-			offsprings[1].Mutate(pop.rng)
+		if pop.RNG.Float64() < mod.MutRate {
+			offsprings[1].Mutate(pop.RNG)
 		}
 	}
 	if mod.KeepBest {
@@ -165,20 +165,20 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 		mod.NOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
-		pop.rng,
+		pop.RNG,
 	)
 	if err != nil {
 		return err
 	}
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
-		offsprings.Mutate(mod.MutRate, pop.rng)
+		offsprings.Mutate(mod.MutRate, pop.RNG)
 	}
 	offsprings.Evaluate(false)
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size
-	var selected, _, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.rng)
+	var selected, _, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.RNG)
 	// Replace the current population of individuals
 	copy(pop.Individuals, selected)
 	return nil
@@ -225,17 +225,17 @@ type ModRing struct {
 func (mod ModRing) Apply(pop *Population) error {
 	for i := range pop.Individuals {
 		var (
-			indi      = pop.Individuals[i].Clone(pop.rng)
+			indi      = pop.Individuals[i].Clone(pop.RNG)
 			neighbour = pop.Individuals[i%len(pop.Individuals)]
 		)
-		indi.Crossover(neighbour, pop.rng)
+		indi.Crossover(neighbour, pop.RNG)
 		// Apply mutation to the offsprings
 		if mod.MutRate > 0 {
-			if pop.rng.Float64() < mod.MutRate {
-				indi.Mutate(pop.rng)
+			if pop.RNG.Float64() < mod.MutRate {
+				indi.Mutate(pop.RNG)
 			}
-			if pop.rng.Float64() < mod.MutRate {
-				neighbour.Mutate(pop.rng)
+			if pop.RNG.Float64() < mod.MutRate {
+				neighbour.Mutate(pop.RNG)
 			}
 		}
 		indi.Evaluate()
@@ -244,7 +244,7 @@ func (mod ModRing) Apply(pop *Population) error {
 		// offsprings
 		var (
 			indis            = Individuals{pop.Individuals[i], indi, neighbour}
-			selected, _, err = mod.Selector.Apply(1, indis, pop.rng)
+			selected, _, err = mod.Selector.Apply(1, indis, pop.RNG)
 		)
 		if err != nil {
 			return err
@@ -288,14 +288,14 @@ func (mod ModSimAnn) Apply(pop *Population) error {
 	for mod.T > mod.Tmin {
 		for i, indi := range pop.Individuals {
 			// Generate a random neighbour through mutation
-			var neighbour = indi.Clone(pop.rng)
-			neighbour.Mutate(pop.rng)
+			var neighbour = indi.Clone(pop.RNG)
+			neighbour.Mutate(pop.RNG)
 			neighbour.Evaluate()
 			if neighbour.Fitness < indi.Fitness {
 				pop.Individuals[i] = neighbour
 			} else {
 				var p = math.Exp((indi.Fitness - neighbour.Fitness) / mod.T)
-				if p > pop.rng.Float64() {
+				if p > pop.RNG.Float64() {
 					pop.Individuals[i] = neighbour
 				}
 			}
@@ -334,13 +334,13 @@ type ModMutationOnly struct {
 
 // Apply ModMutationOnly.
 func (mod ModMutationOnly) Apply(pop *Population) error {
-	var selected, positions, err = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.rng)
+	var selected, positions, err = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.RNG)
 	if err != nil {
 		return err
 	}
 	for i, indi := range selected {
-		var mutant = indi.Clone(pop.rng)
-		mutant.Mutate(pop.rng)
+		var mutant = indi.Clone(pop.RNG)
+		mutant.Mutate(pop.RNG)
 		mutant.Evaluate()
 		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
 			pop.Individuals[positions[i]] = mutant

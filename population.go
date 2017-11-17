@@ -14,17 +14,17 @@ type Population struct {
 	Age         time.Duration `json:"age"`
 	Generations int           `json:"generations"`
 	ID          string        `json:"id"`
-	rng         *rand.Rand
+	RNG         *rand.Rand
 }
 
 // Generate a new population.
-func newPopulation(size int, newGenome NewGenome, rng *rand.Rand) Population {
+func newPopulation(size int, newGenome NewGenome, RNG *rand.Rand) Population {
 	var (
-		popRNG = rand.New(rand.NewSource(rng.Int63()))
+		popRNG = rand.New(rand.NewSource(RNG.Int63()))
 		pop    = Population{
 			Individuals: newIndividuals(size, newGenome, popRNG),
 			ID:          randString(3, popRNG),
-			rng:         popRNG,
+			RNG:         popRNG,
 		}
 	)
 	return pop
