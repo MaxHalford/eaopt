@@ -80,11 +80,13 @@ func TestMutateIndividual(t *testing.T) {
 
 func TestCrossoverIndividual(t *testing.T) {
 	var (
-		rng                    = newRand()
-		indi1                  = NewIndividual(NewVector(rng), rng)
-		indi2                  = NewIndividual(NewVector(rng), rng)
-		offspring1, offspring2 = indi1.Crossover(indi2, rng)
+		rng        = newRand()
+		indi1      = NewIndividual(NewVector(rng), rng)
+		indi2      = NewIndividual(NewVector(rng), rng)
+		offspring1 = indi1.Clone(rng)
+		offspring2 = indi2.Clone(rng)
 	)
+	indi1.Crossover(indi2, rng)
 	if offspring1.Evaluated || offspring2.Evaluated {
 		t.Error("Offsprings shouldn't have Evaluated set to True")
 	}

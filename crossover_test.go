@@ -3,19 +3,26 @@ package gago
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"testing"
 )
 
 func TestCrossUniformFloat64(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = NewVector(rng).(Vector)
-		p2     = NewVector(rng).(Vector)
-		o1, o2 = CrossUniformFloat64(p1, p2, rng)
+		rng = newRand()
+		p1  = NewVector(rng).(Vector)
+		p2  = NewVector(rng).(Vector)
+		o1  = p1.Clone().(Vector)
+		o2  = p2.Clone().(Vector)
 	)
+	CrossUniformFloat64(o1, o2, rng)
 	// Check lengths
 	if len(o1) != len(p1) || len(o2) != len(p1) {
 		t.Error("CrossUniform should not produce offsprings with different sizes")
+	}
+	// Check values are different
+	if reflect.DeepEqual(o1, p1) || reflect.DeepEqual(o2, p2) {
+		t.Error("Offsprings and parents are not different")
 	}
 	// Check new values are contained in hyper-rectangle defined by parents
 	var (
@@ -78,12 +85,9 @@ func TestGNX(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var (
-				n      = len(tc.p1)
-				o1, o2 = gnx(IntSlice(tc.p1), IntSlice(tc.p2), tc.indexes)
-			)
-			for i := 0; i < n; i++ {
-				if o1.At(i).(int) != tc.o1[i] || o2.At(i).(int) != tc.o2[i] {
+			gnx(IntSlice(tc.p1), IntSlice(tc.p2), tc.indexes)
+			for i := range tc.p1 {
+				if tc.p1[i] != tc.o1[i] || tc.p2[i] != tc.o2[i] {
 					t.Error("Something went wrong during GNX crossover")
 				}
 			}
@@ -93,40 +97,55 @@ func TestGNX(t *testing.T) {
 
 func TestCrossGNXFloat64(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []float64{1, 2, 3}
-		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossGNXFloat64(p1, p2, 2, rng)
+		rng = newRand()
+		p1  = []float64{1, 2, 3}
+		p2  = []float64{3, 2, 1}
+		o1  = []float64{1, 2, 1}
+		o2  = []float64{3, 2, 3}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossGNXFloat64 should not produce offsprings with different sizes")
+	CrossGNXFloat64(p1, p2, 1, rng)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossGNXInt(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []int{1, 2, 3}
-		p2     = []int{3, 2, 1}
-		o1, o2 = CrossGNXInt(p1, p2, 2, rng)
+		rng = newRand()
+		p1  = []int{1, 2, 3}
+		p2  = []int{3, 2, 1}
+		o1  = []int{1, 2, 1}
+		o2  = []int{3, 2, 3}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossGNXInt should not produce offsprings with different sizes")
+	CrossGNXInt(p1, p2, 1, rng)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossGNXString(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []string{"a", "b", "c"}
-		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossGNXString(p1, p2, 2, rng)
+		rng = newRand()
+		p1  = []string{"a", "b", "c"}
+		p2  = []string{"c", "b", "a"}
+		o1  = []string{"a", "b", "a"}
+		o2  = []string{"c", "b", "c"}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossGNXString should not produce offsprings with different sizes")
+	CrossGNXString(p1, p2, 1, rng)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
@@ -166,12 +185,9 @@ func TestPMX(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var (
-				n      = len(tc.p1)
-				o1, o2 = pmx(IntSlice(tc.p1), IntSlice(tc.p2), tc.a, tc.b)
-			)
-			for i := 0; i < n; i++ {
-				if o1.At(i).(int) != tc.o1[i] || o2.At(i).(int) != tc.o2[i] {
+			pmx(IntSlice(tc.p1), IntSlice(tc.p2), tc.a, tc.b)
+			for i := range tc.p1 {
+				if tc.p1[i] != tc.o1[i] || tc.p2[i] != tc.o2[i] {
 					t.Error("Something went wrong during PMX crossover")
 				}
 			}
@@ -181,40 +197,55 @@ func TestPMX(t *testing.T) {
 
 func TestCrossPMXFloat64(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []float64{1, 2, 3}
-		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossPMXFloat64(p1, p2, rng)
+		rng = newRand()
+		p1  = []float64{1, 2, 3}
+		p2  = []float64{3, 2, 1}
+		o1  = []float64{1, 2, 3}
+		o2  = []float64{3, 2, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossPMXFloat64 should not produce offsprings with different sizes")
+	CrossPMXFloat64(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
 func TestCrossPMXInt(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []int{1, 2, 3}
-		p2     = []int{3, 2, 1}
-		o1, o2 = CrossPMXInt(p1, p2, rng)
+		rng = newRand()
+		p1  = []int{1, 2, 3}
+		p2  = []int{3, 2, 1}
+		o1  = []int{1, 2, 3}
+		o2  = []int{3, 2, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossPMXInt should not produce offsprings with different sizes")
+	CrossPMXInt(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
 func TestCrossPMXString(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []string{"a", "b", "c"}
-		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossPMXString(p1, p2, rng)
+		rng = newRand()
+		p1  = []string{"a", "b", "c"}
+		p2  = []string{"c", "b", "a"}
+		o1  = []string{"a", "b", "c"}
+		o2  = []string{"c", "b", "a"}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossPMXString should not produce offsprings with different sizes")
+	CrossPMXString(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
@@ -254,12 +285,9 @@ func TestOX(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var (
-				n      = len(tc.p1)
-				o1, o2 = ox(IntSlice(tc.p1), IntSlice(tc.p2), tc.a, tc.b)
-			)
-			for i := 0; i < n; i++ {
-				if o1.At(i).(int) != tc.o1[i] || o2.At(i).(int) != tc.o2[i] {
+			ox(IntSlice(tc.p1), IntSlice(tc.p2), tc.a, tc.b)
+			for i := range tc.p1 {
+				if tc.p1[i] != tc.o1[i] || tc.p2[i] != tc.o2[i] {
 					t.Error("Something went wrong during OX crossover")
 				}
 			}
@@ -269,40 +297,55 @@ func TestOX(t *testing.T) {
 
 func TestCrossOXFloat64(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []float64{1, 2, 3}
-		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossOXFloat64(p1, p2, rng)
+		rng = newRand()
+		p1  = []float64{1, 2, 3}
+		p2  = []float64{3, 2, 1}
+		o1  = []float64{1, 2, 3}
+		o2  = []float64{3, 2, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossOXFloat64 should not produce offsprings with different sizes")
+	CrossOXFloat64(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
 func TestCrossOXInt(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []int{1, 2, 3}
-		p2     = []int{3, 2, 1}
-		o1, o2 = CrossOXInt(p1, p2, rng)
+		rng = newRand()
+		p1  = []int{1, 2, 3}
+		p2  = []int{3, 2, 1}
+		o1  = []int{1, 2, 3}
+		o2  = []int{3, 2, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossOXInt should not produce offsprings with different sizes")
+	CrossOXInt(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
 func TestCrossOXString(t *testing.T) {
 	var (
-		rng    = newRand()
-		p1     = []string{"a", "b", "c"}
-		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossOXString(p1, p2, rng)
+		rng = newRand()
+		p1  = []string{"a", "b", "c"}
+		p2  = []string{"c", "b", "a"}
+		o1  = []string{"a", "b", "c"}
+		o2  = []string{"c", "b", "a"}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossOXString should not produce offsprings with different sizes")
+	CrossOXString(p1, p2, rng)
+	// Check values
+	if reflect.DeepEqual(p1, o1) {
+		t.Error("Values should be different")
+	}
+	if reflect.DeepEqual(p2, o2) {
+		t.Error("Values should be different")
 	}
 }
 
@@ -328,13 +371,10 @@ func TestCrossCX(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var (
-				n      = len(tc.p1)
-				o1, o2 = CrossCX(IntSlice(tc.p1), IntSlice(tc.p2))
-			)
-			for i := 0; i < n; i++ {
-				if o1.At(i).(int) != tc.o1[i] || o2.At(i).(int) != tc.o2[i] {
-					t.Error("Something went wrong during CX crossover")
+			CrossCX(IntSlice(tc.p1), IntSlice(tc.p2))
+			for i := range tc.p1 {
+				if tc.p1[i] != tc.o1[i] || tc.p2[i] != tc.o2[i] {
+					t.Error("Something went wrong during PMX crossover")
 				}
 			}
 		})
@@ -343,37 +383,52 @@ func TestCrossCX(t *testing.T) {
 
 func TestCrossCXFloat64(t *testing.T) {
 	var (
-		p1     = []float64{1, 2, 3}
-		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossCXFloat64(p1, p2)
+		p1 = []float64{1, 2, 3, 4}
+		p2 = []float64{4, 3, 2, 1}
+		o1 = []float64{1, 3, 2, 4}
+		o2 = []float64{4, 2, 3, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossCXFloat64 should not produce offsprings with different sizes")
+	CrossCXFloat64(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossCXInt(t *testing.T) {
 	var (
-		p1     = []int{1, 2, 3}
-		p2     = []int{3, 2, 1}
-		o1, o2 = CrossCXInt(p1, p2)
+		p1 = []int{1, 2, 3, 4}
+		p2 = []int{4, 3, 2, 1}
+		o1 = []int{1, 3, 2, 4}
+		o2 = []int{4, 2, 3, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossCXInt should not produce offsprings with different sizes")
+	CrossCXInt(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossCXString(t *testing.T) {
 	var (
-		p1     = []string{"a", "b", "c"}
-		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossCXString(p1, p2)
+		p1 = []string{"a", "b", "c", "d"}
+		p2 = []string{"d", "c", "b", "a"}
+		o1 = []string{"a", "c", "b", "d"}
+		o2 = []string{"d", "b", "c", "a"}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossCXString should not produce offsprings with different sizes")
+	CrossCXString(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
@@ -389,7 +444,11 @@ func TestCrossERX(t *testing.T) {
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			var o1, o2 = CrossERX(StringSlice(tc.p1), StringSlice(tc.p2))
+			var (
+				o1 = StringSlice(tc.p1).Copy()
+				o2 = StringSlice(tc.p2).Copy()
+			)
+			CrossERX(o1, o2)
 			// Check offsprings have parent's first gene as first gene
 			if o1.At(0).(string) != tc.p1[0] || o2.At(0).(string) != tc.p2[0] {
 				t.Error("Something went wrong during ERX crossover")
@@ -404,36 +463,51 @@ func TestCrossERX(t *testing.T) {
 
 func TestCrossERXFloat64(t *testing.T) {
 	var (
-		p1     = []float64{1, 2, 3}
-		p2     = []float64{3, 2, 1}
-		o1, o2 = CrossERXFloat64(p1, p2)
+		p1 = []float64{1, 2, 3}
+		p2 = []float64{2, 3, 1}
+		o1 = []float64{1, 3, 2}
+		o2 = []float64{2, 3, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossERXFloat64 should not produce offsprings with different sizes")
+	CrossERXFloat64(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossERXInt(t *testing.T) {
 	var (
-		p1     = []int{1, 2, 3}
-		p2     = []int{3, 2, 1}
-		o1, o2 = CrossERXInt(p1, p2)
+		p1 = []int{1, 2, 3}
+		p2 = []int{2, 3, 1}
+		o1 = []int{1, 3, 2}
+		o2 = []int{2, 3, 1}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossERXInt should not produce offsprings with different sizes")
+	CrossERXInt(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }
 
 func TestCrossERXString(t *testing.T) {
 	var (
-		p1     = []string{"a", "b", "c"}
-		p2     = []string{"c", "b", "a"}
-		o1, o2 = CrossERXString(p1, p2)
+		p1 = []string{"a", "b", "c"}
+		p2 = []string{"b", "c", "a"}
+		o1 = []string{"a", "c", "b"}
+		o2 = []string{"b", "c", "a"}
 	)
-	// Check lengths
-	if len(o1) != len(p1) || len(o2) != len(p1) {
-		t.Error("CrossERXString should not produce offsprings with different sizes")
+	CrossERXString(p1, p2)
+	// Check values
+	if !reflect.DeepEqual(p1, o1) {
+		t.Errorf("Expected %v, got %v", o1, p1)
+	}
+	if !reflect.DeepEqual(p2, o2) {
+		t.Errorf("Expected %v, got %v", o2, p2)
 	}
 }

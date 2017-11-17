@@ -22,18 +22,18 @@ func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) 
 	)
 	for i < len(offsprings) {
 		// Select 2 parents
-		var parents, _, err = sel.Apply(2, indis, rng)
+		var selected, _, err = sel.Apply(2, indis, rng)
 		if err != nil {
 			return nil, err
 		}
 		// Generate 2 offsprings from the parents
-		var offspring1, offspring2 = parents[0].Crossover(parents[1], rng)
+		selected[0].Crossover(selected[1], rng)
 		if i < len(offsprings) {
-			offsprings[i] = offspring1
+			offsprings[i] = selected[0]
 			i++
 		}
 		if i < len(offsprings) {
-			offsprings[i] = offspring2
+			offsprings[i] = selected[1]
 			i++
 		}
 	}
@@ -102,33 +102,33 @@ type ModSteadyState struct {
 
 // Apply ModSteadyState.
 func (mod ModSteadyState) Apply(pop *Population) error {
-	var parents, indexes, err = mod.Selector.Apply(2, pop.Individuals, pop.rng)
+	var selected, indexes, err = mod.Selector.Apply(2, pop.Individuals, pop.rng)
 	if err != nil {
 		return err
 	}
-	var offspring1, offspring2 = parents[0].Crossover(parents[1], pop.rng)
+	var offsprings = selected.Clone(pop.rng)
+	offsprings[0].Crossover(offsprings[1], pop.rng)
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		if pop.rng.Float64() < mod.MutRate {
-			offspring1.Mutate(pop.rng)
+			offsprings[0].Mutate(pop.rng)
 		}
 		if pop.rng.Float64() < mod.MutRate {
-			offspring2.Mutate(pop.rng)
+			offsprings[1].Mutate(pop.rng)
 		}
 	}
 	if mod.KeepBest {
-		// Replace the chosen parents with the best individuals out of the
-		// parents and the individuals
-		offspring1.Evaluate()
-		offspring2.Evaluate()
-		var indis = Individuals{parents[0], parents[1], offspring1, offspring2}
+		// Replace the chosen individuals with the best individuals
+		offsprings[0].Evaluate()
+		offsprings[1].Evaluate()
+		var indis = Individuals{selected[0], selected[1], offsprings[0], offsprings[1]}
 		indis.SortByFitness()
 		pop.Individuals[indexes[0]] = indis[0]
 		pop.Individuals[indexes[1]] = indis[1]
 	} else {
 		// Replace the chosen parents with the offsprings
-		pop.Individuals[indexes[0]] = offspring1
-		pop.Individuals[indexes[1]] = offspring2
+		pop.Individuals[indexes[0]] = offsprings[0]
+		pop.Individuals[indexes[1]] = offsprings[1]
 	}
 	return nil
 }
@@ -223,26 +223,27 @@ type ModRing struct {
 
 // Apply ModRing.
 func (mod ModRing) Apply(pop *Population) error {
-	for i, indi := range pop.Individuals {
+	for i := range pop.Individuals {
 		var (
-			neighbour              = pop.Individuals[i%len(pop.Individuals)]
-			offspring1, offspring2 = indi.Crossover(neighbour, pop.rng)
+			indi      = pop.Individuals[i].Clone(pop.rng)
+			neighbour = pop.Individuals[i%len(pop.Individuals)]
 		)
+		indi.Crossover(neighbour, pop.rng)
 		// Apply mutation to the offsprings
 		if mod.MutRate > 0 {
 			if pop.rng.Float64() < mod.MutRate {
-				offspring1.Mutate(pop.rng)
+				indi.Mutate(pop.rng)
 			}
 			if pop.rng.Float64() < mod.MutRate {
-				offspring2.Mutate(pop.rng)
+				neighbour.Mutate(pop.rng)
 			}
 		}
-		offspring1.Evaluate()
-		offspring2.Evaluate()
+		indi.Evaluate()
+		neighbour.Evaluate()
 		// Select an individual out of the original individual and the
 		// offsprings
 		var (
-			indis            = Individuals{indi, offspring1, offspring2}
+			indis            = Individuals{pop.Individuals[i], indi, neighbour}
 			selected, _, err = mod.Selector.Apply(1, indis, pop.rng)
 		)
 		if err != nil {

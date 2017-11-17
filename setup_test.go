@@ -55,9 +55,8 @@ func (X Vector) Mutate(rng *rand.Rand) {
 	MutNormalFloat64(X, 0.5, rng)
 }
 
-func (X Vector) Crossover(Y Genome, rng *rand.Rand) (Genome, Genome) {
-	var o1, o2 = CrossUniformFloat64(X, Y.(Vector), rng)
-	return Vector(o1), Vector(o2)
+func (X Vector) Crossover(Y Genome, rng *rand.Rand) {
+	CrossUniformFloat64(X, Y.(Vector), rng)
 }
 
 func (X Vector) Clone() Genome {

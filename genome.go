@@ -7,7 +7,7 @@ import "math/rand"
 type Genome interface {
 	Evaluate() float64
 	Mutate(rng *rand.Rand)
-	Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
+	Crossover(genome Genome, rng *rand.Rand)
 	Clone() Genome
 }
 
