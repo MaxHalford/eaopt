@@ -68,13 +68,10 @@ func (indi *Individual) Mutate(rng *rand.Rand) {
 }
 
 // Crossover an individual by calling the Crossover method of it's Genome.
-func (indi Individual) Crossover(mate Individual, rng *rand.Rand) (Individual, Individual) {
-	var (
-		genome1, genome2 = indi.Genome.Crossover(mate.Genome, rng)
-		offspring1       = NewIndividual(genome1, rng)
-		offspring2       = NewIndividual(genome2, rng)
-	)
-	return offspring1, offspring2
+func (indi *Individual) Crossover(mate Individual, rng *rand.Rand) {
+	indi.Genome.Crossover(mate.Genome, rng)
+	indi.Evaluated = false
+	mate.Evaluated = false
 }
 
 // IdxOfClosest returns the index of the closest individual from a slice of

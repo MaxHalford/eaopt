@@ -110,9 +110,8 @@ func (X Vector) Mutate(rng *rand.Rand) {
 }
 
 // Crossover a Vector with another Vector by applying uniform crossover.
-func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-    var o1, o2 = gago.CrossUniformFloat64(X, Y.(Vector), rng) // Returns two float64 slices
-    return Vector(o1), Vector(o2)
+func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) {
+    gago.CrossUniformFloat64(X, Y.(Vector), rng)
 }
 
 // Clone a Vector to produce a new one that points to a different slice.
@@ -224,7 +223,7 @@ Let's have a look at the `Genome` interface.
 type Genome interface {
     Evaluate() float64
     Mutate(rng *rand.Rand)
-    Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)
+    Crossover(genome Genome, rng *rand.Rand)
     Clone() Genome
 }
 ```
@@ -233,7 +232,7 @@ The `Evaluate()` method assigns a score to a given genome. The sweet thing is th
 
 The `Mutate(rng *rand.Rand)` method is where you can mutate a solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use to not reinvent the wheel; this is what is being done in most of the provided examples.
 
-The `Crossover(genome Genome, rng *rand.Rand) (Genome, Genome)` method produces two new individuals (called offsprings) by applying some kind of mixture between the parent's attributes. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
+The `Crossover(genome Genome, rng *rand.Rand)` method mixes two individuals. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
 
 The `Genome()` method is there to produce independent copies of the struct you want to evolve. This is necessary for internal reasons and ensures that pointer fields are not pointing to same values memory addresses. Usually this is not too difficult implement; you just have to make sure that the clones you produce are totally independent from the genome they have been produced with. This is also not too difficult to unit test.
 
@@ -440,9 +439,9 @@ func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Geno
 ```
 
 
-**Why isn't my `Mutate` method modifying my `Genome`?**
+**Why aren't my `Mutate` and `Crossover` methods modifying my `Genome`s?**
 
-The `Mutate` has to modify the values of the `Genome` in-place. The following code will work because the `Vector` is a slice; slices in Go are references to underlying data, hence modifying a slice modifies them in-place.
+The `Mutate` and `Crossover` methods have to modify the values of the `Genome` in-place. The following code will work because the `Vector` is a slice; slices in Go are references to underlying data, hence modifying a slice modifies them in-place.
 
 ```go
 type Vector []float64
@@ -463,7 +462,7 @@ func (n *Name) Mutate(rng *rand.Rand) {
 ```
 
 
-**When are genetic algorithms good to apply?**
+**Should I be using genetic algorithms?**
 
 Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
 
