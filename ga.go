@@ -7,8 +7,6 @@ import (
 	"math/rand"
 	"sort"
 	"time"
-
-	"golang.org/x/sync/errgroup"
 )
 
 // A GA contains population which themselves contain individuals.
@@ -104,7 +102,7 @@ func (ga GA) Initialized() bool {
 }
 
 // Initialize each population in the GA and assign an initial fitness to each
-// individual in each population. Running Initialize after running Enhance will
+// individual in each population. Running Initialize after running Evolve will
 // reset the GA entirely.
 func (ga *GA) Initialize() {
 	// Check the NBest field
@@ -142,10 +140,10 @@ func (ga *GA) Initialize() {
 	}
 }
 
-// Enhance each population in the GA. The population level operations are done
+// Evolve each population in the GA. The population level operations are done
 // in parallel with a wait group. After all the population operations have been
 // run, the GA level operations are run.
-func (ga *GA) Enhance() error {
+func (ga *GA) Evolve() error {
 	var start = time.Now()
 	ga.Generations++
 	// Check the GA has been initialized
@@ -158,39 +156,39 @@ func (ga *GA) Enhance() error {
 	if len(ga.Populations) > 1 && ga.Migrator != nil && ga.Generations%ga.MigFrequency == 0 {
 		ga.Migrator.Apply(ga.Populations, ga.RNG)
 	}
-	var g errgroup.Group
-	for i := range ga.Populations {
-		i := i // https://golang.org/doc/faq#closures_and_goroutines
-		g.Go(func() error {
-			var err error
-			// Apply speciation if a positive number of species has been specified
-			if ga.Speciator != nil {
-				err = ga.Populations[i].speciateEvolveMerge(ga.Speciator, ga.Model)
-				if err != nil {
-					return err
-				}
-			} else {
-				// Else apply the evolution model to the entire population
-				err = ga.Model.Apply(&ga.Populations[i])
-				if err != nil {
-					return err
-				}
+
+	var f = func(pop *Population) error {
+		var err error
+		// Apply speciation if a positive number of species has been specified
+		if ga.Speciator != nil {
+			err = pop.speciateEvolveMerge(ga.Speciator, ga.Model)
+			if err != nil {
+				return err
 			}
-			// Evaluate and sort
-			ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
-			ga.Populations[i].Individuals.SortByFitness()
-			ga.Populations[i].Age += time.Since(start)
-			ga.Populations[i].Generations++
-			// Log current statistics if a logger has been provided
-			if ga.Logger != nil {
-				ga.Populations[i].Log(ga.Logger)
+		} else {
+			// Else apply the evolution model to the entire population
+			err = ga.Model.Apply(pop)
+			if err != nil {
+				return err
 			}
-			return err
-		})
-	}
-	if err := g.Wait(); err != nil {
+		}
+		// Evaluate and sort
+		pop.Individuals.Evaluate(ga.ParallelEval)
+		pop.Individuals.SortByFitness()
+		pop.Age += time.Since(start)
+		pop.Generations++
+		// Log current statistics if a logger has been provided
+		if ga.Logger != nil {
+			pop.Log(ga.Logger)
+		}
 		return err
 	}
+
+	var err = ga.Populations.Apply(f, true)
+	if err != nil {
+		return err
+	}
+
 	// Update HallOfFame
 	for _, pop := range ga.Populations {
 		updateHallOfFame(ga.HallOfFame, pop.Individuals)

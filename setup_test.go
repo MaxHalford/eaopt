@@ -35,7 +35,7 @@ func newRand() *rand.Rand {
 func init() {
 	ga.Initialize()
 	for i := 0; i < nbrGenerations; i++ {
-		ga.Enhance()
+		ga.Evolve()
 	}
 }
 

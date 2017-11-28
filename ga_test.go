@@ -104,7 +104,7 @@ func TestValidationSpeciator(t *testing.T) {
 func TestApplyWithSpeciator(t *testing.T) {
 	var speciator = ga.Speciator
 	ga.Speciator = SpecFitnessInterval{4}
-	if ga.Enhance() != nil {
+	if ga.Evolve() != nil {
 		t.Error("Calling Apply with a valid Speciator should not return an error")
 	}
 	ga.Speciator = speciator
@@ -280,36 +280,36 @@ func TestCallback(t *testing.T) {
 	if counter != 1 {
 		t.Error("Counter was not incremented by the callback at initialization")
 	}
-	ga.Enhance()
+	ga.Evolve()
 	if counter != 2 {
 		t.Error("Counter was not incremented by the callback at enhancement")
 	}
 }
 
-func TestGAEnhanceModelRuntimeError(t *testing.T) {
+func TestGAEvolveModelRuntimeError(t *testing.T) {
 	var model = ga.Model
 	ga.Model = ModRuntimeError{}
 	// Check invalid model doesn't raise error
 	if ga.Validate() != nil {
 		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
-	// Enhance
-	var err = ga.Enhance()
+	// Evolve
+	var err = ga.Evolve()
 	if err == nil {
 		t.Error("An error should have been raised")
 	}
 	ga.Model = model
 }
 
-func TestGAEnhanceSpeciatorRuntimeError(t *testing.T) {
+func TestGAEvolveSpeciatorRuntimeError(t *testing.T) {
 	var speciator = ga.Speciator
 	ga.Speciator = SpecRuntimeError{}
 	// Check invalid speciator doesn't raise error
 	if ga.Validate() != nil {
 		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
-	// Enhance
-	var err = ga.Enhance()
+	// Evolve
+	var err = ga.Evolve()
 	if err == nil {
 		t.Error("An error should have been raised")
 	}
@@ -347,13 +347,13 @@ func TestGAConsistentResults(t *testing.T) {
 	// Run the first GA
 	ga1.Initialize()
 	for i := 0; i < 20; i++ {
-		ga1.Enhance()
+		ga1.Evolve()
 	}
 
 	// Run the second GA
 	ga2.Initialize()
 	for i := 0; i < 20; i++ {
-		ga2.Enhance()
+		ga2.Evolve()
 	}
 
 	// Compare best individuals

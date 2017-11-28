@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func BenchmarkEnhance1Pop(b *testing.B) {
+func BenchmarkEvolve1Pop(b *testing.B) {
 	ga = GA{
 		NewGenome: NewVector,
 		NPops:     1,
@@ -19,11 +19,11 @@ func BenchmarkEnhance1Pop(b *testing.B) {
 	}
 	ga.Initialize()
 	for i := 0; i < b.N; i++ {
-		ga.Enhance()
+		ga.Evolve()
 	}
 }
 
-func BenchmarkEnhance2Pops(b *testing.B) {
+func BenchmarkEvolve2Pops(b *testing.B) {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	ga = GA{
 		NewGenome: NewVector,
@@ -38,11 +38,11 @@ func BenchmarkEnhance2Pops(b *testing.B) {
 	}
 	ga.Initialize()
 	for i := 0; i < b.N; i++ {
-		ga.Enhance()
+		ga.Evolve()
 	}
 }
 
-func BenchmarkEnhance3Pops(b *testing.B) {
+func BenchmarkEvolve3Pops(b *testing.B) {
 	ga = GA{
 		NewGenome: NewVector,
 		NPops:     3,
@@ -56,10 +56,10 @@ func BenchmarkEnhance3Pops(b *testing.B) {
 	}
 	ga.Initialize()
 	for i := 0; i < b.N; i++ {
-		ga.Enhance()
+		ga.Evolve()
 	}
 }
-func BenchmarkEnhance4Pops(b *testing.B) {
+func BenchmarkEvolve4Pops(b *testing.B) {
 	ga = GA{
 		NewGenome: NewVector,
 		NPops:     4,
@@ -73,6 +73,6 @@ func BenchmarkEnhance4Pops(b *testing.B) {
 	}
 	ga.Initialize()
 	for i := 0; i < b.N; i++ {
-		ga.Enhance()
+		ga.Evolve()
 	}
 }

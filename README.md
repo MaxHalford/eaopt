@@ -133,7 +133,7 @@ func main() {
 
     fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
     for i := 1; i < 10; i++ {
-        ga.Enhance()
+        ga.Evolve()
         fmt.Printf("Best fitness at generation %d: %f\n", i, ga.Best.Fitness)
     }
 }
@@ -301,7 +301,7 @@ You have to fill in the first set of fields, the rest are generated when calling
   - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
   - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
   - `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
-  - `Callback` is optional will execute any piece of code you wish every time `ga.Enhance()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
+  - `Callback` is optional will execute any piece of code you wish every time `ga.Evolve()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
     - Calculating specific population statistics that are not provided by the logger
     - Changing parameters of the GA after a certain number of generations
     - Monitoring for converging populations
@@ -310,13 +310,13 @@ You have to fill in the first set of fields, the rest are generated when calling
 - Fields populated at runtime
   - `Populations` is where all the current populations and individuals are kept.
   - `HallOfFame` contains the `NBest` individuals ever encountered. This slice is always sorted, meaning that the first element of the slice will be the best individual ever encountered.
-  - `Age` indicates the duration the GA has spent calling the `Enhance` method.
-  - `Generations` indicates how many times the `Enhance` method has been called.
+  - `Age` indicates the duration the GA has spent calling the `Evolve` method.
+  - `Generations` indicates how many times the `Evolve` method has been called.
 
 
 ### Running a GA
 
-Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Enhance` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Enhance` method multiple by using a loop or by imposing a time limit. The `Enhance` method will return an `error` which you should handle. If your population is evolving when you call `Enhance` it's most likely because `Enhance` did not return a `nil` error.
+Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Evolve` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Evolve` method multiple by using a loop or by imposing a time limit. The `Evolve` method will return an `error` which you should handle. If your population is evolving when you call `Evolve` it's most likely because `Evolve` did not return a `nil` error.
 
 At any time you have access to the `GA`'s `Best` field which contains a `Fitness` field and a `Genome` field respectively indicating the overall best obtained solution and the parameters of that solution. Moreover, the `GA`'s`CurrentBest` field contains the best solution and parameters obtained by the current generation.
 

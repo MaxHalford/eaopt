@@ -4,6 +4,8 @@ import (
 	"log"
 	"math/rand"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // A Population contains individuals. Individuals mate within a population.
@@ -44,3 +46,25 @@ func (pop Population) Log(logger *log.Logger) {
 
 // Populations type is necessary for migration and speciation purposes.
 type Populations []Population
+
+// Apply a function to a slice of Populations.
+func (pops Populations) Apply(f func(pop *Population) error, parallel bool) error {
+	if parallel {
+		var g errgroup.Group
+		for i := range pops {
+			i := i // https://golang.org/doc/faq#closures_and_goroutines
+			g.Go(func() error {
+				return f(&pops[i])
+			})
+		}
+		return g.Wait()
+	}
+	var err error
+	for i := range pops {
+		err = f(&pops[i])
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}

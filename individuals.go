@@ -41,7 +41,29 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 	return indis
 }
 
-// Evaluate each individual. If parallel is true then each Individual will be
+// Apply a function to a slice of Individuals.
+func (indis Individuals) Apply(f func(indi *Individual) error, parallel bool) error {
+	if parallel {
+		var g errgroup.Group
+		for i := range indis {
+			i := i // https://golang.org/doc/faq#closures_and_goroutines
+			g.Go(func() error {
+				return f(&indis[i])
+			})
+		}
+		return g.Wait()
+	}
+	var err error
+	for i := range indis {
+		err = f(&indis[i])
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+// Evaluate each Individual. If parallel is true then each Individual will be
 // evaluated in parallel thanks to the golang.org/x/sync/errgroup package. If
 // not then a simple sequential loop will be used. Evaluating in parallel is
 // only recommended for cases where evaluating an Individual takes a "long"
@@ -49,23 +71,10 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 // parallel. In fact performance can be degraded if evaluating an Individual is
 // too cheap.
 func (indis Individuals) Evaluate(parallel bool) {
-	// Evaluate sequentially
-	if !parallel {
-		for i := range indis {
-			indis[i].Evaluate()
-		}
-		return
-	}
-	// Evaluate in parallel
-	var g errgroup.Group
-	for i := range indis {
-		i := i // https://golang.org/doc/faq#closures_and_goroutines
-		g.Go(func() error {
-			indis[i].Evaluate()
-			return nil
-		})
-	}
-	g.Wait()
+	indis.Apply(
+		func(indi *Individual) error { indi.Evaluate(); return nil },
+		parallel,
+	)
 }
 
 // Mutate each individual.
