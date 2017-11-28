@@ -26,7 +26,7 @@ func TestIndividualsString(t *testing.T) {
 					ID:        "ALICE",
 				},
 			},
-			str: "bob - 42.000 - [0 1 2] ✔\nALICE - 42.000 - [0 1 2] ✘",
+			str: "bob - 42.000 - [0 1 2]\nALICE - ??? - [0 1 2]",
 		},
 	}
 	for i, tc := range testCases {

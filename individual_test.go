@@ -17,7 +17,7 @@ func TestIndividualString(t *testing.T) {
 				Evaluated: true,
 				ID:        "bob",
 			},
-			str: "bob - 42.000 - [0 1 2] ✔",
+			str: "bob - 42.000 - [0 1 2]",
 		},
 		{
 			indi: Individual{
@@ -26,7 +26,7 @@ func TestIndividualString(t *testing.T) {
 				Evaluated: false,
 				ID:        "ALICE",
 			},
-			str: "ALICE - 42.000 - [0 1 2] ✘",
+			str: "ALICE - ??? - [0 1 2]",
 		},
 	}
 	for i, tc := range testCases {

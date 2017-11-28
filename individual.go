@@ -27,11 +27,10 @@ func NewIndividual(genome Genome, rng *rand.Rand) Individual {
 // String representation of an Individual. A tick (✔) or cross (✘) marker is
 // added at the end to indicate if the Individual has been evaluated or not.
 func (indi Individual) String() string {
-	var evalSymbol = map[bool]string{
-		true:  "✔",
-		false: "✘",
-	}[indi.Evaluated]
-	return fmt.Sprintf("%s - %.3f - %v %s", indi.ID, indi.Fitness, indi.Genome, evalSymbol)
+	if indi.Evaluated {
+		return fmt.Sprintf("%s - %.3f - %v", indi.ID, indi.Fitness, indi.Genome)
+	}
+	return fmt.Sprintf("%s - ??? - %v", indi.ID, indi.Genome)
 }
 
 // Clone an individual to produce a new individual with a different pointer and
