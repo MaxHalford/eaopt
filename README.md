@@ -131,10 +131,10 @@ func main() {
     var ga = gago.Generational(VectorFactory)
     ga.Initialize()
 
-    fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
+    fmt.Printf("Best fitness at generation 0: %f\n", ga.HallOfFame[0].Fitness)
     for i := 1; i < 10; i++ {
         ga.Evolve()
-        fmt.Printf("Best fitness at generation %d: %f\n", i, ga.Best.Fitness)
+        fmt.Printf("Best fitness at generation %d: %f\n", i, ga.HallOfFame[0].Fitness)
     }
 }
 
