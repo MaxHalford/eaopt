@@ -72,7 +72,7 @@
 
 ## Example
 
-The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1.
+The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1 when each of it's arguments is equal to 0.
 
 <div align="center">
   <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/chart.png" alt="drop_wave_chart" />
@@ -131,10 +131,10 @@ func main() {
     var ga = gago.Generational(VectorFactory)
     ga.Initialize()
 
-    fmt.Printf("Best fitness at generation 0: %f\n", ga.Best.Fitness)
+    fmt.Printf("Best fitness at generation 0: %f\n", ga.HallOfFame[0].Fitness)
     for i := 1; i < 10; i++ {
         ga.Evolve()
-        fmt.Printf("Best fitness at generation %d: %f\n", i, ga.Best.Fitness)
+        fmt.Printf("Best fitness at generation %d: %f\n", i, ga.HallOfFame[0].Fitness)
     }
 }
 
@@ -170,14 +170,14 @@ There is a lot of intellectual fog around the concept of genetic algorithms (GAs
 
 ### Terminology
 
-- ***Fitness function***: The fitness function is simply the function associated to a given problem. It takes in an input and returns an output.
-- ***Individual***: An individual contains a **genome** which represents a candidate solution. In the physical world, an individual's genome is composed of acids. In an imaginary world, it could be composed of floating point numbers or string sequences representing cities. A **fitness** can be associated to a genome thanks to the fitness function. For example, one could measure the height of a group of individuals in order to rank them. In this case the genome is the body of the individual, the fitness function is the act of measuring the height of the individual's body and the fitness is the height of individual measured by the fitness function.
+- ***Fitness function***: The fitness function is simply the function associated to a given problem. It takes in an input and returns an output. The goal is to find the input that minimizes the output.
+- ***Individual***: An individual contains a **genome** which represents a function input. In the physical world, an individual's genome is composed of acids. In an imaginary world, it could be composed of floating point numbers or string sequences representing cities. A **fitness** can be associated to a genome thanks to the fitness function. For example, one could measure the height of a group of individuals in order to rank them. In this case the genome is the body of an individual, the fitness function is the act of measuring the height of an individual's body and the fitness is the resulting height.
 - ***Population***: Individuals are contained in a population wherein they can interact.
 - ***Crossover***:  A crossover acts on two or more individuals (called **parents**) and mixes their genome in order to produce one or more new individuals (called **offsprings**). Crossover is really what sets genetic algorithms apart from other evolutionary methods.
 - ***Selection***: Selection is a process in which parents are selected to generate offsprings, most often by applying a crossover method. Popular selection methods include **elitism selection** and **tournament selection**.
 - ***Mutation***: Mutation applies random modifications to an individual's genome without interacting with other individuals.
 - ***Migration***: **Multi-population** GAs run more than one population in parallel and exchange individuals between each other.
-- ***Speciation***: In the physical world, individuals do not mate at random. Instead, they mate with similar individuals. For some problems such as neural network topology optimization, crossover will often generate poor solutions. Speciation sidesteps this by mating similar individuals (called **species**) separately.
+- ***Speciation***: In the physical world, individuals do not mate at random. Instead, they mate with similar individuals. For some problems -- for example neural network topology optimization -- crossover will often generate poor solutions. Speciation sidesteps this by mating similar individuals (called **species**) separately.
 - ***Evolution model***: An evolution model describes the exact manner and order in which genetic operators are applied to a population. The most popular models are the **steady state model** and the **generational model**.
 
 ### Methodology
@@ -185,12 +185,12 @@ There is a lot of intellectual fog around the concept of genetic algorithms (GAs
 In a nutshell, a GA solves an optimization problem by doing the following:
 
 1. Generate random solutions.
-2. Evaluate the solutions.
-3. Sort the solutions according to their evaluation score.
+2. Assign a fitness to each solutions.
+3. Sort the solutions according to their fitness.
 4. Apply genetic operators following a model.
-5. Repeat from step 2 until the stopping criterion is not satisfied.
+5. Repeat from step 2 until the stopping criterion is satisfied.
 
-This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. Genetic operators are applied following a **model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criteria include
+This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. In general genetic operators are applied following an **evolution model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criteria include
 
 - a fixed number of generations,
 - a fixed duration,
@@ -199,7 +199,7 @@ This description is voluntarily vague as to how the genetic operators are applie
 
 ## Features
 
-- gago is extensible, you can control most of what's happening
+- gago is extensible, you can control most of the evolution logic
 - Different evolution models are available
 - Popular operators are already implemented
 - Speciation is available
@@ -213,7 +213,7 @@ The two requirements for using gago are
 - Implement the `Genome` interface.
 - Instantiate a `GA` struct.
 
-The `Genome` interface is used define the logic that is specific to your problem; logic that gago doesn't know about. For example this is where you will define an `Evaluate()` method for evaluating a particular problem. The `GA` struct contains context-agnostic information. For example this is where you can choose the number of individuals in a population (which is a separate concern from your particular problem).
+The `Genome` interface is used to define the logic that is specific to your problem; logic that gago doesn't know about. For example this is where you will define an `Evaluate()` method for evaluating a particular problem. The `GA` struct contains context-agnostic information. For example this is where you can choose the number of individuals in a population (which is a separate concern from your particular problem). Apart from a good design pattern, decoupling the problem definition from the optimization through the `Genome` interface means that gago can be used to optimize *any* kind of problem.
 
 ### Implementing the Genome interface
 
@@ -228,19 +228,19 @@ type Genome interface {
 }
 ```
 
-The `Evaluate()` method assigns a score to a given genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice (which is a common representation). The `Evaluate()` method is *your* problem to deal with, gago only needs it's output to be able to function.
+The `Evaluate()` method assigns a fitness to a given genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice. The `Evaluate()` method is *your* problem to deal with, gago only needs it's output to be able to function.
 
-The `Mutate(rng *rand.Rand)` method is where you can mutate a solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use to not reinvent the wheel; this is what is being done in most of the provided examples.
+The `Mutate(rng *rand.Rand)` method is where you can modify an existing solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use instead of reinventing the wheel -- this is what is being done in most of the [examples](https://github.com/MaxHalford/gago-examples).
 
-The `Crossover(genome Genome, rng *rand.Rand)` method mixes two individuals. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
+The `Crossover(genome Genome, rng *rand.Rand)` method combines two individuals. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
 
-The `Genome()` method is there to produce independent copies of the struct you want to evolve. This is necessary for internal reasons and ensures that pointer fields are not pointing to same values memory addresses. Usually this is not too difficult implement; you just have to make sure that the clones you produce are totally independent from the genome they have been produced with. This is also not too difficult to unit test.
+The `Clone()` method is there to produce independent copies of the struct you want to evolve. This is necessary for internal reasons and ensures that pointer fields are not pointing to identical memory addresses. Usually this is not too difficult implement; you just have to make sure that the clones you produce are not shallow copies of the genome that is being cloned. This is also fairly easy to unit test.
 
-Once you have implemented the `Genome` you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
+Once you have implemented the `Genome` interface you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
 
 ### Using the Slice interface
 
-Classically GAs are used to optimize problems where the genome has a slice representation - eg. a vector or a sequence of DNA code. Almost all the mutation and crossover algorithms gago makes available are based on the `Slice` interface which has the following definition.
+Classically GAs are used to optimize problems where the genome has a slice representation - eg. a vector or a sequence of DNA code. Almost all the mutation and crossover algorithms available in gago are based on the `Slice` interface which has the following definition.
 
 ```go
 type Slice interface {
@@ -266,7 +266,7 @@ Let's have a look at the GA struct.
 ```go
 type GA struct {
     // Required fields
-    NewGenome   NewGenome
+    NewGenome    NewGenome
     NPops        int
     PopSize      int
     Model        Model
@@ -292,7 +292,7 @@ type GA struct {
 You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method. Check out the examples in `presets.go` to get an idea of how to fill them out.
 
 - Required fields
-  - `NewGenome` is a method that returns a random genome that you defined in the previous step. gago will use this method to produce an initial population. Again, gago provides some methods for common random genome generation.
+  - `NewGenome` is a method that returns a random `Genome` that you defined in the previous step. gago will use this method to produce initial individuals in each population. Again, gago provides some methods for common random genome generation.
   - `NPops` determines the number of populations that will be used.
   - `PopSize` determines the number of individuals inside each population.
   - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
@@ -316,9 +316,9 @@ You have to fill in the first set of fields, the rest are generated when calling
 
 ### Running a GA
 
-Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Evolve` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Evolve` method multiple by using a loop or by imposing a time limit. The `Evolve` method will return an `error` which you should handle. If your population is evolving when you call `Evolve` it's most likely because `Evolve` did not return a `nil` error.
+Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Evolve` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Evolve` method multiple by using a loop or by imposing a time limit. The `Evolve` method will return an `error` which you should handle. If your population does not evolve when you call `Evolve` it's most likely because `Evolve` returned an error.
 
-At any time you have access to the `GA`'s `Best` field which contains a `Fitness` field and a `Genome` field respectively indicating the overall best obtained solution and the parameters of that solution. Moreover, the `GA`'s`CurrentBest` field contains the best solution and parameters obtained by the current generation.
+At any time you have access to the `GA`'s `HallOfFame` field which contains the `NBest` individuals ever encountered.
 
 ### Models
 
