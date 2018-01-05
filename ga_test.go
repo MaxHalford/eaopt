@@ -6,7 +6,6 @@ import (
 	"math"
 	"math/rand"
 	"testing"
-	"time"
 )
 
 func TestInitialized(t *testing.T) {
@@ -132,6 +131,7 @@ func TestBest(t *testing.T) {
 
 func TestUpdateHallOfFame(t *testing.T) {
 	var (
+		rng       = newRand()
 		testCases = []struct {
 			hofIn  Individuals
 			indis  Individuals
@@ -165,7 +165,7 @@ func TestUpdateHallOfFame(t *testing.T) {
 	)
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
-			updateHallOfFame(tc.hofIn, tc.indis)
+			updateHallOfFame(tc.hofIn, tc.indis, rng)
 			// Compare the obtained hall of fame to the expected one)
 			for i, indi := range tc.hofIn {
 				if indi.Fitness != tc.hofOut[i].Fitness {
@@ -173,19 +173,6 @@ func TestUpdateHallOfFame(t *testing.T) {
 				}
 			}
 		})
-	}
-}
-
-// TestDuration verifies the sum of the duration of each population is higher
-// the actual duration. This is due to the fact that each population runs on a
-// separate core.
-func TestDuration(t *testing.T) {
-	var totalDuration time.Duration
-	for _, pop := range ga.Populations {
-		totalDuration += pop.Age
-	}
-	if totalDuration < ga.Age {
-		t.Error("Inefficient parallelism")
 	}
 }
 

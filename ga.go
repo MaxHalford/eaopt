@@ -18,6 +18,7 @@ type GA struct {
 	Model     Model     `json:"-"`
 
 	// Optional fields
+	ParallelEval bool         `json:"-"` // Evaluate Individuals in parallel or not
 	NBest        int          `json:"-"` // Length of HallOfFame
 	Migrator     Migrator     `json:"-"`
 	MigFrequency int          `json:"-"` // Frequency at which migrations occur
@@ -25,7 +26,6 @@ type GA struct {
 	Logger       *log.Logger  `json:"-"`
 	Callback     func(ga *GA) `json:"-"`
 	RNG          *rand.Rand   `json:"-"`
-	ParallelEval bool         `json:"-"`
 
 	// Fields generated at runtime
 	Populations Populations   `json:"populations"`
@@ -75,7 +75,7 @@ func (ga GA) Validate() error {
 // Find the best current Individual in each population and then compare the best
 // overall Individual to the current best Individual. The Individuals in each
 // population are expected to be sorted.
-func updateHallOfFame(hof Individuals, indis Individuals) {
+func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 	var k = len(hof)
 	// Start by finding the current best Individual
 	for _, indi := range indis[:min(k, len(indis))] {
@@ -88,7 +88,7 @@ func updateHallOfFame(hof Individuals, indis Individuals) {
 			// Shift the hall of fame to the right
 			copy(hof[i+1:], hof[i:])
 			// Insert the new Individual
-			hof[i] = indi
+			hof[i] = indi.Clone(rng)
 		}
 	}
 }
@@ -117,7 +117,7 @@ func (ga *GA) Initialize() {
 	for i := range ga.Populations {
 		// Generate a Population
 		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
-		// Evaluate its Individuals
+		// Evaluate it's Individuals
 		ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 		// Sort it's Individuals
 		ga.Populations[i].Individuals.SortByFitness()
@@ -132,7 +132,7 @@ func (ga *GA) Initialize() {
 		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
 	}
 	for _, pop := range ga.Populations {
-		updateHallOfFame(ga.HallOfFame, pop.Individuals)
+		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
 	}
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
@@ -188,10 +188,9 @@ func (ga *GA) Evolve() error {
 	if err != nil {
 		return err
 	}
-
 	// Update HallOfFame
 	for _, pop := range ga.Populations {
-		updateHallOfFame(ga.HallOfFame, pop.Individuals)
+		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
 	}
 	// Execute the callback if it has been set
 	if ga.Callback != nil {

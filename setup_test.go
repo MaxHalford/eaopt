@@ -71,8 +71,10 @@ func NewVector(rng *rand.Rand) Genome {
 
 // Minkowski distance with p = 1
 func l1Distance(x1, x2 Individual) (dist float64) {
-	var g1 = x1.Genome.(Vector)
-	var g2 = x2.Genome.(Vector)
+	var (
+		g1 = x1.Genome.(Vector)
+		g2 = x2.Genome.(Vector)
+	)
 	for i := range g1 {
 		dist += math.Abs(g1[i] - g2[i])
 	}

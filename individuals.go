@@ -3,10 +3,10 @@ package gago
 import (
 	"math"
 	"math/rand"
+	"runtime"
 	"sort"
 	"strings"
-
-	"golang.org/x/sync/errgroup"
+	"sync"
 )
 
 // Individuals is a convenience type, methods that belong to an Individual can
@@ -41,40 +41,32 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 	return indis
 }
 
-// Apply a function to a slice of Individuals.
-func (indis Individuals) Apply(f func(indi *Individual) error, parallel bool) error {
-	if parallel {
-		var g errgroup.Group
-		for i := range indis {
-			i := i // https://golang.org/doc/faq#closures_and_goroutines
-			g.Go(func() error {
-				return f(&indis[i])
-			})
-		}
-		return g.Wait()
-	}
-	var err error
-	for i := range indis {
-		err = f(&indis[i])
-		if err != nil {
-			return err
-		}
-	}
-	return err
-}
-
-// Evaluate each Individual. If parallel is true then each Individual will be
-// evaluated in parallel thanks to the golang.org/x/sync/errgroup package. If
-// not then a simple sequential loop will be used. Evaluating in parallel is
-// only recommended for cases where evaluating an Individual takes a "long"
-// time. Indeed there won't necessarily be a speed-up when evaluating in
-// parallel. In fact performance can be degraded if evaluating an Individual is
-// too cheap.
+// Evaluate each Individual in a slice.
 func (indis Individuals) Evaluate(parallel bool) {
-	indis.Apply(
-		func(indi *Individual) error { indi.Evaluate(); return nil },
-		parallel,
+	if !parallel {
+		for i := range indis {
+			indis[i].Evaluate()
+		}
+		return
+	}
+
+	var (
+		nWorkers  = runtime.GOMAXPROCS(-1)
+		n         = len(indis)
+		chunkSize = (n + nWorkers - 1) / nWorkers
+		wg        = &sync.WaitGroup{}
 	)
+
+	for a := 0; a < n; a += chunkSize {
+		wg.Add(1)
+		var b = min(a+chunkSize, n)
+		go func(chunk Individuals, wg *sync.WaitGroup) {
+			chunk.Evaluate(false)
+			wg.Done()
+		}(indis[a:b], wg)
+	}
+
+	wg.Wait()
 }
 
 // Mutate each individual.

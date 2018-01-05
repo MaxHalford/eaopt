@@ -36,12 +36,17 @@ func (indi Individual) String() string {
 // Clone an individual to produce a new individual with a different pointer and
 // a different ID.
 func (indi Individual) Clone(rng *rand.Rand) Individual {
-	return Individual{
-		Genome:    indi.Genome.Clone(),
+	var clone = Individual{
 		Fitness:   indi.Fitness,
 		Evaluated: indi.Evaluated,
 		ID:        randString(6, rng),
 	}
+	if indi.Genome == nil {
+		clone.Genome = nil
+	} else {
+		clone.Genome = indi.Genome.Clone()
+	}
+	return clone
 }
 
 // Evaluate the fitness of an individual. Don't evaluate individuals that have
