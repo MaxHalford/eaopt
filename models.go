@@ -7,15 +7,16 @@ import (
 )
 
 var (
-	errNilSelector    = errors.New("Selector cannot be nil")
-	errInvalidMutRate = errors.New("MutRate should be between 0 and 1")
+	errNilSelector      = errors.New("Selector cannot be nil")
+	errInvalidMutRate   = errors.New("MutRate should be between 0 and 1")
+	errInvalidCrossRate = errors.New("CrossRate should be between 0 and 1")
 )
 
 // Two parents are selected from a pool of individuals, crossover is then
 // applied to generate two offsprings. The selection and crossover process is
 // repeated until n offsprings have been generated. If n is uneven then the
 // second offspring of the last crossover is discarded.
-func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) (Individuals, error) {
+func generateOffsprings(n int, indis Individuals, sel Selector, crossRate float64, rng *rand.Rand) (Individuals, error) {
 	var (
 		offsprings = make(Individuals, n)
 		i          = 0
@@ -27,7 +28,9 @@ func generateOffsprings(n int, indis Individuals, sel Selector, rng *rand.Rand) 
 			return nil, err
 		}
 		// Generate 2 offsprings from the parents
-		selected[0].Crossover(selected[1], rng)
+        if rng.Float64() < crossRate {
+            selected[0].Crossover(selected[1], rng)
+        }
 		if i < len(offsprings) {
 			offsprings[i] = selected[0]
 			i++
@@ -50,8 +53,9 @@ type Model interface {
 
 // ModGenerational implements the generational model.
 type ModGenerational struct {
-	Selector Selector
-	MutRate  float64
+	Selector  Selector
+	MutRate   float64
+    CrossRate float64
 }
 
 // Apply ModGenerational.
@@ -61,6 +65,7 @@ func (mod ModGenerational) Apply(pop *Population) error {
 		len(pop.Individuals),
 		pop.Individuals,
 		mod.Selector,
+        mod.CrossRate,
 		pop.RNG,
 	)
 	if err != nil {
@@ -90,14 +95,19 @@ func (mod ModGenerational) Validate() error {
 	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errInvalidMutRate
 	}
+	// Check the crossover rate
+	if mod.CrossRate < 0 || mod.CrossRate > 1 {
+		return errInvalidCrossRate
+	}
 	return nil
 }
 
 // ModSteadyState implements the steady state model.
 type ModSteadyState struct {
-	Selector Selector
-	KeepBest bool
-	MutRate  float64
+	Selector  Selector
+	KeepBest  bool
+	MutRate   float64
+    CrossRate float64
 }
 
 // Apply ModSteadyState.
@@ -107,7 +117,9 @@ func (mod ModSteadyState) Apply(pop *Population) error {
 		return err
 	}
 	var offsprings = selected.Clone(pop.RNG)
-	offsprings[0].Crossover(offsprings[1], pop.RNG)
+    if pop.RNG.Float64() < mod.CrossRate {
+        offsprings[0].Crossover(offsprings[1], pop.RNG)
+    }
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		if pop.RNG.Float64() < mod.MutRate {
@@ -148,6 +160,10 @@ func (mod ModSteadyState) Validate() error {
 	if mod.MutRate < 0 || mod.MutRate > 1 {
 		return errInvalidMutRate
 	}
+	// Check the crossover rate
+	if mod.CrossRate < 0 || mod.CrossRate > 1 {
+		return errInvalidCrossRate
+	}
 	return nil
 }
 
@@ -157,6 +173,7 @@ type ModDownToSize struct {
 	SelectorA   Selector
 	SelectorB   Selector
 	MutRate     float64
+    CrossRate   float64
 }
 
 // Apply ModDownToSize.
@@ -165,6 +182,7 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 		mod.NOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
+        mod.CrossRate,
 		pop.RNG,
 	)
 	if err != nil {

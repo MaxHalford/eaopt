@@ -434,9 +434,10 @@ Alas you still have to implement the `Genome` interface. You can however provide
 type Vector []float64
 
 func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
-    return X, Y.(Vector)
 }
 ```
+
+Or you can set `CrossRate: 0` when initializing the GA model.
 
 
 **Why aren't my `Mutate` and `Crossover` methods modifying my `Genome`s?**
