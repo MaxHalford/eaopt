@@ -9,10 +9,19 @@ var (
 			Selector: SelTournament{1},
 			MutRate:  0.2,
 		},
+		ModGenerational{
+			Selector: SelTournament{1},
+			CrossRate:  0.7,
+		},
 		ModSteadyState{
 			Selector: SelTournament{1},
 			KeepBest: false,
 			MutRate:  0.2,
+		},
+		ModSteadyState{
+			Selector: SelTournament{1},
+			KeepBest: false,
+			CrossRate:  0.7,
 		},
 		ModSteadyState{
 			Selector: SelTournament{1},
@@ -59,6 +68,10 @@ var (
 			Selector: SelTournament{1},
 			MutRate:  -1,
 		},
+		ModGenerational{
+			Selector: SelTournament{1},
+			CrossRate:  -1,
+		},
 		ModSteadyState{
 			Selector: nil,
 			KeepBest: false,
@@ -73,6 +86,11 @@ var (
 			Selector: SelTournament{1},
 			KeepBest: true,
 			MutRate:  -1,
+		},
+		ModSteadyState{
+			Selector: SelTournament{1},
+			KeepBest: true,
+			CrossRate:  -1,
 		},
 		ModDownToSize{
 			NOffsprings: -1,
