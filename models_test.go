@@ -163,7 +163,7 @@ func TestGenerateOffsprings(t *testing.T) {
 		indis = newIndividuals(20, NewVector, rng)
 	)
 	for _, n := range []int{0, 1, 3, 10} {
-		var offsprings, _ = generateOffsprings(n, indis, SelTournament{1}, rng)
+		var offsprings, _ = generateOffsprings(n, indis, SelTournament{1}, 1.0, rng)
 		if len(offsprings) != n {
 			t.Error("GenerateOffsprings didn't produce the expected number of offsprings")
 		}
