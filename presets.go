@@ -10,7 +10,8 @@ func Generational(NewGenome NewGenome) GA {
 			Selector: SelTournament{
 				NContestants: 3,
 			},
-			MutRate: 0.5,
+			MutRate:   0.5,
+			CrossRate: 0.7,
 		},
 	}
 }
