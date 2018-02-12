@@ -5,18 +5,6 @@ engines:
     checks:
       GoLint/Naming/MixedCaps:
         enabled: false
-      argument-count:
-        enabled: false
-      complex-logic:
-        enabled: false
-      method-complexity:
-        enabled: false
-      method-lines:
-        enabled: false
-      similar-code:
-        enabled: false
-      identical-code:
-        enabled: false
   govet:
     enabled: true
   gofmt:
