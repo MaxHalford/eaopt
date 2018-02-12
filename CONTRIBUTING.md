@@ -1,11 +1,12 @@
 ## Ideas
 
 - Implement [differential evolution](https://www.wikiwand.com/en/Differential_evolution)
+- Implement [CMAES](https://www.wikiwand.com/en/CMA-ES)
+- Implement Particle Swarm Optimization
 - Improve tournament selection testing
 - Refactor models testings
 - Add more context to errors (at least the method/struct name) (https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully)
 - Implement operators described in http://www.ppgia.pucpr.br/~alceu/mestrado/aula3/IJBB-41.pdf
-- Implement Particle Swarm Optimization
 - http://deap.readthedocs.io/en/master/
 - http://pyevolve.sourceforge.net/intro.html#ga-features
 - http://www.dmi.unict.it/mpavone/nc-cs/materiale/moscato89.pdf

@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-var (
-	ga = GA{
+var newGA = func() GA {
+	return GA{
 		NewGenome: NewVector,
 		NPops:     2,
 		PopSize:   50,
@@ -22,21 +22,14 @@ var (
 		},
 		Migrator:     MigRing{10},
 		MigFrequency: 3,
+		RNG:          rand.New(rand.NewSource(42)),
 		Logger:       log.New(os.Stdin, "", log.Ldate|log.Ltime),
 	}
-	nbrGenerations = 5 // Initial number of generations to enhance
-)
+}
 
 // newRand returns a new random number generator with a random seed.
 func newRand() *rand.Rand {
 	return rand.New(rand.NewSource(time.Now().UnixNano()))
-}
-
-func init() {
-	ga.Initialize()
-	for i := 0; i < nbrGenerations; i++ {
-		ga.Evolve()
-	}
 }
 
 type Vector []float64

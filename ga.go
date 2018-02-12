@@ -145,11 +145,12 @@ func (ga *GA) Initialize() {
 // run, the GA level operations are run.
 func (ga *GA) Evolve() error {
 	var start = time.Now()
-	ga.Generations++
+
 	// Check the GA has been initialized
 	if !ga.Initialized() {
 		return errors.New("The GA has not been initialized")
 	}
+
 	// Migrate the individuals between the populations if there are at least 2
 	// Populations and that there is a migrator and that the migration frequency
 	// divides the generation count
@@ -183,8 +184,7 @@ func (ga *GA) Evolve() error {
 		}
 		return err
 	}
-
-	var err = ga.Populations.Apply(f, true)
+	var err = ga.Populations.Apply(f)
 	if err != nil {
 		return err
 	}
@@ -197,6 +197,7 @@ func (ga *GA) Evolve() error {
 		ga.Callback(ga)
 	}
 	ga.Age += time.Since(start)
+	ga.Generations++
 	// No error
 	return nil
 }

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
 	"testing"
 )
 
@@ -24,41 +23,38 @@ func TestInitialized(t *testing.T) {
 }
 
 func TestValidationSuccess(t *testing.T) {
-	var err = ga.Validate()
+	var err = newGA().Validate()
 	if err != nil {
 		t.Error("GA parameters are invalid")
 	}
 }
 
 func TestValidationNewGenome(t *testing.T) {
-	var genomeFactory = ga.NewGenome
+	var ga = newGA()
 	ga.NewGenome = nil
 	if ga.Validate() == nil {
 		t.Error("Nil NewGenome should return an error")
 	}
-	ga.NewGenome = genomeFactory
 }
 
 func TestValidationNPopulations(t *testing.T) {
-	var nPops = ga.NPops
+	var ga = newGA()
 	ga.NPops = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of Populations should return an error")
 	}
-	ga.NPops = nPops
 }
 
 func TestValidationNIndividuals(t *testing.T) {
-	var popSize = ga.PopSize
+	var ga = newGA()
 	ga.PopSize = -1
 	if ga.Validate() == nil {
 		t.Error("Invalid number of Individuals should return an error")
 	}
-	ga.PopSize = popSize
 }
 
 func TestValidationModel(t *testing.T) {
-	var model = ga.Model
+	var ga = newGA()
 	// Check nil model raises error
 	ga.Model = nil
 	if ga.Validate() == nil {
@@ -74,42 +70,47 @@ func TestValidationModel(t *testing.T) {
 	if ga.Validate() == nil {
 		t.Error("Invalid Model should return an error")
 	}
-	ga.Model = model
 }
 
 func TestValidationMigFrequency(t *testing.T) {
-	var (
-		migrator     = ga.Migrator
-		migFrequency = ga.MigFrequency
-	)
+	var ga = newGA()
 	ga.Migrator = MigRing{}
 	ga.MigFrequency = 0
 	if ga.Validate() == nil {
 		t.Error("Invalid MigFrequency should return an error")
 	}
-	ga.Migrator = migrator
-	ga.MigFrequency = migFrequency
 }
 
 func TestValidationSpeciator(t *testing.T) {
-	var speciator = ga.Speciator
+	var ga = newGA()
 	ga.Speciator = SpecFitnessInterval{0}
 	if ga.Validate() == nil {
 		t.Error("Invalid Speciator should return an error")
 	}
-	ga.Speciator = speciator
+}
+
+func TestEvolveWithoutInitialization(t *testing.T) {
+	var ga = newGA()
+	if ga.Evolve() == nil {
+		t.Error("Calling Evolve without initialization should return an error")
+	}
+	ga.Initialize()
+	if ga.Evolve() != nil {
+		t.Error("Calling Evolve with initialization should not return an error")
+	}
 }
 
 func TestApplyWithSpeciator(t *testing.T) {
-	var speciator = ga.Speciator
+	var ga = newGA()
 	ga.Speciator = SpecFitnessInterval{4}
+	ga.Initialize()
 	if ga.Evolve() != nil {
 		t.Error("Calling Apply with a valid Speciator should not return an error")
 	}
-	ga.Speciator = speciator
 }
 
 func TestRandomNumberGenerators(t *testing.T) {
+	var ga = newGA()
 	for i, pop1 := range ga.Populations {
 		for j, pop2 := range ga.Populations {
 			if i != j && &pop1.RNG == &pop2.RNG {
@@ -120,6 +121,7 @@ func TestRandomNumberGenerators(t *testing.T) {
 }
 
 func TestBest(t *testing.T) {
+	var ga = newGA()
 	for _, pop := range ga.Populations {
 		for _, indi := range pop.Individuals {
 			if ga.HallOfFame[0].Fitness > indi.Fitness {
@@ -257,6 +259,7 @@ func TestSpeciateEvolveMerge(t *testing.T) {
 
 func TestCallback(t *testing.T) {
 	var (
+		ga               = newGA()
 		counter          int
 		incrementCounter = func(ga *GA) {
 			counter++
@@ -274,75 +277,50 @@ func TestCallback(t *testing.T) {
 }
 
 func TestGAEvolveModelRuntimeError(t *testing.T) {
-	var model = ga.Model
+	var ga = newGA()
 	ga.Model = ModRuntimeError{}
 	// Check invalid model doesn't raise error
 	if ga.Validate() != nil {
 		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Evolve
+	ga.Initialize()
 	var err = ga.Evolve()
 	if err == nil {
 		t.Error("An error should have been raised")
 	}
-	ga.Model = model
 }
 
 func TestGAEvolveSpeciatorRuntimeError(t *testing.T) {
-	var speciator = ga.Speciator
+	var ga = newGA()
 	ga.Speciator = SpecRuntimeError{}
 	// Check invalid speciator doesn't raise error
 	if ga.Validate() != nil {
 		t.Errorf("Expected nil, got %s", ga.Validate())
 	}
 	// Evolve
+	ga.Initialize()
 	var err = ga.Evolve()
 	if err == nil {
 		t.Error("An error should have been raised")
 	}
-	ga.Speciator = speciator
 }
 
 func TestGAConsistentResults(t *testing.T) {
 	var (
-		ga1 = GA{
-			NewGenome: NewVector,
-			NPops:     2,
-			PopSize:   10,
-			Model: ModGenerational{
-				Selector: SelTournament{
-					NContestants: 3,
-				},
-				MutRate: 0.5,
-			},
-			RNG: rand.New(rand.NewSource(42)),
-		}
-		ga2 = GA{
-			NewGenome: NewVector,
-			NPops:     2,
-			PopSize:   10,
-			Model: ModGenerational{
-				Selector: SelTournament{
-					NContestants: 3,
-				},
-				MutRate: 0.5,
-			},
-			RNG: rand.New(rand.NewSource(42)),
-		}
+		ga1 = newGA()
+		ga2 = newGA()
 	)
-
 	// Run the first GA
 	ga1.Initialize()
 	for i := 0; i < 20; i++ {
 		ga1.Evolve()
 	}
-
 	// Run the second GA
 	ga2.Initialize()
 	for i := 0; i < 20; i++ {
 		ga2.Evolve()
 	}
-
 	// Compare best individuals
 	if ga1.HallOfFame[0].Fitness != ga2.HallOfFame[0].Fitness {
 		t.Errorf("Expected %f, got %f", ga1.HallOfFame[0].Fitness, ga2.HallOfFame[0].Fitness)

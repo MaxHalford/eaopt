@@ -1,7 +1,6 @@
 package gago
 
 import (
-	"math/rand"
 	"testing"
 )
 
@@ -24,18 +23,7 @@ func BenchmarkIndividualsEvaluateParallel(b *testing.B) {
 }
 
 func BenchmarkEvolve1Pop(b *testing.B) {
-	ga = GA{
-		NewGenome: NewVector,
-		NPops:     1,
-		PopSize:   50,
-		Model: ModGenerational{
-			Selector: SelTournament{
-				NContestants: 3,
-			},
-			MutRate: 0.5,
-		},
-		RNG: rand.New(rand.NewSource(42)),
-	}
+	var ga = newGA()
 	ga.Initialize()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -44,19 +32,7 @@ func BenchmarkEvolve1Pop(b *testing.B) {
 }
 
 func BenchmarkEvolve1PopParallel(b *testing.B) {
-	ga = GA{
-		NewGenome: NewVector,
-		NPops:     1,
-		PopSize:   50,
-		Model: ModGenerational{
-			Selector: SelTournament{
-				NContestants: 3,
-			},
-			MutRate: 0.5,
-		},
-		RNG:          rand.New(rand.NewSource(42)),
-		ParallelEval: true,
-	}
+	var ga = newGA()
 	ga.Initialize()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -65,18 +41,7 @@ func BenchmarkEvolve1PopParallel(b *testing.B) {
 }
 
 func BenchmarkEvolve2Pop(b *testing.B) {
-	ga = GA{
-		NewGenome: NewVector,
-		NPops:     2,
-		PopSize:   50,
-		Model: ModGenerational{
-			Selector: SelTournament{
-				NContestants: 3,
-			},
-			MutRate: 0.5,
-		},
-		RNG: rand.New(rand.NewSource(42)),
-	}
+	var ga = newGA()
 	ga.Initialize()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -85,19 +50,7 @@ func BenchmarkEvolve2Pop(b *testing.B) {
 }
 
 func BenchmarkEvolve2PopParallel(b *testing.B) {
-	ga = GA{
-		NewGenome: NewVector,
-		NPops:     2,
-		PopSize:   50,
-		Model: ModGenerational{
-			Selector: SelTournament{
-				NContestants: 3,
-			},
-			MutRate: 0.5,
-		},
-		RNG:          rand.New(rand.NewSource(42)),
-		ParallelEval: true,
-	}
+	var ga = newGA()
 	ga.Initialize()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
