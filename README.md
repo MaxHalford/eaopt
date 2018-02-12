@@ -382,9 +382,9 @@ With gago it's possible to use speciation on top of all the rest. To do so the `
 
 ### Multiple populations and migration
 
-Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In gago a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `Topology` field.
+Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In gago a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `NPops` field.
 
-If `Migrator` and `MigFrequency` are not provided the populations will be run independently, in parallel. However, if they are provided then at every generation number that divides `MigFrequency` individuals will be exchanged between the populations following the `Migrator` protocol.
+If `Migrator` and `MigFrequency` are not provided the populations will be run independently, in parallel. However, if they are provided then at each generation number that divides `MigFrequency` (for example 5 divides 25) individuals will be exchanged between the populations following the `Migrator` protocol.
 
 Using multi-populations can be an easy way to gain in diversity. Moreover, not using multi-populations on a multi-core architecture is a waste of resources.
 
