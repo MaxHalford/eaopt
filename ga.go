@@ -3,7 +3,6 @@ package gago
 import (
 	"errors"
 	"log"
-	"math"
 	"math/rand"
 	"sort"
 	"time"
@@ -133,7 +132,7 @@ func (ga *GA) Initialize() error {
 	// Initialize HallOfFame
 	ga.HallOfFame = make(Individuals, ga.NBest)
 	for i := range ga.HallOfFame {
-		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
+		ga.HallOfFame[i] = ga.Populations[0].Individuals[0].Clone(ga.RNG)
 	}
 	for _, pop := range ga.Populations {
 		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
