@@ -94,13 +94,14 @@ import (
 type Vector []float64
 
 // Evaluate a Vector with the Drop-Wave function which takes two variables as
-// input and reaches a minimum of -1 in (0, 0).
-func (X Vector) Evaluate() float64 {
+// input and reaches a minimum of -1 in (0, 0). The function is rather pure so
+// there isn't any error handling to do.
+func (X Vector) Evaluate() (float64, error) {
     var (
         numerator   = 1 + m.Cos(12*m.Sqrt(m.Pow(X[0], 2)+m.Pow(X[1], 2)))
         denominator = 0.5*(m.Pow(X[0], 2)+m.Pow(X[1], 2)) + 2
     )
-    return -numerator / denominator
+    return -numerator / denominator, nil
 }
 
 // Mutate a Vector by resampling each element from a normal distribution with
@@ -129,11 +130,17 @@ func VectorFactory(rng *rand.Rand) gago.Genome {
 
 func main() {
     var ga = gago.Generational(VectorFactory)
-    ga.Initialize()
+    var err = ga.Initialize()
+    if err != nil {
+        fmt.Println("Handle error!")
+    }
 
     fmt.Printf("Best fitness at generation 0: %f\n", ga.HallOfFame[0].Fitness)
     for i := 1; i < 10; i++ {
-        ga.Evolve()
+        err = ga.Evolve()
+        if err != nil {
+            fmt.Println("Handle error!")
+        }
         fmt.Printf("Best fitness at generation %d: %f\n", i, ga.HallOfFame[0].Fitness)
     }
 }
@@ -221,14 +228,14 @@ Let's have a look at the `Genome` interface.
 
 ```go
 type Genome interface {
-    Evaluate() float64
+    Evaluate() (float64, error)
     Mutate(rng *rand.Rand)
     Crossover(genome Genome, rng *rand.Rand)
     Clone() Genome
 }
 ```
 
-The `Evaluate()` method assigns a fitness to a given genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice. The `Evaluate()` method is *your* problem to deal with, gago only needs it's output to be able to function.
+The `Evaluate()` method returns the fitness of a genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice. The `Evaluate()` method is *your* problem to deal with. gago only needs it's output to be able to function. You can also return an `error` which gago will catch and return when calling `ga.Initialize()` and `ga.Evolve()`.
 
 The `Mutate(rng *rand.Rand)` method is where you can modify an existing solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use instead of reinventing the wheel -- this is what is being done in most of the [examples](https://github.com/MaxHalford/gago-examples).
 

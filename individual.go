@@ -51,11 +51,17 @@ func (indi Individual) Clone(rng *rand.Rand) Individual {
 
 // Evaluate the fitness of an individual. Don't evaluate individuals that have
 // already been evaluated.
-func (indi *Individual) Evaluate() {
-	if !indi.Evaluated {
-		indi.Fitness = indi.Genome.Evaluate()
-		indi.Evaluated = true
+func (indi *Individual) Evaluate() error {
+	if indi.Evaluated {
+		return nil
 	}
+	fitness, err := indi.Genome.Evaluate()
+	if err != nil {
+		return err
+	}
+	indi.Fitness = fitness
+	indi.Evaluated = true
+	return nil
 }
 
 // GetFitness returns the fitness of an Individual after making sure it has been

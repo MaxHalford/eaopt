@@ -5,7 +5,7 @@ import "math/rand"
 // A Genome is an object that can have any number and kinds of properties. As
 // long as it can be evaluated, mutated and crossedover then it can evolved.
 type Genome interface {
-	Evaluate() float64
+	Evaluate() (float64, error)
 	Mutate(rng *rand.Rand)
 	Crossover(genome Genome, rng *rand.Rand)
 	Clone() Genome

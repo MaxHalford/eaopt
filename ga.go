@@ -104,7 +104,7 @@ func (ga GA) Initialized() bool {
 // Initialize each population in the GA and assign an initial fitness to each
 // individual in each population. Running Initialize after running Evolve will
 // reset the GA entirely.
-func (ga *GA) Initialize() {
+func (ga *GA) Initialize() error {
 	// Check the NBest field
 	if ga.NBest < 1 {
 		ga.NBest = 1
@@ -114,11 +114,15 @@ func (ga *GA) Initialize() {
 		ga.RNG = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
 	ga.Populations = make([]Population, ga.NPops)
+	var err error
 	for i := range ga.Populations {
 		// Generate a Population
 		ga.Populations[i] = newPopulation(ga.PopSize, ga.NewGenome, ga.RNG)
 		// Evaluate it's Individuals
-		ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
+		err = ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
+		if err != nil {
+			return err
+		}
 		// Sort it's Individuals
 		ga.Populations[i].Individuals.SortByFitness()
 		// Log current statistics if a logger has been provided
@@ -138,6 +142,7 @@ func (ga *GA) Initialize() {
 	if ga.Callback != nil {
 		ga.Callback(ga)
 	}
+	return nil
 }
 
 // Evolve each population in the GA. The population level operations are done
@@ -174,8 +179,12 @@ func (ga *GA) Evolve() error {
 			}
 		}
 		// Evaluate and sort
-		pop.Individuals.Evaluate(ga.ParallelEval)
+		err = pop.Individuals.Evaluate(ga.ParallelEval)
+		if err != nil {
+			return err
+		}
 		pop.Individuals.SortByFitness()
+		// Record time spent evolving
 		pop.Age += time.Since(start)
 		pop.Generations++
 		// Log current statistics if a logger has been provided
@@ -184,6 +193,7 @@ func (ga *GA) Evolve() error {
 		}
 		return err
 	}
+
 	var err = ga.Populations.Apply(f)
 	if err != nil {
 		return err

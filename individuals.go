@@ -6,7 +6,8 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Individuals is a convenience type, methods that belong to an Individual can
@@ -42,31 +43,34 @@ func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
 }
 
 // Evaluate each Individual in a slice.
-func (indis Individuals) Evaluate(parallel bool) {
+func (indis Individuals) Evaluate(parallel bool) error {
 	if !parallel {
+		var err error
 		for i := range indis {
-			indis[i].Evaluate()
+			err = indis[i].Evaluate()
+			if err != nil {
+				return err
+			}
 		}
-		return
+		return nil
 	}
 
 	var (
 		nWorkers  = runtime.GOMAXPROCS(-1)
 		n         = len(indis)
 		chunkSize = (n + nWorkers - 1) / nWorkers
-		wg        = &sync.WaitGroup{}
+		g         errgroup.Group
 	)
 
 	for a := 0; a < n; a += chunkSize {
-		wg.Add(1)
+		a := a // https://golang.org/doc/faq#closures_and_goroutines
 		var b = min(a+chunkSize, n)
-		go func(chunk Individuals, wg *sync.WaitGroup) {
-			chunk.Evaluate(false)
-			wg.Done()
-		}(indis[a:b], wg)
+		g.Go(func() error {
+			return indis[a:b].Evaluate(false)
+		})
 	}
 
-	wg.Wait()
+	return g.Wait()
 }
 
 // Mutate each individual.

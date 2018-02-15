@@ -36,12 +36,12 @@ type Vector []float64
 
 // Implement the Genome interface
 
-func (X Vector) Evaluate() float64 {
+func (X Vector) Evaluate() (float64, error) {
 	var sum float64
 	for _, x := range X {
 		sum += x
 	}
-	return sum
+	return sum, nil
 }
 
 func (X Vector) Mutate(rng *rand.Rand) {
