@@ -16,9 +16,30 @@ func TestInitialized(t *testing.T) {
 	if ga.Initialized() {
 		t.Error("GA should not yet be initialized")
 	}
-	ga.Initialize()
+	var err = ga.Initialize()
+	if err != nil {
+		t.Error("No error should have been raised")
+	}
 	if !ga.Initialized() {
 		t.Error("GA should be initialized")
+	}
+}
+
+func TestInitializeWithGenomeError(t *testing.T) {
+	var ga = GA{
+		NewGenome: NewRuntimeErrorGenome,
+		NPops:     1,
+		PopSize:   10,
+	}
+	if ga.Initialized() {
+		t.Error("GA should not yet be initialized")
+	}
+	var err = ga.Initialize()
+	if err == nil {
+		t.Error("An error should have been raised")
+	}
+	if ga.Initialized() {
+		t.Error("GA should still not be initialized")
 	}
 }
 

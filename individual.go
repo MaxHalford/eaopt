@@ -55,7 +55,7 @@ func (indi *Individual) Evaluate() error {
 	if indi.Evaluated {
 		return nil
 	}
-	fitness, err := indi.Genome.Evaluate()
+	var fitness, err = indi.Genome.Evaluate()
 	if err != nil {
 		return err
 	}

@@ -96,3 +96,15 @@ func (spec SpecRuntimeError) Apply(indis Individuals, rng *rand.Rand) ([]Individ
 	return []Individuals{indis, indis}, errors.New("")
 }
 func (spec SpecRuntimeError) Validate() error { return nil }
+
+// Runtime error genome
+
+type RuntimeErrorGenome struct{ Vector }
+
+func (spec RuntimeErrorGenome) Evaluate() (float64, error) {
+	return 0, errors.New("error")
+}
+
+func NewRuntimeErrorGenome(rng *rand.Rand) Genome {
+	return RuntimeErrorGenome{[]float64{42}}
+}

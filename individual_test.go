@@ -59,9 +59,27 @@ func TestEvaluateIndividual(t *testing.T) {
 	if indi.Evaluated {
 		t.Error("Individual shouldn't have Evaluated set to True")
 	}
-	indi.Evaluate()
+	var err = indi.Evaluate()
+	if err != nil {
+		t.Error("No error should have been raised")
+	}
 	if !indi.Evaluated {
 		t.Error("Individual should have Evaluated set to True")
+	}
+}
+
+func TestEvaluateIndividualWithError(t *testing.T) {
+	var (
+		rng    = newRand()
+		genome = NewRuntimeErrorGenome(rng)
+		indi   = NewIndividual(genome, rng)
+	)
+	var err = indi.Evaluate()
+	if err == nil {
+		t.Error("An error should have been raised")
+	}
+	if indi.Evaluated {
+		t.Error("The individual shouldn't have Evaluated set to true")
 	}
 }
 

@@ -78,6 +78,24 @@ func TestEvaluateIndividuals(t *testing.T) {
 	}
 }
 
+func TestEvaluateIndividualsWithError(t *testing.T) {
+	var indis = newIndividuals(10, NewRuntimeErrorGenome, newRand())
+	for _, indi := range indis {
+		if indi.Evaluated {
+			t.Error("Individual shouldn't have Evaluated set to true")
+		}
+	}
+	var err = indis.Evaluate(false)
+	if err == nil {
+		t.Error("An error should have been raised")
+	}
+	for _, indi := range indis {
+		if indi.Evaluated {
+			t.Error("The individual still should't have Evaluated set to true")
+		}
+	}
+}
+
 func TestEvaluateIndividualsParallel(t *testing.T) {
 	var indis = newIndividuals(10, NewVector, newRand())
 	for _, indi := range indis {

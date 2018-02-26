@@ -94,10 +94,7 @@ func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 
 // Initialized indicates if the GA has been initialized or not.
 func (ga GA) Initialized() bool {
-	if len(ga.Populations) != ga.NPops {
-		return false
-	}
-	return true
+	return len(ga.Populations) == ga.NPops && len(ga.HallOfFame) == ga.NBest
 }
 
 // Initialize each population in the GA and assign an initial fitness to each
