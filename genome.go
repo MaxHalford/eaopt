@@ -2,8 +2,9 @@ package gago
 
 import "math/rand"
 
-// A Genome is an object that can have any number and kinds of properties. As
-// long as it can be evaluated, mutated and crossedover then it can evolved.
+// A Genome is an entity that can have any number and kinds of properties. As
+// long as it can be evaluated, mutated, crossedover, and cloned then it can
+// be evolved.
 type Genome interface {
 	Evaluate() (float64, error)
 	Mutate(rng *rand.Rand)

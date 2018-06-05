@@ -28,9 +28,9 @@ func generateOffsprings(n int, indis Individuals, sel Selector, crossRate float6
 			return nil, err
 		}
 		// Generate 2 offsprings from the parents
-        if rng.Float64() < crossRate {
-            selected[0].Crossover(selected[1], rng)
-        }
+		if rng.Float64() < crossRate {
+			selected[0].Crossover(selected[1], rng)
+		}
 		if i < len(offsprings) {
 			offsprings[i] = selected[0]
 			i++
@@ -55,7 +55,7 @@ type Model interface {
 type ModGenerational struct {
 	Selector  Selector
 	MutRate   float64
-    CrossRate float64
+	CrossRate float64
 }
 
 // Apply ModGenerational.
@@ -65,7 +65,7 @@ func (mod ModGenerational) Apply(pop *Population) error {
 		len(pop.Individuals),
 		pop.Individuals,
 		mod.Selector,
-        mod.CrossRate,
+		mod.CrossRate,
 		pop.RNG,
 	)
 	if err != nil {
@@ -107,7 +107,7 @@ type ModSteadyState struct {
 	Selector  Selector
 	KeepBest  bool
 	MutRate   float64
-    CrossRate float64
+	CrossRate float64
 }
 
 // Apply ModSteadyState.
@@ -117,9 +117,9 @@ func (mod ModSteadyState) Apply(pop *Population) error {
 		return err
 	}
 	var offsprings = selected.Clone(pop.RNG)
-    if pop.RNG.Float64() < mod.CrossRate {
-        offsprings[0].Crossover(offsprings[1], pop.RNG)
-    }
+	if pop.RNG.Float64() < mod.CrossRate {
+		offsprings[0].Crossover(offsprings[1], pop.RNG)
+	}
 	// Apply mutation to the offsprings
 	if mod.MutRate > 0 {
 		if pop.RNG.Float64() < mod.MutRate {
@@ -173,7 +173,7 @@ type ModDownToSize struct {
 	SelectorA   Selector
 	SelectorB   Selector
 	MutRate     float64
-    CrossRate   float64
+	CrossRate   float64
 }
 
 // Apply ModDownToSize.
@@ -182,7 +182,7 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 		mod.NOffsprings,
 		pop.Individuals,
 		mod.SelectorA,
-        mod.CrossRate,
+		mod.CrossRate,
 		pop.RNG,
 	)
 	if err != nil {
@@ -341,11 +341,11 @@ func (mod ModSimAnn) Validate() error {
 }
 
 // ModMutationOnly implements the mutation only model. Each generation,
-// NChosen are selected and are replaced with mutants. Mutants are obtained by
-// mutating the selected Individuals. If Strict is set to true, then the mutants
-// replace the chosen individuals only if they have a lower fitness.
+// NChosen Undividuals are selected and replaced with mutants. Mutants are
+// obtained by mutating the selected Individuals. If Strict is true then the
+// mutants replace the chosen individuals only if they have a lower fitness.
 type ModMutationOnly struct {
-	NChosen  int // Number of individuals that are mutated each generation
+	NChosen  int
 	Selector Selector
 	Strict   bool
 }
@@ -360,7 +360,7 @@ func (mod ModMutationOnly) Apply(pop *Population) error {
 		var mutant = indi.Clone(pop.RNG)
 		mutant.Mutate(pop.RNG)
 		mutant.Evaluate()
-		if !mod.Strict || (mod.Strict && mutant.Fitness > indi.Fitness) {
+		if !mod.Strict || (mod.Strict && mutant.Fitness < indi.Fitness) {
 			pop.Individuals[positions[i]] = mutant
 		}
 	}
