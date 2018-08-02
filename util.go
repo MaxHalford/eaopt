@@ -1,10 +1,16 @@
-package gago
+package eaopt
 
 import (
 	"math"
 )
 
-func newInts(n int) []int {
+func copyFloat64s(fs []float64) []float64 {
+	var fsc = make([]float64, len(fs))
+	copy(fsc, fs)
+	return fsc
+}
+
+func newInts(n uint) []int {
 	var ints = make([]int, n)
 	for i := range ints {
 		ints[i] = i
@@ -32,11 +38,16 @@ func cumsum(floats []float64) []float64 {
 }
 
 // Find the minimum between two ints.
-func min(a, b int) int {
+func minInt(a, b int) int {
 	if a <= b {
 		return a
 	}
 	return b
+}
+
+// Find the minimum between two uints.
+func minUint(a, b uint) uint {
+	return uint(minInt(int(a), int(b)))
 }
 
 // Compute the sum of an int slice.

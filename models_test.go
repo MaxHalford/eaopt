@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import "testing"
 
@@ -10,8 +10,8 @@ var (
 			MutRate:  0.2,
 		},
 		ModGenerational{
-			Selector: SelTournament{1},
-			CrossRate:  0.7,
+			Selector:  SelTournament{1},
+			CrossRate: 0.7,
 		},
 		ModSteadyState{
 			Selector: SelTournament{1},
@@ -19,9 +19,9 @@ var (
 			MutRate:  0.2,
 		},
 		ModSteadyState{
-			Selector: SelTournament{1},
-			KeepBest: false,
-			CrossRate:  0.7,
+			Selector:  SelTournament{1},
+			KeepBest:  false,
+			CrossRate: 0.7,
 		},
 		ModSteadyState{
 			Selector: SelTournament{1},
@@ -44,14 +44,10 @@ var (
 			Alpha: 0.3,
 		},
 		ModMutationOnly{
-			NChosen:  3,
-			Selector: SelTournament{1},
-			Strict:   false,
+			Strict: false,
 		},
 		ModMutationOnly{
-			NChosen:  3,
-			Selector: SelTournament{1},
-			Strict:   true,
+			Strict: true,
 		},
 	}
 	// Invalid models
@@ -69,8 +65,8 @@ var (
 			MutRate:  -1,
 		},
 		ModGenerational{
-			Selector: SelTournament{1},
-			CrossRate:  -1,
+			Selector:  SelTournament{1},
+			CrossRate: -1,
 		},
 		ModSteadyState{
 			Selector: nil,
@@ -88,12 +84,12 @@ var (
 			MutRate:  -1,
 		},
 		ModSteadyState{
-			Selector: SelTournament{1},
-			KeepBest: true,
-			CrossRate:  -1,
+			Selector:  SelTournament{1},
+			KeepBest:  true,
+			CrossRate: -1,
 		},
 		ModDownToSize{
-			NOffsprings: -1,
+			NOffsprings: 0,
 			SelectorA:   SelTournament{1},
 			SelectorB:   SelElitism{},
 			MutRate:     0.2,
@@ -155,21 +151,6 @@ var (
 			Tmin:  1,
 			Alpha: -1,
 		},
-		ModMutationOnly{
-			NChosen:  -1,
-			Selector: SelTournament{1},
-			Strict:   false,
-		},
-		ModMutationOnly{
-			NChosen:  3,
-			Selector: nil,
-			Strict:   false,
-		},
-		ModMutationOnly{
-			NChosen:  3,
-			Selector: SelTournament{0},
-			Strict:   false,
-		},
 	}
 )
 
@@ -180,9 +161,9 @@ func TestGenerateOffsprings(t *testing.T) {
 		rng   = newRand()
 		indis = newIndividuals(20, NewVector, rng)
 	)
-	for _, n := range []int{0, 1, 3, 10} {
+	for _, n := range []uint{0, 1, 3, 10} {
 		var offsprings, _ = generateOffsprings(n, indis, SelTournament{1}, 1.0, rng)
-		if len(offsprings) != n {
+		if len(offsprings) != int(n) {
 			t.Error("GenerateOffsprings didn't produce the expected number of offsprings")
 		}
 	}
@@ -209,13 +190,13 @@ func TestModelsValidate(t *testing.T) {
 // population when applied.
 func TestModelsConstantSize(t *testing.T) {
 	var rng = newRand()
-	for _, n := range []int{1, 2, 3, 42} {
+	for _, n := range []uint{1, 2, 3, 42} {
 		for _, model := range validModels {
 			var pop = newPopulation(n, NewVector, rng)
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)
-				if len(pop.Individuals) != n {
+				if len(pop.Individuals) != int(n) {
 					t.Error("A model application changed the population size")
 				}
 			}

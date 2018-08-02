@@ -1,29 +1,35 @@
-package gago
+package eaopt
 
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
+
+// newRand returns a new random number generator with a random seed.
+func newRand() *rand.Rand {
+	return rand.New(rand.NewSource(time.Now().UnixNano()))
+}
 
 // Sample k unique integers in range [min, max) using reservoir sampling,
 // specifically Vitter's Algorithm R.
-func randomInts(k, min, max int, rng *rand.Rand) (ints []int) {
-	ints = make([]int, k)
-	for i := 0; i < k; i++ {
+func randomInts(k uint, min, max int, rng *rand.Rand) []int {
+	var ints = make([]int, k)
+	for i := 0; i < int(k); i++ {
 		ints[i] = i + min
 	}
-	for i := k; i < max-min; i++ {
+	for i := int(k); i < max-min; i++ {
 		var j = rng.Intn(i + 1)
-		if j < k {
+		if j < int(k) {
 			ints[j] = i + min
 		}
 	}
-	return
+	return ints
 }
 
 // Sample k unique integers from a slice of n integers without replacement.
-func sampleInts(ints []int, k int, rng *rand.Rand) ([]int, []int, error) {
-	if k > len(ints) {
+func sampleInts(ints []int, k uint, rng *rand.Rand) ([]int, []int, error) {
+	if int(k) > len(ints) {
 		return nil, nil, fmt.Errorf("Cannot sample %d elements from array of length %d", k, len(ints))
 	}
 	var (

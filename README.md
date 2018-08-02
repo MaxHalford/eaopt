@@ -18,24 +18,24 @@
 
 <div align="center">
   <!-- godoc -->
-  <a href="https://godoc.org/github.com/MaxHalford/gago">
+  <a href="https://godoc.org/github.com/MaxHalford/eaopt">
     <img src="https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square" alt="godoc" />
   </a>
   <!-- Build status -->
-  <a href="https://travis-ci.org/MaxHalford/gago">
-    <img src="https://img.shields.io/travis/MaxHalford/gago/master.svg?style=flat-square" alt="build_status" />
+  <a href="https://travis-ci.org/MaxHalford/eaopt">
+    <img src="https://img.shields.io/travis/MaxHalford/eaopt/master.svg?style=flat-square" alt="build_status" />
   </a>
   <!-- Test coverage -->
-  <a href="https://coveralls.io/github/MaxHalford/gago?branch=master">
-    <img src="https://coveralls.io/repos/github/MaxHalford/gago/badge.svg?branch=master&style=flat-square" alt="test_coverage" />
+  <a href="https://coveralls.io/github/MaxHalford/eaopt?branch=master">
+    <img src="https://coveralls.io/repos/github/MaxHalford/eaopt/badge.svg?branch=master&style=flat-square" alt="test_coverage" />
   </a>
   <!-- Go report card -->
-  <a href="https://goreportcard.com/report/github.com/MaxHalford/gago">
-    <img src="https://goreportcard.com/badge/github.com/MaxHalford/gago?style=flat-square" alt="go_report_card" />
+  <a href="https://goreportcard.com/report/github.com/MaxHalford/eaopt">
+    <img src="https://goreportcard.com/badge/github.com/MaxHalford/eaopt?style=flat-square" alt="go_report_card" />
   </a>
   <!-- Code Climate -->
-  <a href="https://codeclimate.com/github/MaxHalford/gago">
-    <img src="https://codeclimate.com/github/MaxHalford/gago/badges/gpa.svg" alt="Code Climate" />
+  <a href="https://codeclimate.com/github/MaxHalford/eaopt">
+    <img src="https://codeclimate.com/github/MaxHalford/eaopt/badges/gpa.svg" alt="Code Climate" />
   </a>
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
@@ -45,38 +45,45 @@
 
 <br/>
 
-<div align="center">An extensible toolkit for conceiving and running genetic algorithms</div>
+<div align="center">eaopt is an evolutionary optimization library</div>
 
 <br/>
 
 **Table of Contents**
+  - [Changelog](#changelog)
   - [Example](#example)
   - [Background](#background)
-    - [Terminology](#terminology)
-    - [Methodology](#methodology)
   - [Features](#features)
   - [Usage](#usage)
-    - [Implementing the Genome interface](#implementing-the-genome-interface)
-    - [Using the Slice interface](#using-the-slice-interface)
-    - [Instantiating a GA struct](#instantiating-a-ga-struct)
-    - [Running a GA](#running-a-ga)
-    - [Models](#models)
-    - [Multiple populations and migration](#multiple-populations-and-migration)
-    - [Speciation](#speciation)
-    - [Presets](#presets)
-    - [Logging population statistics](#logging-population-statistics)
+    - [General advice](#general-advice)
+    - [Genetic algorithms](#genetic-algorithms)
+      - [Overview](#overview)
+      - [Implementing the Genome interface](#implementing-the-genome-interface)
+      - [Instantiating the GA struct](#instantiating-the-ga-struct)
+      - [Calling the Minimize method](#calling-the-minimize-method)
+      - [Using the Slice interface](#using-the-slice-interface)
+      - [Models](#models)
+      - [Multiple populations and migration](#multiple-populations-and-migration)
+      - [Speciation](#speciation)
+      - [Logging population statistics](#logging-population-statistics)
+    - [Particle swarm optimization](#particle-swarm-optimization)
+    - [Differential evolution](#differential-evolution)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
-  - [Alternatives](#alternatives)
+  - [Dependencies](#dependencies)
   - [License](#license)
+
+## Changelog
+
+- 02/08/18: gago has now become eaopt. You can still everything you could do before but the scope is now larger than genetic algorithms. The goal is to implement many more evolutionary optimization algorithms on top of the existing codebase.
 
 ## Example
 
-The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) which is known to have a minimum value of -1 when each of it's arguments is equal to 0.
+The following example attempts to minimize the [Drop-Wave function](https://www.sfu.ca/~ssurjano/drop.html) using a genetic algorithm. The Drop-Wave function is known to have a minimum value of -1 when each of it's arguments is equal to 0.
 
 <div align="center">
-  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/chart.png" alt="drop_wave_chart" />
-  <img src="https://github.com/MaxHalford/gago-examples/blob/master/drop_wave/function.png" alt="drop_wave_function" />
+  <img src="https://github.com/MaxHalford/eaopt-examples/blob/master/drop_wave/chart.png" alt="drop_wave_chart" />
+  <img src="https://github.com/MaxHalford/eaopt-examples/blob/master/drop_wave/function.png" alt="drop_wave_function" />
 </div>
 
 ```go
@@ -87,7 +94,7 @@ import (
     m "math"
     "math/rand"
 
-    "github.com/MaxHalford/gago"
+    "github.com/MaxHalford/eaopt"
 )
 
 // A Vector contains float64s.
@@ -107,16 +114,16 @@ func (X Vector) Evaluate() (float64, error) {
 // Mutate a Vector by resampling each element from a normal distribution with
 // probability 0.8.
 func (X Vector) Mutate(rng *rand.Rand) {
-    gago.MutNormalFloat64(X, 0.8, rng)
+    eaopt.MutNormalFloat64(X, 0.8, rng)
 }
 
 // Crossover a Vector with another Vector by applying uniform crossover.
-func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) {
-    gago.CrossUniformFloat64(X, Y.(Vector), rng)
+func (X Vector) Crossover(Y eaopt.Genome, rng *rand.Rand) {
+    eaopt.CrossUniformFloat64(X, Y.(Vector), rng)
 }
 
 // Clone a Vector to produce a new one that points to a different slice.
-func (X Vector) Clone() gago.Genome {
+func (X Vector) Clone() eaopt.Genome {
     var Y = make(Vector, len(X))
     copy(Y, X)
     return Y
@@ -124,25 +131,24 @@ func (X Vector) Clone() gago.Genome {
 
 // VectorFactory returns a random vector by generating 2 values uniformally
 // distributed between -10 and 10.
-func VectorFactory(rng *rand.Rand) gago.Genome {
-    return Vector(gago.InitUnifFloat64(2, -10, 10, rng))
+func VectorFactory(rng *rand.Rand) eaopt.Genome {
+    return Vector(eaopt.InitUnifFloat64(2, -10, 10, rng))
 }
 
 func main() {
-    var ga = gago.Generational(VectorFactory)
-    var err = ga.Initialize()
+    // Instantiate a GA with a GAConfig
+    var ga, err = NewDefaultGAConfig().NewGA()
     if err != nil {
-        fmt.Println("Handle error!")
+        fmt.Println("Handle it!")
     }
 
-    fmt.Printf("Best fitness at generation 0: %f\n", ga.HallOfFame[0].Fitness)
-    for i := 1; i < 10; i++ {
-        err = ga.Evolve()
-        if err != nil {
-            fmt.Println("Handle error!")
-        }
+    // Add a custom print function
+    ga.CallBack = function(ga *GA) {
         fmt.Printf("Best fitness at generation %d: %f\n", i, ga.HallOfFame[0].Fitness)
     }
+
+    // Find an optimum
+    ga.Minimize(VectorFactory)
 }
 
 ```
@@ -162,67 +168,73 @@ func main() {
 
 **More examples**
 
-All the examples can be found [here](https://github.com/MaxHalford/gago-examples).
+All the examples can be found [here](https://github.com/MaxHalford/eaopt-examples).
 
-- [Cross-in-Tray (speciation)](https://github.com/MaxHalford/gago-examples/tree/master/cross_in_tray)
-- [Grid TSP](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid)
-- [Including a constraint](https://github.com/MaxHalford/gago-examples/tree/master/constraint)
-- [One Max problem](https://github.com/MaxHalford/gago-examples/tree/master/one_max)
-- [N-queens problem](https://github.com/MaxHalford/gago-examples/tree/master/n_queens)
-- [String matching](https://github.com/MaxHalford/gago-examples/tree/master/string_matching)
+- [Cross-in-Tray (speciation)](https://github.com/MaxHalford/eaopt-examples/tree/master/cross_in_tray)
+- [Grid TSP](https://github.com/MaxHalford/eaopt-examples/tree/master/tsp_grid)
+- [Including a constraint](https://github.com/MaxHalford/eaopt-examples/tree/master/constraint)
+- [One Max problem](https://github.com/MaxHalford/eaopt-examples/tree/master/one_max)
+- [N-queens problem](https://github.com/MaxHalford/eaopt-examples/tree/master/n_queens)
+- [String matching](https://github.com/MaxHalford/eaopt-examples/tree/master/string_matching)
 
 ## Background
 
-There is a lot of intellectual fog around the concept of genetic algorithms (GAs). It's important to appreciate the fact that GAs are composed of many nuts and bolts. **There isn't a single definition of genetic algorithms**. `gago` is intended to be a toolkit where one may run many kinds of genetic algorithms, with different evolution models and various genetic operators.
+Evolutionary optimization algorithms are a subdomain of evolutionary computation. Their goal is to minimize/maximize a function without using any gradient information (usually because said function doesn't have a gradient). They share the common property of exploring the search space by breeding, mutating, evaluating, and sorting so-called *individuals*. Most evolutionary algorithms are designed to handle real valued functions, however in practice they are more commonly used for more exotic problems. For example genetic algorithms are commonly used for finding the optimal structure of a neural network.
 
-### Terminology
+eaopt provides implementations for various evolutionary optimization algorithms. Implementation-wise, the idea is that most (if not all) of said algorithms can be written as special cases of a genetic algorithm. Indeed this is made possible by using a generic definition of a genetic algorithm by allowing the mutation, crossover, selection, and replacement procedures to be modified. The `GA` struct is the most flexible struct of eaopt, the other algorithms are written on top of it. If you don't find any algorithm that suits your need then you can easily write your own operators (as is done in most of the [examples](https://github.com/MaxHalford/eaopt-examples)).
 
-- ***Fitness function***: The fitness function is simply the function associated to a given problem. It takes in an input and returns an output. The goal is to find the input that minimizes the output.
-- ***Individual***: An individual contains a **genome** which represents a function input. In the physical world, an individual's genome is composed of acids. In an imaginary world, it could be composed of floating point numbers or string sequences representing cities. A **fitness** can be associated to a genome thanks to the fitness function. For example, one could measure the height of a group of individuals in order to rank them. In this case the genome is the body of an individual, the fitness function is the act of measuring the height of an individual's body and the fitness is the resulting height.
-- ***Population***: Individuals are contained in a population wherein they can interact.
-- ***Crossover***:  A crossover acts on two or more individuals (called **parents**) and mixes their genome in order to produce one or more new individuals (called **offsprings**). Crossover is really what sets genetic algorithms apart from other evolutionary methods.
-- ***Selection***: Selection is a process in which parents are selected to generate offsprings, most often by applying a crossover method. Popular selection methods include **elitism selection** and **tournament selection**.
-- ***Mutation***: Mutation applies random modifications to an individual's genome without interacting with other individuals.
-- ***Migration***: **Multi-population** GAs run more than one population in parallel and exchange individuals between each other.
-- ***Speciation***: In the physical world, individuals do not mate at random. Instead, they mate with similar individuals. For some problems -- for example neural network topology optimization -- crossover will often generate poor solutions. Speciation sidesteps this by mating similar individuals (called **species**) separately.
-- ***Evolution model***: An evolution model describes the exact manner and order in which genetic operators are applied to a population. The most popular models are the **steady state model** and the **generational model**.
+## Features
 
-### Methodology
+- Different evolutionary algorithms are available with a consistent API
+- You can practically do anything by using the `GA` struct
+- Common genetic operators are already implemented
+- Speciation and migration procedures are available
+- Function evaluation can be done in parallel
+
+## Usage
+
+### General advice
+
+- Evolutionary algorithms are usually defined with different kinds of problems. Take a look at the `Minimize` function of each method to get an idea of what type of function it can optimize.
+- Use the associated constructor function of each method to initialize it. For example use the `NewPSO` function instead of instantiating the `PSO` struct yourself. Along with making things easier, these functions provide the added benefit of checking for parameter input errors.
+- If you're going to use the `GA` struct then be aware that some evolutionary operators are already implemented in eaopt.
+- Don't feel overwhelmed by the fact that algorithms are implemented as special cases of genetic algorithms, it doesn't matter if you just want to get things done.
+
+### Genetic algorithms
+
+#### Overview
+
+Genetic algorithms are the backbone of eaopt. Most of the other algorithms available in eaopt are implemented as special cases of GAs. A GA isn't an algorithm per say, but rather a blueprint which can be used to optimize any kind of problem.
 
 In a nutshell, a GA solves an optimization problem by doing the following:
 
-1. Generate random solutions.
+1. Generate random solutions to a problem.
 2. Assign a fitness to each solutions.
-3. Sort the solutions according to their fitness.
-4. Apply genetic operators following a model.
+3. Check if a new best solution has been found.
+4. Apply genetic operators following a given evolutionary model.
 5. Repeat from step 2 until the stopping criterion is satisfied.
 
-This description is voluntarily vague as to how the genetic operators are applied. It's important to understand that there isn't a single way of applying genetic algorithms. For example some people believe that crossover is useless and use mutation for generating new individuals. In general genetic operators are applied following an **evolution model**, a fact that is often omitted in introductions to genetic algorithms. Popular stopping criteria include
+This description is voluntarily vague. It is up to the user to define the problem and the genetic operators to use. Two types of genetic operators exist:
+
+- Mutation operators modify an existing solution.
+- Crossover operators generate a new solution by combining two or more existing ones.
+
+Popular stopping criteria include
 
 - a fixed number of generations,
 - a fixed duration,
 - an indicator that the population is stagnating.
 
+Genetic algorithms can be used via the `GA` struct. The necessary steps for using the GA struct are
 
-## Features
-
-- gago is extensible, you can control most of the evolution logic
-- Different evolution models are available
-- Popular operators are already implemented
-- Speciation is available
-- Multiple population migration is available
+1. Implement the `Genome` interface to model your problem
+2. Instantiate a `GA` struct (preferably via the `GAConfig` struct)
+3. Call the GA's `Minimize` function and check the `HallOfFame` field
 
 
-## Usage
+#### Implementing the Genome interface
 
-The two requirements for using gago are
-
-- Implement the `Genome` interface.
-- Instantiate a `GA` struct.
-
-The `Genome` interface is used to define the logic that is specific to your problem; logic that gago doesn't know about. For example this is where you will define an `Evaluate()` method for evaluating a particular problem. The `GA` struct contains context-agnostic information. For example this is where you can choose the number of individuals in a population (which is a separate concern from your particular problem). Apart from a good design pattern, decoupling the problem definition from the optimization through the `Genome` interface means that gago can be used to optimize *any* kind of problem.
-
-### Implementing the Genome interface
+To use the `GA` struct you first have to implement the `Genome` interface, which is used to define the logic that is specific to your problem (logic that eaopt doesn't know about). For example this is where you will define an `Evaluate()` method for evaluating a particular problem. The `GA` struct contains context-agnostic information. For example this is where you can choose the number of individuals in a population (which is a separate concern from your particular problem). Apart from a good design pattern, decoupling the problem definition from the optimization through the `Genome` interface means that eaopt can be used to optimize *any* kind of problem.
 
 Let's have a look at the `Genome` interface.
 
@@ -235,19 +247,97 @@ type Genome interface {
 }
 ```
 
-The `Evaluate()` method returns the fitness of a genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice. The `Evaluate()` method is *your* problem to deal with. gago only needs it's output to be able to function. You can also return an `error` which gago will catch and return when calling `ga.Initialize()` and `ga.Evolve()`.
+The `Evaluate()` method returns the fitness of a genome. The sweet thing is that you can do whatever you want in this method. Your struct that implements the interface doesn't necessarily have to be a slice. The `Evaluate()` method is *your* problem to deal with. eaopt only needs it's output to be able to function. You can also return an `error` which eaopt will catch and return when calling `ga.Initialize()` and `ga.Evolve()`.
 
-The `Mutate(rng *rand.Rand)` method is where you can modify an existing solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. gago provides some common mutation methods that you can use instead of reinventing the wheel -- this is what is being done in most of the [examples](https://github.com/MaxHalford/gago-examples).
+The `Mutate(rng *rand.Rand)` method is where you can modify an existing solution by tinkering with it's variables. The way in which you should mutate a solution essentially boils down to your particular problem. eaopt provides some common mutation methods that you can use instead of reinventing the wheel -- this is what is being done in most of the [examples](https://github.com/MaxHalford/eaopt-examples).
 
 The `Crossover(genome Genome, rng *rand.Rand)` method combines two individuals. The important thing to notice is that the type of first argument differs from the struct calling the method. Indeed the first argument is a `Genome` that has to be casted into your struct before being able to apply a crossover operator. This is due to the fact that Go doesn't provide generics out of the box; it's easier to convince yourself by checking out the examples.
 
 The `Clone()` method is there to produce independent copies of the struct you want to evolve. This is necessary for internal reasons and ensures that pointer fields are not pointing to identical memory addresses. Usually this is not too difficult implement; you just have to make sure that the clones you produce are not shallow copies of the genome that is being cloned. This is also fairly easy to unit test.
 
-Once you have implemented the `Genome` interface you have provided gago with all the information it couldn't guess for you. Essentially you have total control over the definition of your problem, gago will handle the rest and find a good solution to the problem.
+Once you have implemented the `Genome` interface you have provided eaopt with all the information it couldn't guess for you.
 
-### Using the Slice interface
+#### Instantiate the GA struct
 
-Classically GAs are used to optimize problems where the genome has a slice representation - eg. a vector or a sequence of DNA code. Almost all the mutation and crossover algorithms available in gago are based on the `Slice` interface which has the following definition.
+You can now instantiate a `GA` and use it to find an optimal solution to your problem. The `GA` struct has a lot of fields, hence the recommended way is to use the `GAConfig` struct and call it's `NewGA` method.
+
+Let's have a look at the `GAConfig` struct.
+
+```go
+type GAConfig struct {
+    // Required fields
+    NPops        uint
+    PopSize      uint
+    NGenerations uint
+    HofSize      uint
+    Model        Model
+
+    // Optional fields
+    ParallelEval bool // Whether to evaluate Individuals in parallel or not
+    Migrator     Migrator
+    MigFrequency uint // Frequency at which migrations occur
+    Speciator    Speciator
+    Logger       *log.Logger
+    Callback     func(ga *GA)
+    RNG          *rand.Rand
+}
+```
+
+- Required fields
+  - `NPops` determines the number of populations that will be used.
+  - `PopSize` determines the number of individuals inside each population.
+  - `NGenerations` determines for many generations the populations will be evolved.
+  - `HofSize` determines how many of the best individuals should be recorded.
+  - `Model` is a struct that determines how to evolve each population of individuals.
+- Optional fields
+  - `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
+  - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
+  - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
+  - `Logger` can be used to record basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
+  - `Callback` will execute any piece of code you wish every time `ga.Evolve()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
+    - Calculating specific population statistics that are not provided by the logger
+    - Changing parameters of the GA after a certain number of generations
+    - Monitoring convergence
+  - `EarlyStop` will be called before each generation to check if the evolution should be stopped early.
+  - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
+
+  Once you have instantiated a `GAConfig` you can call it's `NewGA` method to obtain a `GA`. The `GA` struct has the following definition:
+
+type GA struct {
+    GAConfig
+
+    Populations Populations
+    HallOfFame  Individuals
+    Age         time.Duration
+    Generations uint
+}
+
+Naturally a `GA` stores a copy of the `GAConfig` that was used to instantiate it. Apart from this the following fields are available:
+
+- `Populations` is where all the current populations and individuals are kept.
+- `HallOfFame` contains the `HofSize` best individuals ever encountered. This slice is always sorted, meaning that the first element of the slice will be the best individual ever encountered.
+- `Age` indicates the duration the GA has spent evolving.
+- `Generations` indicates how many how many generations have gone by.
+
+You could bypass the `NewGA` method instantiate a `GA` with a `GAConfig` but this would leave the `GAConfig`'s fields unchecked for input errors.
+
+
+#### Calling the Minimize method
+
+You are now all set to find an optimal solution to your problem. To do so you have to call the GA's `Minimize` function which has the following signature:
+
+```go
+func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error
+```
+
+You have to provide the `Minimize` a function which returns a `Genome`. It is recommended that the `Genome` thus produced contains random values. This is where the connection between the `Genome` interface and the `GA` struct is made.
+
+The `Minimize` function will return an error (`nil` if everything went okay) once it is done. You can done access the first entry in the `HallOfFame` field to retrieve the best encountered solution.
+
+
+#### Using the Slice interface
+
+Classically GAs are used to optimize problems where the genome has a slice representation - eg. a vector or a sequence of DNA code. Almost all the mutation and crossover algorithms available in eaopt are based on the `Slice` interface which has the following definition.
 
 ```go
 type Slice interface {
@@ -263,75 +353,14 @@ type Slice interface {
 }
 ```
 
-Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators with slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and the [TSP example](https://github.com/MaxHalford/gago-examples/tree/master/tsp_grid).
+Internally `IntSlice`, `Float64Slice` and `StringSlice` implement this interface so that you can use the available operators for most use cases. If however you wish to use the operators with slices of a different type you will have to implement the `Slice` interface. Although there are many methods to implement, they are all trivial (have a look at [`slice.go`](slice.go) and the [TSP example](https://github.com/MaxHalford/eaopt-examples/tree/master/tsp_grid).
 
 
-### Instantiating a GA struct
+#### Models
 
-Let's have a look at the GA struct.
+eaopt makes it easy to use different so called *models*. Simply put, a models defines how a GA evolves a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the intrinsics of the underlying operators. In a nutshell, an evolution model attempts to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
 
-```go
-type GA struct {
-    // Required fields
-    NewGenome    NewGenome
-    NPops        int
-    PopSize      int
-    Model        Model
-
-    // Optional fields
-    NBest        int
-    Migrator     Migrator
-    MigFrequency int
-    Speciator    Speciator
-    Logger       *log.Logger
-    Callback     func(ga *GA)
-    RNG          *rand.Rand
-    ParallelEval bool
-
-    // Fields generated at runtime
-    Populations        Populations
-    HallOfFame         Individuals
-    Age                time.Duration
-    Generations        int
-}
-```
-
-You have to fill in the first set of fields, the rest are generated when calling the `GA`'s `Initialize()` method. Check out the examples in `presets.go` to get an idea of how to fill them out.
-
-- Required fields
-  - `NewGenome` is a method that returns a random `Genome` that you defined in the previous step. gago will use this method to produce initial individuals in each population. Again, gago provides some methods for common random genome generation.
-  - `NPops` determines the number of populations that will be used.
-  - `PopSize` determines the number of individuals inside each population.
-  - `Model` determines how to use the genetic operators you chose in order to produce better solutions, in other words it's a recipe. A dedicated section is available in the [model section](#models).
-- Optional fields
-  - `NBest` determines how many of the best individuals encountered should be regarded in the `HallOfFame` field. This defaults to 1.
-  - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
-  - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
-  - `Logger` is optional and provides basic population statistics, you can read more about it in the [logging section](#logging-population-statistics).
-  - `Callback` is optional will execute any piece of code you wish every time `ga.Evolve()` is called. `Callback` will also be called when `ga.Initialize()` is. Using a callback can be useful for many things:
-    - Calculating specific population statistics that are not provided by the logger
-    - Changing parameters of the GA after a certain number of generations
-    - Monitoring for converging populations
-  - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
-  - `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
-- Fields populated at runtime
-  - `Populations` is where all the current populations and individuals are kept.
-  - `HallOfFame` contains the `NBest` individuals ever encountered. This slice is always sorted, meaning that the first element of the slice will be the best individual ever encountered.
-  - `Age` indicates the duration the GA has spent calling the `Evolve` method.
-  - `Generations` indicates how many times the `Evolve` method has been called.
-
-
-### Running a GA
-
-Once you have implemented the `Genome` interface and instantiated a `GA` struct you are good to go. You can call the `GA`'s `Evolve` method which will apply a model once (see the [models section](#models)). It's your choice if you want to call `Evolve` method multiple by using a loop or by imposing a time limit. The `Evolve` method will return an `error` which you should handle. If your population does not evolve when you call `Evolve` it's most likely because `Evolve` returned an error.
-
-At any time you have access to the `GA`'s `HallOfFame` field which contains the `NBest` individuals ever encountered.
-
-### Models
-
-`gago` makes it easy to use different so called *models*. Simply put, a models tells the story of how a GA enhances a population of individuals through a sequence of genetic operators. It does so without considering whatsoever the underlying operators. In a nutshell, an evolution model attempts to mimic evolution in the real world. **It's extremely important to choose a good model because it is usually the highest influence on the performance of a GA**.
-
-#### Generational model
+##### Generational model
 
 The generational model is one the, if not the most, popular models. Simply put it generates *n* offsprings from a population of size *n* and replaces the population with the offsprings. The offsprings are generated by selecting 2 individuals from the population and applying a crossover method to the selected individuals until the *n* offsprings have been generated. The newly generated offsprings are then optionally mutated before replacing the original population. Crossover generates two new individuals, thus if the population size isn't an even number then the second individual from the last crossover (individual *n+1*) won't be included in the new population.
 
@@ -339,7 +368,7 @@ The generational model is one the, if not the most, popular models. Simply put i
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vQrkFXTHkak2GiRpDarsEIDHnsFWqXd9A98Cq2UUIR1keyMSU8NUE8af7_87KiQnmCKKBEb0IiQVsZM/pub?w=960&h=720" alt="generational" width="70%" />
 </div>
 
-#### Steady state model
+##### Steady state model
 
 The steady state model differs from the generational model in that the entire population isn't replaced between each generations. Instead of adding the children of the selected parents into the next generation, the 2 best individuals out of the two parents and two children are added back into the population so that the population size remains constant. However, one may also replace the parents with the children regardless of their fitness. This method has the advantage of not having to evaluate the newly generated offsprings. Whats more, crossover often generates individuals who are sub-par but who have a lot of potential; giving individuals generated from crossover a chance can be beneficial on the long run.
 
@@ -347,7 +376,7 @@ The steady state model differs from the generational model in that the entire po
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vTTk7b1QS67CZTr7-ksBMlk_cIDhm2YMZjemmrhXbLei5_VgvXCsINCLu8uia3ea6Ouj9I3V5HcZUwS/pub?w=962&h=499" alt="steady-state" width="70%" />
 </div>
 
-#### Select down to size model
+##### Select down to size model
 
 The select down to size model uses two selection rounds. The first one is similar to the one used in the generational model. Parents are selected to generate new individuals through crossover. However, the offsprings are then merged with the original population and a second selection round occurs to determine which individuals will survive to the next generation. Formally *m* offsprings are generated from a population of *n*, the *n+m* individuals are then "selected down to size" so that there only remains *n* individuals.
 
@@ -355,7 +384,7 @@ The select down to size model uses two selection rounds. The first one is simila
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vSyXQLPkWOOffKfnTRcdwrKvHTN9rWvdqGVT1fC6vcXGJAQPzxQVmauYLhSd2Xh74vQMhBEnhrSt1od/pub?w=969&h=946" alt="select-down-to-size" width="70%" />
 </div>
 
-#### Ring model
+##### Ring model
 
 In the ring model, crossovers are applied to neighbours in a one-directional ring topology. Two by the two neighbours generate 2 offsprings. The best out of the 4 individuals (2 parents + 2 offsprings) replaces the first neighbour.
 
@@ -363,17 +392,11 @@ In the ring model, crossovers are applied to neighbours in a one-directional rin
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vTCsgqnEXj4KCn_C7IxHZXSw9XMP3RK_YeW5AoVKUSRHzq6CIFlp7fbBA-DK9mtFV330kROwrEsP6tj/pub?w=960&h=625" alt="ring" width="70%" />
 </div>
 
-#### Simulated annealing
-
-Although [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) isn't a genetic algorithm, it can nonetheless be implemented with gago. A mutator is the only necessary operator. Other than that a starting temperature, a stopping temperature and a decrease rate have to be provided. Effectively a single simulated annealing is run for each individual in the population.
-
-The temperature evolution is relative to one single generation. In order to mimic the original simulated annealing algorithm, one would the number of individuals to 1 and would run the algorithm for only 1 generation. However, nothing stops you from running many simulated annealings and to repeat them over many generations.
-
-#### Mutation only
+##### Mutation only
 
 It's possible to run a GA without crossover simply by mutating individuals. Essentially this boils down to doing [hill climbing](https://www.wikiwand.com/en/Hill_climbing) because there is not interaction between individuals. Indeed taking a step in hill climbing is equivalent to mutation for genetic algorithms. What's nice is that by using a population of size n you are essentially running multiple independent hill climbs.
 
-### Speciation
+#### Speciation
 
 Clusters, also called speciation in the literature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the literature, speciation is also called *speciation*.
 
@@ -381,31 +404,28 @@ The purpose of a partitioning individuals is to apply genetic operators to simil
 
 Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely disappear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't disappear immediately. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
-With gago it's possible to use speciation on top of all the rest. To do so the `Speciator` field of the `GA` struct has to specified.
+With eaopt it's possible to use speciation on top of all the rest. To do so the `Speciator` field of the `GA` struct has to specified.
 
 <div align="center">
   <img src="https://docs.google.com/drawings/d/e/2PACX-1vRLr7j4ML-ZeXFfvjko9aepRAkCgBlpg4dhuWhB-vXCQ17gJFmDQHrcUbcPFwlqzvaPAXwDxx5ld1kf/pub?w=686&h=645" alt="speciation" width="70%" />
 </div>
 
-### Multiple populations and migration
+#### Multiple populations and migration
 
-Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In gago a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `NPops` field.
+Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In eaopt a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `NPops` field.
 
 If `Migrator` and `MigFrequency` are not provided the populations will be run independently, in parallel. However, if they are provided then at each generation number that is divisible by `MigFrequency` (for example 5 divides generation number 25) individuals will be exchanged between the populations following the `Migrator` protocol.
 
 Using multi-populations can be an easy way to gain in diversity. Moreover, not using multi-populations on a multi-core architecture is a waste of resources.
 
-With gago you can use multi-populations and speciation at the same time. The following flowchart shows what that would look like.
+With eaopt you can use multi-populations and speciation at the same time. The following flowchart shows what that would look like.
 
 <div align="center">
   <img src="https://docs.google.com/drawings/d/14VVpTkWquhrcG_oQ61hvZgjKlYWZs_UZRVnL22HFYKM/pub?w=1052&h=607" alt="multi-population_and_speciation" width="70%" />
 </div>
 
-### Presets
 
-Some preset GA instances are available to get started as fast as possible. They are available in the [presets.go](presets.go) file. These instances also serve as example instantiations of the GA struct. To obtain optimal solutions you should fill in the fields manually!
-
-### Logging population statistics
+#### Logging population statistics
 
 It's possible to log statistics for each population at every generation. To do so you simply have to provide the `GA` struct a `Logger` from the Go standard library. This is quite convenient because it allows you to decide where to write the log output, whether it be in a file or directly in the standard output.
 
@@ -421,6 +441,162 @@ If a logger is provided, each row in the log output will include
 - the population average fitness,
 - the population's fitness standard deviation.
 
+### Particle swarm optimization
+
+#### Description
+
+[Particle swarm optimization (PSO)](https://www.wikiwand.com/en/Particle_swarm_optimization) can be used to optimize real valued functions. It maintains a population of candidate solutions called particles. The particles move around the search-space according to a mathematical formula that takes as input the particle's position and it's velocity. Each particle's movement is influenced by itss local best encountered position, as well as the best overall position in the search-space (these values are updated after each generation). This is expected to move the swarm toward the best solutions.
+
+As can be expected there are many variants of PSO. The `SPSO` struct implements the [SPSO-2011 standard](http://clerc.maurice.free.fr/pso/SPSO_descriptions.pdf).
+
+#### Example
+
+In this example we're going to minimize th [Styblinski-Tang function](https://www.sfu.ca/~ssurjano/stybtang.html) with two dimensions. The global minimum is around -39.16599 times the number of dimensions.
+
+```go
+package main
+
+import (
+    "fmt"
+    m "math"
+    "math/rand"
+
+    "github.com/MaxHalford/eaopt"
+)
+
+func StyblinskiTang(X []float64) (y float64) {
+    for _, x := range X {
+        y += m.Pow(x, 4) - 16*m.Pow(x, 2) + 5*x
+    }
+    return 0.5 * y
+}
+
+func main() {
+    // Instantiate SPSO
+    var spso, err = eaopt.NewDefaultSPSO()
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Fix random number generation
+    spso.GA.RNG = rand.New(rand.NewSource(42))
+
+    // Run minimization
+    _, y, err := spso.Minimize(StyblinskiTang, 2)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Output best encountered solution
+    fmt.Printf("Found minimum of %.5f, the global minimum is %.5f\n", y, -39.16599*2)
+}
+```
+
+This should produce the following output.
+
+```sh
+>>> Found minimum of -78.23783, the global minimum is -78.33198
+```
+
+#### Parameters
+
+You can (and should) instantiate an `SPSO` with the `NewSPSO` method. You can also use the `NewDefaultSPSO` method as is done in the previous example.
+
+```go
+func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *rand.Rand) (*SPSO, error)
+```
+
+- `nParticles` is the number of particles to use
+- `nSteps` is the number of steps during which evolution occurs
+- `min` and `max` are the boundaries from which the initial values are sampled from
+- `w` is the velocity amplifier
+- `parallel` determines if the particles are evaluated in parallel or not
+- `rng` is a random number generator, you can set it to `nil` if you don't care for reproducibility
+
+### Differential evolution
+
+#### Description
+
+[Differential evolution (DE)](https://www.wikiwand.com/en/Differential_evolution) somewhat ressembles PSO and is also used for optimizing real-valued functions. At each generation, each so-called agent is moved according to the position of 3 randomly sampled agents. If the new position is not better than the current one then it is discarded.
+
+As can be expected there are many variants of PSO. The `SPSO` struct implements the [SPSO-2011 standard](http://clerc.maurice.free.fr/pso/SPSO_descriptions.pdf).
+
+#### Example
+
+In this example we're going to minimize th [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is around 0.
+
+```go
+package main
+
+import (
+  "fmt"
+  m "math"
+  "math/rand"
+
+  "github.com/MaxHalford/eaopt"
+)
+
+func Ackley(X []float64) float64 {
+    var (
+        a, b, c = 20.0, 0.2, 2 * m.Pi
+        s1, s2      float64
+        float64
+        d = float64(len(X))
+    )
+    for _, x := range X {
+        s1 += x * x
+        s2 += m.Cos(c * x)
+    }
+    return -a*m.Exp(-b*m.Sqrt(s1/d)) - m.Exp(s2/d) + a + m.Exp(1)
+}
+
+func main() {
+    // Instantiate SPSO
+    var de, err = eaopt.NewDefaultDiffEvo()
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Fix random number generation
+    de.GA.RNG = rand.New(rand.NewSource(42))
+
+    // Run minimization
+    _, y, err := de.Minimize(Ackley, 2)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Output best encountered solution
+    fmt.Printf("Found minimum of %.5f, the global minimum is 0\n", y)
+}
+```
+
+This should produce the following output.
+
+```sh
+>>> Found minimum of 0.00051, the global minimum is 0
+```
+
+#### Parameters
+
+You can (and should) instantiate an `DiffEvo` with the `NewDiffEvo` method. You can also use the `NewDefaultDiffEvo` method as is done in the previous example.
+
+```go
+func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel bool, rng *rand.Rand) (*DiffEvo, error)
+```
+
+- `nAgents` is the number of agents to use (it has to be at least 4)
+- `nSteps` is the number of steps during which evolution occurs
+- `min` and `max` are the boundaries from which the initial values are sampled from
+- `cRate` is the crossover rate
+- `dWeight` is the differential weight
+- `parallel` determines if the agents are evaluated in parallel or not
+- `rng` is a random number generator, you can set it to `nil` if you don't care for reproducibility
+
 
 ## A note on parallelism
 
@@ -428,7 +604,7 @@ Genetic algorithms are famous for being [embarrassingly parallel](https://www.wi
 
 The Go language provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are "heavy". If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
 
-By default gago will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
+By default eaopt will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
 
 
 ## FAQ
@@ -440,11 +616,9 @@ Alas you still have to implement the `Genome` interface. You can however provide
 ```go
 type Vector []float64
 
-func (X Vector) Crossover(Y gago.Genome, rng *rand.Rand) (gago.Genome, gago.Genome) {
+func (X Vector) Crossover(Y eaopt.Genome, rng *rand.Rand) {
 }
 ```
-
-Or you can set `CrossRate: 0` when initializing the GA model.
 
 
 **Why aren't my `Mutate` and `Crossover` methods modifying my `Genome`s?**
@@ -455,7 +629,7 @@ The `Mutate` and `Crossover` methods have to modify the values of the `Genome` i
 type Vector []float64
 
 func (X Vector) Mutate(rng *rand.Rand) {
-    gago.MutNormal(X, rng, 0.5)
+    eaopt.MutNormal(X, rng, 0.5)
 }
 ```
 
@@ -470,22 +644,23 @@ func (n *Name) Mutate(rng *rand.Rand) {
 ```
 
 
-**Should I be using genetic algorithms?**
+**Are evolutionary optimization algorithms any good?**
 
-Genetic algorithms (GAs) are often used for [NP-hard problems](https://www.wikiwand.com/en/NP-hardness). They *usually* perform better than [hill climbing](https://www.wikiwand.com/en/Hill_climbing) and [simulated annealing](https://www.wikiwand.com/en/Simulated_annealing) because they explore the search space more intelligently. However, GAs can also be used for classical problems where the search space makes it difficult for, say, gradient algorithms to be efficient (like the introductory example).
+For real-valued, differentiable functions, evolutionary optimization algorithms will probably not fair well against methods  based on gradient descent. Intuitively this is because evolutionary optimization algorithms ignore the shape and slope of the function. However gradient descent algorithms usually get stuck in local optimas, whereas evolutionary optimization algorithms don't.
 
-As mentioned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). For example tuning the number of layers and of neurons per layer in a neural network is an open problem that doesn't yet have a reliable solution. Neural networks architectures used in production are usually designed by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms. As such genetic algorithms are a good candidate for training neural networks, usually by optimizing the network's topology.
+As mentioned earlier, some problems can simply not be written down as [closed-form expressions](https://www.wikiwand.com/en/Closed-form_expression). In this case methods based on gradient information can't be used whilst evolutionary optimization algorithms can still be used. For example tuning the number of layers and of neurons per layer in a neural network is an open problem that doesn't yet have a reliable solution. Neural networks architectures used in production are usually designed by human experts. The field of [neuroevolution](https://www.wikiwand.com/en/Neuroevolution) aims to train neural networks with evolutionary algorithms.
 
 **How can I contribute?**
 
-Feel free to implement your own operators or to make suggestions! Check out the [CONTRIBUTING file](CONTRIBUTING.md) for some guidelines.
+Feel free to implement your own operators or to make suggestions! Check out the [CONTRIBUTING file](CONTRIBUTING.md) for some guidelines. [This repository](https://github.com/fcampelo/EC-Bestiary) has a long list of existing evolutionary algorithms.
 
 
 ## Dependencies
 
-You can see the list of dependencies [here](https://godoc.org/github.com/MaxHalford/gago?imports) and the graph view [here](https://godoc.org/github.com/MaxHalford/gago?import-graph). Here is the list of external dependencies:
+You can see the list of dependencies [here](https://godoc.org/github.com/MaxHalford/eaopt?imports) and the graph view [here](https://godoc.org/github.com/MaxHalford/eaopt?import-graph). Here is the list of external dependencies:
 
 - [golang.org/x/sync/errgroup](https://godoc.org/golang.org/x/sync/errgroup)
+
 
 ## License
 

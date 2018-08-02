@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"math"
@@ -34,7 +34,7 @@ func (indis Individuals) Clone(rng *rand.Rand) Individuals {
 }
 
 // Generate a slice of n new individuals.
-func newIndividuals(n int, newGenome NewGenome, rng *rand.Rand) Individuals {
+func newIndividuals(n uint, newGenome func(rng *rand.Rand) Genome, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, n)
 	for i := range indis {
 		indis[i] = NewIndividual(newGenome(rng), rng)
@@ -64,7 +64,7 @@ func (indis Individuals) Evaluate(parallel bool) error {
 
 	for a := 0; a < n; a += chunkSize {
 		a := a // https://golang.org/doc/faq#closures_and_goroutines
-		var b = min(a+chunkSize, n)
+		var b = minInt(a+chunkSize, n)
 		g.Go(func() error {
 			return indis[a:b].Evaluate(false)
 		})

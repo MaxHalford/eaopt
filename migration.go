@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type Migrator interface {
 // number of individuals in each population, else all the individuals will
 // migrate and it will be as if nothing happened.
 type MigRing struct {
-	NMigrants int // Number of migrants per exchange between Populations
+	NMigrants uint // Number of migrants per exchange between Populations
 }
 
 // Apply MigRing.

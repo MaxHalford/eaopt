@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import "testing"
 
@@ -12,20 +12,20 @@ func TestMigSizes(t *testing.T) {
 		}
 	)
 	for _, migrator := range migrators {
-		for _, nbrPops := range []int{2, 3, 10} {
-			var fitnessMeans = make([]float64, nbrPops)
-			for _, nbrIndis := range []int{6, 10, 30} {
+		for _, nPops := range []uint{2, 3, 10} {
+			var fitnessMeans = make([]float64, nPops)
+			for _, popSize := range []uint{6, 10, 30} {
 				// Instantiate populations
-				var pops = make([]Population, nbrPops)
+				var pops = make([]Population, nPops)
 				for i := range pops {
-					pops[i] = newPopulation(nbrIndis, NewVector, rng)
+					pops[i] = newPopulation(popSize, NewVector, rng)
 					pops[i].Individuals.Evaluate(false)
 					fitnessMeans[i] = pops[i].Individuals.FitAvg()
 				}
 				migrator.Apply(pops, rng)
 				// Check the Population sizes haven't changed
 				for _, pop := range pops {
-					if len(pop.Individuals) != nbrIndis {
+					if len(pop.Individuals) != int(popSize) {
 						t.Error("Migration changed the Population sizes")
 					}
 				}

@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 func TestInitUnifFloat64(t *testing.T) {
 	var (
 		testCases = []struct {
-			n      int
+			n      uint
 			bounds struct{ lower, upper float64 }
 		}{
 			{
@@ -43,7 +43,7 @@ func TestInitUnifFloat64(t *testing.T) {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
 			var vector = InitUnifFloat64(tc.n, tc.bounds.lower, tc.bounds.upper, rng)
 			// Check length
-			if len(vector) != tc.n {
+			if len(vector) != int(tc.n) {
 				t.Error("InitUnifFloat64 didn't produce the right number of values")
 			}
 			// Check values are bounded
@@ -58,7 +58,7 @@ func TestInitUnifFloat64(t *testing.T) {
 
 func TestInitJaggFloat64(t *testing.T) {
 	var (
-		N   = []int{0, 1, 2, 42}
+		N   = []uint{0, 1, 2, 42}
 		rng = newRand()
 	)
 	for _, n := range N {
@@ -67,14 +67,14 @@ func TestInitJaggFloat64(t *testing.T) {
 			upper = make([]float64, n)
 		)
 
-		for i := 0; i < n; i++ {
+		for i := uint(0); i < n; i++ {
 			lower[i] = 0.0 + rng.Float64()*100.0
 			upper[i] = lower[i] + rng.Float64()*100.0
 		}
 
 		var vector = InitJaggFloat64(n, lower, upper, rng)
 		// Check length
-		if len(vector) != n {
+		if len(vector) != int(n) {
 			t.Error("InitJaggFloat64 didn't produce the right number of values")
 		}
 		// Check values are bounded
@@ -88,8 +88,8 @@ func TestInitJaggFloat64(t *testing.T) {
 
 func TestInitNormFloat64(t *testing.T) {
 	var rng = newRand()
-	for _, n := range []int{0, 1, 2, 42} {
-		if len(InitNormFloat64(n, 0, 1, rng)) != n {
+	for _, n := range []uint{0, 1, 2, 42} {
+		if len(InitNormFloat64(n, 0, 1, rng)) != int(n) {
 			t.Error("InitNormFloat64 didn't produce the right number of values")
 		}
 	}
@@ -100,9 +100,9 @@ func TestInitUnifString(t *testing.T) {
 		rng    = newRand()
 		corpus = strings.Split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
 	)
-	for _, n := range []int{0, 1, 2, 42} {
+	for _, n := range []uint{0, 1, 2, 42} {
 		var genome = InitUnifString(n, corpus, rng)
-		if len(genome) != n {
+		if len(genome) != int(n) {
 			t.Error("InitUnifString didn't produce the right number of values")
 		}
 		// Check the values are part of the corpus
@@ -126,9 +126,9 @@ func TestInitUniqueString(t *testing.T) {
 		rng    = newRand()
 		corpus = strings.Split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
 	)
-	for _, n := range []int{0, 1, 2, 42} {
+	for _, n := range []uint{0, 1, 2, 42} {
 		var genome = InitUniqueString(n, corpus, rng)
-		if len(genome) != n {
+		if len(genome) != int(n) {
 			t.Error("InitUniqueString didn't produce the right number of values")
 		}
 		// Check the values are part of the corpus

@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"log"
@@ -14,13 +14,13 @@ import (
 type Population struct {
 	Individuals Individuals   `json:"indis"`
 	Age         time.Duration `json:"age"`
-	Generations int           `json:"generations"`
+	Generations uint          `json:"generations"`
 	ID          string        `json:"id"`
 	RNG         *rand.Rand
 }
 
 // Generate a new population.
-func newPopulation(size int, newGenome NewGenome, RNG *rand.Rand) Population {
+func newPopulation(size uint, newGenome func(rng *rand.Rand) Genome, RNG *rand.Rand) Population {
 	var (
 		popRNG = rand.New(rand.NewSource(RNG.Int63()))
 		pop    = Population{

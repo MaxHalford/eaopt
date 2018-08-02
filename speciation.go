@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -17,16 +17,16 @@ type Speciator interface {
 
 // SpecKMedoids (k-medoid clustering).
 type SpecKMedoids struct {
-	K             int // Number of medoids
-	MinPerCluster int
+	K             uint // Number of medoids
+	MinPerCluster uint
 	Metric        Metric // Dissimimilarity measure
-	MaxIterations int
+	MaxIterations uint
 }
 
 // Apply SpecKMedoids.
 func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
 	// Check there are at least K Individuals
-	if len(indis) < spec.K {
+	if len(indis) < int(spec.K) {
 		return nil, fmt.Errorf("SpecKMedoids: have %d individuals and need at least %d",
 			len(indis), spec.K)
 	}
@@ -53,7 +53,7 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 		species[i] = append(species[i], indi)
 		total += dm.GetDistance(medoids[i], indi)
 	}
-	var nIterations int
+	var nIterations uint
 	for nIterations < spec.MaxIterations {
 		nIterations++
 		var (
@@ -107,23 +107,23 @@ func (spec SpecKMedoids) Validate() error {
 // individuals (3*8 + 1*6 = 30). More generally each group is of size
 // min(n-i, m) where i is a multiple of m.
 type SpecFitnessInterval struct {
-	K int // Number of intervals
+	K uint // Number of intervals
 }
 
 // Apply SpecFitnessInterval.
 func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
 	// Check there are at least K Individuals
-	if len(indis) < spec.K {
+	if len(indis) < int(spec.K) {
 		return nil, fmt.Errorf("SpecFitnessInterval: have %d individuals and need at least %d",
 			len(indis), spec.K)
 	}
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)
-		m       = min(int(math.Ceil(float64(n/spec.K))), n)
+		m       = minInt(int(math.Ceil(float64(n/int(spec.K)))), n)
 	)
 	for i := range species {
-		var a, b = i * m, min((i+1)*m, n)
+		var a, b = i * m, minInt((i+1)*m, n)
 		species[i] = indis[a:b]
 	}
 	return species, nil

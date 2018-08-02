@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"math/rand"
@@ -51,24 +51,24 @@ func gnx(p1, p2 Slice, indexes []int) {
 // each parent's genome and the mirroring segments are switched. n determines
 // the number of crossovers (aka mirroring segments) to perform. n has to be
 // equal or lower than the number of genes in each parent.
-func CrossGNX(p1 Slice, p2 Slice, n int, rng *rand.Rand) {
+func CrossGNX(p1 Slice, p2 Slice, n uint, rng *rand.Rand) {
 	var indexes = randomInts(n, 1, p1.Len(), rng)
 	sort.Ints(indexes)
 	gnx(p1, p2, indexes)
 }
 
 // CrossGNXInt calls CrossGNX on two int slices.
-func CrossGNXInt(s1 []int, s2 []int, n int, rng *rand.Rand) {
+func CrossGNXInt(s1 []int, s2 []int, n uint, rng *rand.Rand) {
 	CrossGNX(IntSlice(s1), IntSlice(s2), n, rng)
 }
 
 // CrossGNXFloat64 calls CrossGNX on two float64 slices.
-func CrossGNXFloat64(s1 []float64, s2 []float64, n int, rng *rand.Rand) {
+func CrossGNXFloat64(s1 []float64, s2 []float64, n uint, rng *rand.Rand) {
 	CrossGNX(Float64Slice(s1), Float64Slice(s2), n, rng)
 }
 
 // CrossGNXString calls CrossGNX on two string slices.
-func CrossGNXString(s1 []string, s2 []string, n int, rng *rand.Rand) {
+func CrossGNXString(s1 []string, s2 []string, n uint, rng *rand.Rand) {
 	CrossGNX(StringSlice(s1), StringSlice(s2), n, rng)
 }
 

@@ -40,4 +40,4 @@ Genetic algorithms are notorious for being [embarrassingly parallel](http://www.
 ## Performance
 
 1. `go test -bench . -cpuprofile=cpu.prof`
-2. `go tool pprof -pdf gago.test cpu.prof > profile.pdf`
+2. `go tool pprof -pdf eaopt.test cpu.prof > profile.pdf`

@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -58,7 +58,7 @@ func TestSpecKMedoidsApply(t *testing.T) {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
 			var species, err = tc.kmeds.Apply(tc.indis, rng)
 			// Check the number of species is correct
-			if err == nil && len(species) != tc.kmeds.K {
+			if err == nil && len(species) != int(tc.kmeds.K) {
 				t.Error("Wrong number of species")
 			}
 			// Check size of each specie
@@ -103,14 +103,14 @@ func TestSpecKMedoidsValidate(t *testing.T) {
 
 func TestSpecFitnessIntervalApply(t *testing.T) {
 	var (
-		nIndividuals = []int{1, 2, 3}
-		nSpecies     = []int{1, 2, 3}
+		nIndividuals = []uint{1, 2, 3}
+		nSpecies     = []uint{1, 2, 3}
 		rng          = newRand()
 	)
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {
 			var (
-				m          = min(int(math.Ceil(float64(nbi/nbs))), nbi)
+				m          = minInt(int(math.Ceil(float64(nbi/nbs))), int(nbi))
 				indis      = newIndividuals(nbi, NewVector, rng)
 				spec       = SpecFitnessInterval{K: nbs}
 				species, _ = spec.Apply(indis, rng)
@@ -119,7 +119,7 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 			// multiple of m
 			for i, specie := range species {
 				var (
-					expected = min(nbi-i*m, m)
+					expected = minInt(int(nbi)-i*m, m)
 					obtained = len(specie)
 				)
 				if obtained != expected {

@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -72,8 +72,8 @@ func TestRebalanceClusters(t *testing.T) {
 	var testCases = []struct {
 		clusters        []Individuals
 		dm              DistanceMemoizer
-		minClusterSize  int
-		newClusterSizes []int
+		minClusterSize  uint
+		newClusterSizes []uint
 		err             error
 	}{
 		{
@@ -94,7 +94,7 @@ func TestRebalanceClusters(t *testing.T) {
 			},
 			dm:              newDistanceMemoizer(l1Distance),
 			minClusterSize:  2,
-			newClusterSizes: []int{3, 2, 2},
+			newClusterSizes: []uint{3, 2, 2},
 			err:             nil,
 		},
 		{
@@ -107,7 +107,7 @@ func TestRebalanceClusters(t *testing.T) {
 			},
 			dm:              newDistanceMemoizer(l1Distance),
 			minClusterSize:  1,
-			newClusterSizes: []int{2, 0},
+			newClusterSizes: []uint{2, 0},
 			err:             errors.New("Cluster number 2 is empty"),
 		},
 		{
@@ -122,7 +122,7 @@ func TestRebalanceClusters(t *testing.T) {
 			},
 			dm:              newDistanceMemoizer(l1Distance),
 			minClusterSize:  2,
-			newClusterSizes: []int{2, 0},
+			newClusterSizes: []uint{2, 0},
 			err:             errors.New("Not enough individuals to rebalance"),
 		},
 	}
@@ -136,7 +136,7 @@ func TestRebalanceClusters(t *testing.T) {
 			// Check new cluster sizes
 			if err == nil {
 				for j, cluster := range tc.clusters {
-					if len(cluster) != tc.newClusterSizes[j] {
+					if len(cluster) != int(tc.newClusterSizes[j]) {
 						t.Errorf("Wrong new cluster size in test case number %d", i)
 					}
 				}

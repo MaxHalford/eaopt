@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ func TestMin(t *testing.T) {
 		[]int{2, 3},
 	}
 	for _, test := range testCases {
-		if min(test[0], test[1]) != test[0] {
+		if minInt(test[0], test[1]) != test[0] {
 			t.Error("min didn't find the smallest integer")
 		}
 	}

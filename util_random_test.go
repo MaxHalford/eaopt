@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -14,7 +14,8 @@ func TestRandomInts(t *testing.T) {
 		src       = rand.NewSource(time.Now().UnixNano())
 		rng       = rand.New(src)
 		testCases = []struct {
-			k, min, max int
+			k        uint
+			min, max int
 		}{
 			{1, 0, 1},
 			{1, 0, 2},
@@ -25,7 +26,7 @@ func TestRandomInts(t *testing.T) {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
 			var ints = randomInts(tc.k, tc.min, tc.max, rng)
 			// Check the number of generated integers
-			if len(ints) != tc.k {
+			if len(ints) != int(tc.k) {
 				t.Error("randomInts didn't generate the right number of integers")
 			}
 			// Check the bounds of each generated integer
@@ -49,7 +50,7 @@ func TestRandomInts(t *testing.T) {
 func TestSampleInts(t *testing.T) {
 	var testCases = []struct {
 		ints []int
-		k    int
+		k    uint
 		err  error
 	}{
 		{
@@ -85,7 +86,7 @@ func TestSampleInts(t *testing.T) {
 			if (err == nil) != (tc.err == nil) {
 				t.Error("Error")
 			} else {
-				if err == nil && (len(ints) != tc.k || len(idxs) != tc.k) {
+				if err == nil && (len(ints) != int(tc.k) || len(idxs) != int(tc.k)) {
 					t.Error("Error")
 				}
 			}

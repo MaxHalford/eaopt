@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func calcAvgDistances(indis Individuals, dm DistanceMemoizer) map[string]float64
 	return avgDistances
 }
 
-func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluster int) error {
+func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluster uint) error {
 	// Calculate the number of missing Individuals per cluster for each cluster
 	// to reach at least minPerCluster Individuals.
 	var missing = make([]int, len(clusters))
@@ -77,7 +77,7 @@ func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluste
 			return fmt.Errorf("Cluster %d has 0 individuals", i)
 		}
 		// Calculate the number of missing Individual in the cluster to reach minPerCluster
-		missing[i] = minPerCluster - len(cluster)
+		missing[i] = int(minPerCluster) - len(cluster)
 	}
 	// Check if there are enough Individuals to rebalance the clusters.
 	if sumInts(missing) >= 0 {

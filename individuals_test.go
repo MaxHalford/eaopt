@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"fmt"
@@ -40,9 +40,9 @@ func TestIndividualsString(t *testing.T) {
 
 func TestNewIndividuals(t *testing.T) {
 	var rng = newRand()
-	for _, n := range []int{1, 2, 42} {
+	for _, n := range []uint{1, 2, 42} {
 		var indis = newIndividuals(n, NewVector, rng)
-		if len(indis) != n {
+		if len(indis) != int(n) {
 			t.Error("newIndividuals didn't generate the right number of individuals")
 		}
 	}

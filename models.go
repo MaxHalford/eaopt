@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ var (
 // applied to generate two offsprings. The selection and crossover process is
 // repeated until n offsprings have been generated. If n is uneven then the
 // second offspring of the last crossover is discarded.
-func generateOffsprings(n int, indis Individuals, sel Selector, crossRate float64, rng *rand.Rand) (Individuals, error) {
+func generateOffsprings(n uint, indis Individuals, sel Selector, crossRate float64, rng *rand.Rand) (Individuals, error) {
 	var (
 		offsprings = make(Individuals, n)
 		i          = 0
@@ -62,7 +62,7 @@ type ModGenerational struct {
 func (mod ModGenerational) Apply(pop *Population) error {
 	// Generate as many offsprings as there are of individuals in the current population
 	var offsprings, err = generateOffsprings(
-		len(pop.Individuals),
+		uint(len(pop.Individuals)),
 		pop.Individuals,
 		mod.Selector,
 		mod.CrossRate,
@@ -169,7 +169,7 @@ func (mod ModSteadyState) Validate() error {
 
 // ModDownToSize implements the select down to size model.
 type ModDownToSize struct {
-	NOffsprings int
+	NOffsprings uint
 	SelectorA   Selector
 	SelectorB   Selector
 	MutRate     float64
@@ -196,7 +196,7 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size
-	var selected, _, _ = mod.SelectorB.Apply(len(pop.Individuals), offsprings, pop.RNG)
+	var selected, _, _ = mod.SelectorB.Apply(uint(len(pop.Individuals)), offsprings, pop.RNG)
 	// Replace the current population of individuals
 	copy(pop.Individuals, selected)
 	return nil
@@ -340,28 +340,21 @@ func (mod ModSimAnn) Validate() error {
 	return nil
 }
 
-// ModMutationOnly implements the mutation only model. Each generation,
-// NChosen Undividuals are selected and replaced with mutants. Mutants are
-// obtained by mutating the selected Individuals. If Strict is true then the
-// mutants replace the chosen individuals only if they have a lower fitness.
+// ModMutationOnly implements the mutation only model. Each generation, all the
+// Individuals are mutated. If Strict is true then the individuals are only
+// replaced if the mutation is favorable.
 type ModMutationOnly struct {
-	NChosen  int
-	Selector Selector
-	Strict   bool
+	Strict bool
 }
 
 // Apply ModMutationOnly.
 func (mod ModMutationOnly) Apply(pop *Population) error {
-	var selected, positions, err = mod.Selector.Apply(mod.NChosen, pop.Individuals, pop.RNG)
-	if err != nil {
-		return err
-	}
-	for i, indi := range selected {
+	for i, indi := range pop.Individuals {
 		var mutant = indi.Clone(pop.RNG)
 		mutant.Mutate(pop.RNG)
 		mutant.Evaluate()
 		if !mod.Strict || (mod.Strict && mutant.Fitness < indi.Fitness) {
-			pop.Individuals[positions[i]] = mutant
+			pop.Individuals[i] = mutant
 		}
 	}
 	return nil
@@ -369,18 +362,5 @@ func (mod ModMutationOnly) Apply(pop *Population) error {
 
 // Validate ModMutationOnly fields.
 func (mod ModMutationOnly) Validate() error {
-	// Check the number of chosen individuals value
-	if mod.NChosen < 1 {
-		return errors.New("NChosen should be higher than 0")
-	}
-	// Check the selector presence
-	if mod.Selector == nil {
-		return errNilSelector
-	}
-	// Check the selection method parameters
-	var errSelector = mod.Selector.Validate()
-	if errSelector != nil {
-		return errSelector
-	}
 	return nil
 }

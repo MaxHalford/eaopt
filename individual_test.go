@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"fmt"

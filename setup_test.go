@@ -1,36 +1,10 @@
-package gago
+package eaopt
 
 import (
 	"errors"
-	"log"
 	"math"
 	"math/rand"
-	"os"
-	"time"
 )
-
-var newGA = func() GA {
-	return GA{
-		NewGenome: NewVector,
-		NPops:     2,
-		PopSize:   50,
-		Model: ModGenerational{
-			Selector: SelTournament{
-				NContestants: 3,
-			},
-			MutRate: 0.5,
-		},
-		Migrator:     MigRing{10},
-		MigFrequency: 3,
-		RNG:          rand.New(rand.NewSource(42)),
-		Logger:       log.New(os.Stdin, "", log.Ldate|log.Ltime),
-	}
-}
-
-// newRand returns a new random number generator with a random seed.
-func newRand() *rand.Rand {
-	return rand.New(rand.NewSource(time.Now().UnixNano()))
-}
 
 type Vector []float64
 

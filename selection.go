@@ -1,4 +1,4 @@
-package gago
+package eaopt
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 // Selector chooses a subset of size n from a group of individuals. The group of
 // individuals a Selector is applied to is expected to be sorted.
 type Selector interface {
-	Apply(n int, indis Individuals, rng *rand.Rand) (selected Individuals, indexes []int, err error)
+	Apply(n uint, indis Individuals, rng *rand.Rand) (selected Individuals, indexes []int, err error)
 	Validate() error
 }
 
@@ -18,7 +18,7 @@ type Selector interface {
 type SelElitism struct{}
 
 // Apply SelElitism.
-func (sel SelElitism) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+func (sel SelElitism) Apply(n uint, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
 	indis.SortByFitness()
 	return indis[:n].Clone(rng), newInts(n), nil
 }
@@ -31,15 +31,15 @@ func (sel SelElitism) Validate() error {
 // SelTournament samples individuals through tournament selection. The
 // tournament is composed of randomly chosen individuals. The winner of the
 // tournament is the chosen individual with the lowest fitness. The obtained
-// individuals are all distinct.
+// individuals are all distinct, in other words there are no repetitions.
 type SelTournament struct {
-	NContestants int
+	NContestants uint
 }
 
 // Apply SelTournament.
-func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+func (sel SelTournament) Apply(n uint, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
 	// Check that the number of individuals is large enough
-	if len(indis)-n < sel.NContestants-1 {
+	if uint(len(indis))-n < sel.NContestants-1 || len(indis) < int(n) {
 		return nil, nil, fmt.Errorf("Not enough individuals to select %d "+
 			"with NContestants = %d, have %d individuals and need at least %d",
 			n, sel.NContestants, len(indis), sel.NContestants+n-1)
@@ -47,7 +47,7 @@ func (sel SelTournament) Apply(n int, indis Individuals, rng *rand.Rand) (Indivi
 	var (
 		winners         = make(Individuals, n)
 		indexes         = make([]int, n)
-		notSelectedIdxs = newInts(len(indis))
+		notSelectedIdxs = newInts(uint(len(indis)))
 	)
 	for i := range winners {
 		// Sample contestants
@@ -95,7 +95,7 @@ func buildWheel(fitnesses []float64) []float64 {
 }
 
 // Apply SelRoulette.
-func (sel SelRoulette) Apply(n int, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
+func (sel SelRoulette) Apply(n uint, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
 	var (
 		selected = make(Individuals, n)
 		indexes  = make([]int, n)
