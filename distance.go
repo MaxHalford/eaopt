@@ -29,7 +29,7 @@ func newDistanceMemoizer(metric Metric) DistanceMemoizer {
 // so that if GetDistance is called twice with the two same Individuals then
 // the second call will return the stored distance instead of recomputing it.
 func (dm *DistanceMemoizer) GetDistance(a, b Individual) float64 {
-	// Check if the two individuals are the same before proceding
+	// Check if the two individuals are the same before proceeding
 	if a.ID == b.ID {
 		return 0
 	}

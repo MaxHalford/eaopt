@@ -153,6 +153,7 @@ func (pso *SPSO) newParticle(rng *rand.Rand) Genome {
 	return &Particle{
 		CurrentX: X,
 		BestX:    copyFloat64s(X),
+		BestY:    math.Inf(1),
 		SPSO:     pso,
 		Velocity: velocity,
 	}
