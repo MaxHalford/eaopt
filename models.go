@@ -2,7 +2,6 @@ package eaopt
 
 import (
 	"errors"
-	"math"
 	"math/rand"
 )
 
@@ -285,56 +284,6 @@ func (mod ModRing) Validate() error {
 	}
 	// Check the mutation rate in the presence of a mutator
 	if mod.MutRate < 0 || mod.MutRate > 1 {
-		return errInvalidMutRate
-	}
-	return nil
-}
-
-// ModSimAnn implements simulated annealing. Enhancing a GA with the ModSimAnn
-// model only has to be done once for the simulated annealing to do a complete
-// run. Successive enhancements will simply reset the temperature and run the
-// simulated annealing again (which can potentially stagnate).
-type ModSimAnn struct {
-	T     float64 // Starting temperature
-	Tmin  float64 // Stopping temperature
-	Alpha float64 // Decrease rate per iteration
-}
-
-// Apply ModSimAnn.
-func (mod ModSimAnn) Apply(pop *Population) error {
-	// Continue until having reached the minimum temperature
-	for mod.T > mod.Tmin {
-		for i, indi := range pop.Individuals {
-			// Generate a random neighbour through mutation
-			var neighbour = indi.Clone(pop.RNG)
-			neighbour.Mutate(pop.RNG)
-			neighbour.Evaluate()
-			if neighbour.Fitness < indi.Fitness {
-				pop.Individuals[i] = neighbour
-			} else {
-				var p = math.Exp((indi.Fitness - neighbour.Fitness) / mod.T)
-				if p > pop.RNG.Float64() {
-					pop.Individuals[i] = neighbour
-				}
-			}
-		}
-		mod.T *= mod.Alpha // Reduce the temperature
-	}
-	return nil
-}
-
-// Validate ModSimAnn fields.
-func (mod ModSimAnn) Validate() error {
-	// Check the stopping temperature value
-	if mod.Tmin < 0 {
-		return errors.New("Tmin should be higher than 0")
-	}
-	// Check the starting temperature value
-	if mod.T < mod.Tmin {
-		return errors.New("T should be a number higher than Tmin")
-	}
-	// Check the decrease rate value
-	if mod.Alpha <= 0 || mod.Alpha >= 1 {
 		return errInvalidMutRate
 	}
 	return nil

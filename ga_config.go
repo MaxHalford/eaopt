@@ -50,12 +50,16 @@ func (conf GAConfig) NewGA() (*GA, error) {
 	if conf.Model == nil {
 		return nil, errors.New("Model has to be provided")
 	}
-	var modelErr = conf.Model.Validate()
-	if modelErr != nil {
+	if modelErr := conf.Model.Validate(); modelErr != nil {
 		return nil, modelErr
 	}
-	if conf.Migrator != nil && conf.MigFrequency == 0 {
-		return nil, errors.New("MigFrequency should be higher than 0")
+	if conf.Migrator != nil {
+		if migErr := conf.Migrator.Validate(); migErr != nil {
+			return nil, migErr
+		}
+		if conf.MigFrequency == 0 {
+			return nil, errors.New("MigFrequency should be higher than 0")
+		}
 	}
 	if conf.Speciator != nil {
 		if specErr := conf.Speciator.Validate(); specErr != nil {
@@ -69,9 +73,10 @@ func (conf GAConfig) NewGA() (*GA, error) {
 // NewDefaultGAConfig returns a valid GAConfig with default values.
 func NewDefaultGAConfig() GAConfig {
 	return GAConfig{
-		NPops:   1,
-		PopSize: 30,
-		HofSize: 1,
+		NPops:        1,
+		PopSize:      30,
+		HofSize:      1,
+		NGenerations: 50,
 		Model: ModGenerational{
 			Selector: SelTournament{
 				NContestants: 3,

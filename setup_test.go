@@ -8,8 +8,6 @@ import (
 
 type Vector []float64
 
-// Implement the Genome interface
-
 func (X Vector) Evaluate() (float64, error) {
 	var sum float64
 	for _, x := range X {
@@ -36,33 +34,26 @@ func NewVector(rng *rand.Rand) Genome {
 	return Vector(InitUnifFloat64(4, -10, 10, rng))
 }
 
-// Minkowski distance with p = 1
-func l1Distance(x1, x2 Individual) (dist float64) {
+func l1Distance(x1, x2 Individual) (d float64) {
 	var (
 		g1 = x1.Genome.(Vector)
 		g2 = x2.Genome.(Vector)
 	)
 	for i := range g1 {
-		dist += math.Abs(g1[i] - g2[i])
+		d += math.Abs(g1[i] - g2[i])
 	}
 	return
 }
-
-// Identity model
 
 type ModIdentity struct{}
 
 func (mod ModIdentity) Apply(pop *Population) error { return nil }
 func (mod ModIdentity) Validate() error             { return nil }
 
-// Runtime error model
-
 type ModRuntimeError struct{}
 
 func (mod ModRuntimeError) Apply(pop *Population) error { return errors.New("") }
 func (mod ModRuntimeError) Validate() error             { return nil }
-
-// Runtime error speciator
 
 type SpecRuntimeError struct{}
 
@@ -70,8 +61,6 @@ func (spec SpecRuntimeError) Apply(indis Individuals, rng *rand.Rand) ([]Individ
 	return []Individuals{indis, indis}, errors.New("")
 }
 func (spec SpecRuntimeError) Validate() error { return nil }
-
-// Runtime error genome
 
 type RuntimeErrorGenome struct{ Vector }
 

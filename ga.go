@@ -40,6 +40,9 @@ func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 }
 
 func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
+	// Reset counters
+	ga.Generations = 0
+	ga.Age = 0
 	// Create the initial Populations
 	ga.Populations = make(Populations, ga.NPops)
 	for i := range ga.Populations {
@@ -49,17 +52,28 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		if err != nil {
 			return err
 		}
+		ga.Populations[i].Individuals.SortByFitness()
 	}
+
 	// Initialize the hall of fame
 	ga.HallOfFame = make(Individuals, ga.HofSize)
 	for i := range ga.HallOfFame {
 		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
 	}
+	for _, pop := range ga.Populations {
+		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
+	}
+
+	// Execute the callback if it has been set
+	if ga.Callback != nil {
+		ga.Callback(ga)
+	}
+
 	return nil
 }
 
 // Evolve a GA's Populations in parallel.
-func (ga *GA) evolve(newGenome func(rng *rand.Rand) Genome) error {
+func (ga *GA) evolve() error {
 	var start = time.Now()
 
 	// Migrate the individuals between the populations if there are at least 2
@@ -108,13 +122,15 @@ func (ga *GA) evolve(newGenome func(rng *rand.Rand) Genome) error {
 	for _, pop := range ga.Populations {
 		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
 	}
+
+	ga.Age += time.Since(start)
+	ga.Generations++
+
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
 		ga.Callback(ga)
 	}
-	ga.Age += time.Since(start)
-	ga.Generations++
-	// No error
+
 	return nil
 }
 
@@ -128,7 +144,7 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 	}
 	// Go through the generations
 	for i := uint(0); i < ga.NGenerations; i++ {
-		if err := ga.evolve(newGenome); err != nil {
+		if err := ga.evolve(); err != nil {
 			return err
 		}
 		// Check for early stopping

@@ -32,7 +32,7 @@ func (mig MigRing) Apply(pops Populations, rng *rand.Rand) {
 
 // Validate MigRing fields.
 func (mig MigRing) Validate() error {
-	if mig.NMigrants < 1 {
+	if mig.NMigrants == 0 {
 		return errors.New("NMigrants should be higher than 0")
 	}
 	return nil

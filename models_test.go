@@ -38,11 +38,6 @@ var (
 			Selector: SelTournament{1},
 			MutRate:  0.2,
 		},
-		ModSimAnn{
-			T:     10,
-			Tmin:  1,
-			Alpha: 0.3,
-		},
 		ModMutationOnly{
 			Strict: false,
 		},
@@ -135,21 +130,6 @@ var (
 		ModRing{
 			Selector: SelTournament{1},
 			MutRate:  -1,
-		},
-		ModSimAnn{
-			T:     1,
-			Tmin:  10,
-			Alpha: 0.3,
-		},
-		ModSimAnn{
-			T:     10,
-			Tmin:  -1,
-			Alpha: 0.3,
-		},
-		ModSimAnn{
-			T:     10,
-			Tmin:  1,
-			Alpha: -1,
 		},
 	}
 )

@@ -75,7 +75,7 @@
 
 ## Changelog
 
-- 02/08/18: gago has now become eaopt. You can still everything you could do before but the scope is now larger than genetic algorithms. The goal is to implement many more evolutionary optimization algorithms on top of the existing codebase.
+- **02/08/18**: gago has now become eaopt. You can still everything you could do before but the scope is now larger than genetic algorithms. The goal is to implement many more evolutionary optimization algorithms on top of the existing codebase.
 
 ## Example
 
@@ -101,8 +101,8 @@ import (
 type Vector []float64
 
 // Evaluate a Vector with the Drop-Wave function which takes two variables as
-// input and reaches a minimum of -1 in (0, 0). The function is rather pure so
-// there isn't any error handling to do.
+// input and reaches a minimum of -1 in (0, 0). The function is simple so there
+// isn't any error handling to do.
 func (X Vector) Evaluate() (float64, error) {
     var (
         numerator   = 1 + m.Cos(12*m.Sqrt(m.Pow(X[0], 2)+m.Pow(X[1], 2)))
@@ -139,16 +139,24 @@ func main() {
     // Instantiate a GA with a GAConfig
     var ga, err = NewDefaultGAConfig().NewGA()
     if err != nil {
-        fmt.Println("Handle it!")
+        fmt.Println(err)
+        return
     }
 
-    // Add a custom print function
-    ga.CallBack = function(ga *GA) {
-        fmt.Printf("Best fitness at generation %d: %f\n", i, ga.HallOfFame[0].Fitness)
+    // Set the number of generations to run for
+    ga.NGenerations = 10
+
+    // Add a custom print function to track progress
+    ga.Callback = func(ga *GA) {
+        fmt.Printf("Best fitness at generation %d: %f\n", ga.NGenerations, ga.HallOfFame[0].Fitness)
     }
 
-    // Find an optimum
-    ga.Minimize(VectorFactory)
+    // Find an minimum
+    var err = ga.Minimize(VectorFactory)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
 }
 
 ```
@@ -164,41 +172,35 @@ func main() {
 >>> Best fitness at generation 7: -0.997961
 >>> Best fitness at generation 8: -0.999954
 >>> Best fitness at generation 9: -0.999995
+>>> Best fitness at generation 10: -0.999999
 ```
 
 **More examples**
 
-All the examples can be found [here](https://github.com/MaxHalford/eaopt-examples).
-
-- [Cross-in-Tray (speciation)](https://github.com/MaxHalford/eaopt-examples/tree/master/cross_in_tray)
-- [Grid TSP](https://github.com/MaxHalford/eaopt-examples/tree/master/tsp_grid)
-- [Including a constraint](https://github.com/MaxHalford/eaopt-examples/tree/master/constraint)
-- [One Max problem](https://github.com/MaxHalford/eaopt-examples/tree/master/one_max)
-- [N-queens problem](https://github.com/MaxHalford/eaopt-examples/tree/master/n_queens)
-- [String matching](https://github.com/MaxHalford/eaopt-examples/tree/master/string_matching)
+All the examples can be found [in this repository](https://github.com/MaxHalford/eaopt-examples).
 
 ## Background
 
-Evolutionary optimization algorithms are a subdomain of evolutionary computation. Their goal is to minimize/maximize a function without using any gradient information (usually because said function doesn't have a gradient). They share the common property of exploring the search space by breeding, mutating, evaluating, and sorting so-called *individuals*. Most evolutionary algorithms are designed to handle real valued functions, however in practice they are more commonly used for more exotic problems. For example genetic algorithms are commonly used for finding the optimal structure of a neural network.
+Evolutionary optimization algorithms are a subdomain of evolutionary computation. Their goal is to minimize/maximize a function without using any gradient information (usually because there isn't any gradient available). They share the common property of exploring the search space by breeding, mutating, evaluating, and sorting so-called *individuals*. Most evolutionary algorithms are designed to handle real valued functions, however in practice they are commonly used for handling more exotic problems. For example genetic algorithms can be used to find the optimal structure of a neural network.
 
-eaopt provides implementations for various evolutionary optimization algorithms. Implementation-wise, the idea is that most (if not all) of said algorithms can be written as special cases of a genetic algorithm. Indeed this is made possible by using a generic definition of a genetic algorithm by allowing the mutation, crossover, selection, and replacement procedures to be modified. The `GA` struct is the most flexible struct of eaopt, the other algorithms are written on top of it. If you don't find any algorithm that suits your need then you can easily write your own operators (as is done in most of the [examples](https://github.com/MaxHalford/eaopt-examples)).
+eaopt provides implementations for various evolutionary optimization algorithms. Implementation-wise, the idea is that most (if not all) of said algorithms can be written as special cases of a genetic algorithm. Indeed this is made possible by using a generic definition of a genetic algorithm by allowing the mutation, crossover, selection, and replacement procedures to be modified at will. The `GA` struct is thus the most flexible struct of eaopt, the other algorithms are written on top of it. If you don't find any algorithm that suits your need then you can easily write your own operators (as is done in most of the [examples](https://github.com/MaxHalford/eaopt-examples)).
 
 ## Features
 
 - Different evolutionary algorithms are available with a consistent API
 - You can practically do anything by using the `GA` struct
-- Common genetic operators are already implemented
 - Speciation and migration procedures are available
-- Function evaluation can be done in parallel
+- Common genetic operators (mutation, crossover, selection, migration, speciation) are already implemented
+- Function evaluation can be done in parallel if your function is costly
 
 ## Usage
 
 ### General advice
 
-- Evolutionary algorithms are usually defined with different kinds of problems. Take a look at the `Minimize` function of each method to get an idea of what type of function it can optimize.
-- Use the associated constructor function of each method to initialize it. For example use the `NewPSO` function instead of instantiating the `PSO` struct yourself. Along with making things easier, these functions provide the added benefit of checking for parameter input errors.
-- If you're going to use the `GA` struct then be aware that some evolutionary operators are already implemented in eaopt.
-- Don't feel overwhelmed by the fact that algorithms are implemented as special cases of genetic algorithms, it doesn't matter if you just want to get things done.
+- Evolutionary algorithms are usually designed for solving specific kinds of problems. Take a look at the `Minimize` function of each method to get an idea of what type of function it can optimize.
+- Use the associated constructor function of each method to initialize it. For example use the `NewPSO` function instead of instantiating the `PSO` struct yourself. Along with making your life easier, these functions provide the added benefit of checking for parameter input errors.
+- If you're going to use the `GA` struct then be aware that some evolutionary operators are already implemented in eaopt (you don't necessarily have to reinvent the wheel).
+- Don't feel overwhelmed by the fact that algorithms are implemented as special cases of genetic algorithms. It doesn't matter if you just want to get things done, it just makes things easier under the hood.
 
 ### Genetic algorithms
 
@@ -214,10 +216,13 @@ In a nutshell, a GA solves an optimization problem by doing the following:
 4. Apply genetic operators following a given evolutionary model.
 5. Repeat from step 2 until the stopping criterion is satisfied.
 
-This description is voluntarily vague. It is up to the user to define the problem and the genetic operators to use. Two types of genetic operators exist:
+This description is voluntarily vague. It is up to the user to define the problem and the genetic operators to use. Different categories of genetic operators exist:
 
 - Mutation operators modify an existing solution.
 - Crossover operators generate a new solution by combining two or more existing ones.
+- Selection operators selects individuals that are to be evolved.
+- Migration swaps individuals between populations.
+- Speciation clusters individuals into subpopulations.
 
 Popular stopping criteria include
 
@@ -303,6 +308,7 @@ type GAConfig struct {
 
   Once you have instantiated a `GAConfig` you can call it's `NewGA` method to obtain a `GA`. The `GA` struct has the following definition:
 
+```go
 type GA struct {
     GAConfig
 
@@ -311,6 +317,7 @@ type GA struct {
     Age         time.Duration
     Generations uint
 }
+```
 
 Naturally a `GA` stores a copy of the `GAConfig` that was used to instantiate it. Apart from this the following fields are available:
 
@@ -445,13 +452,13 @@ If a logger is provided, each row in the log output will include
 
 #### Description
 
-[Particle swarm optimization (PSO)](https://www.wikiwand.com/en/Particle_swarm_optimization) can be used to optimize real valued functions. It maintains a population of candidate solutions called particles. The particles move around the search-space according to a mathematical formula that takes as input the particle's position and it's velocity. Each particle's movement is influenced by itss local best encountered position, as well as the best overall position in the search-space (these values are updated after each generation). This is expected to move the swarm toward the best solutions.
+[Particle swarm optimization (PSO)](https://www.wikiwand.com/en/Particle_swarm_optimization) can be used to optimize real valued functions. It maintains a population of candidate solutions called particles. The particles move around the search-space according to a mathematical formula that takes as input the particle's position and it's velocity. Each particle's movement is influenced by its's local best encountered position, as well as the best overall position in the search-space (these values are updated after each generation). This is expected to move the swarm toward the best solutions.
 
 As can be expected there are many variants of PSO. The `SPSO` struct implements the [SPSO-2011 standard](http://clerc.maurice.free.fr/pso/SPSO_descriptions.pdf).
 
 #### Example
 
-In this example we're going to minimize th [Styblinski-Tang function](https://www.sfu.ca/~ssurjano/stybtang.html) with two dimensions. The global minimum is around -39.16599 times the number of dimensions.
+In this example we're going to minimize th [Styblinski-Tang function](https://www.sfu.ca/~ssurjano/stybtang.html) with two dimensions. The global minimum is about -39.16599 times the number of dimensions.
 
 ```go
 package main
@@ -513,7 +520,7 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 - `min` and `max` are the boundaries from which the initial values are sampled from
 - `w` is the velocity amplifier
 - `parallel` determines if the particles are evaluated in parallel or not
-- `rng` is a random number generator, you can set it to `nil` if you don't care for reproducibility
+- `rng` is a random number generator, you can set it to `nil` if you want it to be random
 
 ### Differential evolution
 
@@ -525,7 +532,7 @@ As can be expected there are many variants of PSO. The `SPSO` struct implements 
 
 #### Example
 
-In this example we're going to minimize th [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is around 0.
+In this example we're going to minimize th [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is 0.
 
 ```go
 package main
@@ -553,7 +560,7 @@ func Ackley(X []float64) float64 {
 }
 
 func main() {
-    // Instantiate SPSO
+    // Instantiate DiffEvo
     var de, err = eaopt.NewDefaultDiffEvo()
     if err != nil {
         fmt.Println(err)
@@ -595,14 +602,14 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 - `cRate` is the crossover rate
 - `dWeight` is the differential weight
 - `parallel` determines if the agents are evaluated in parallel or not
-- `rng` is a random number generator, you can set it to `nil` if you don't care for reproducibility
+- `rng` is a random number generator, you can set it to `nil` if you want it to be random
 
 
 ## A note on parallelism
 
-Genetic algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations used in the GA can be run independently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
+Evolutionary algorithms are famous for being [embarrassingly parallel](https://www.wikiwand.com/en/Embarrassingly_parallel). Most of the operations can be run independently each one from another. For example individuals can be mutated in parallel because mutation doesn't have any side effects.
 
-The Go language provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are "heavy". If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
+The Go language provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are heavy. If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
 
 By default eaopt will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
 

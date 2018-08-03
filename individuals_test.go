@@ -41,8 +41,7 @@ func TestIndividualsString(t *testing.T) {
 func TestNewIndividuals(t *testing.T) {
 	var rng = newRand()
 	for _, n := range []uint{1, 2, 42} {
-		var indis = newIndividuals(n, NewVector, rng)
-		if len(indis) != int(n) {
+		if len(newIndividuals(n, NewVector, rng)) != int(n) {
 			t.Error("newIndividuals didn't generate the right number of individuals")
 		}
 	}
@@ -85,8 +84,7 @@ func TestEvaluateIndividualsWithError(t *testing.T) {
 			t.Error("Individual shouldn't have Evaluated set to true")
 		}
 	}
-	var err = indis.Evaluate(false)
-	if err == nil {
+	if indis.Evaluate(false) == nil {
 		t.Error("An error should have been raised")
 	}
 	for _, indi := range indis {
