@@ -1,8 +1,10 @@
 package eaopt
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"reflect"
@@ -179,6 +181,23 @@ func TestInitResetCounters(t *testing.T) {
 	}
 }
 
+func TestEvolveWithMigrator(t *testing.T) {
+	var conf = NewDefaultGAConfig()
+	conf.NPops = 2
+	conf.Migrator = MigRing{3}
+	conf.MigFrequency = 1
+	var ga, err = conf.NewGA()
+	if err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	if err = ga.init(NewVector); err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	if err = ga.evolve(); err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+}
+
 func TestEvolveWithSpeciator(t *testing.T) {
 	var ga, err = NewDefaultGAConfig().NewGA()
 	if err != nil {
@@ -190,6 +209,26 @@ func TestEvolveWithSpeciator(t *testing.T) {
 	}
 	if err = ga.evolve(); err != nil {
 		t.Errorf("Expected nil, got %v", err)
+	}
+}
+
+func TestGALog(t *testing.T) {
+	var ga, err = NewDefaultGAConfig().NewGA()
+	if err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	var (
+		b      bytes.Buffer
+		logger = log.New(&b, "", 0)
+	)
+	ga.RNG = rand.New(rand.NewSource(42))
+	ga.Logger = logger
+	ga.init(NewVector)
+	ga.evolve()
+	var expected = "pop_id=QrZ min=-21.342844 max=16.086140 avg=-2.554992 std=11.673396\n" +
+		"pop_id=QrZ min=-29.052226 max=10.630133 avg=-11.827780 std=8.179576\n"
+	if s := b.String(); s != expected {
+		t.Errorf("Expected %s, got %s", expected, s)
 	}
 }
 
@@ -362,5 +401,20 @@ func TestGASameRNGs(t *testing.T) {
 	// Compare best individuals
 	if ga1.HallOfFame[0].Fitness != ga2.HallOfFame[0].Fitness {
 		t.Errorf("Mismatch: %f != %f", ga1.HallOfFame[0].Fitness, ga2.HallOfFame[0].Fitness)
+	}
+}
+
+func TestGAMinimizeEarlyStop(t *testing.T) {
+	ga, err := NewDefaultGAConfig().NewGA()
+	if err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	ga.NGenerations = 20
+	ga.EarlyStop = func(ga *GA) bool { return ga.Generations == 10 }
+	if err = ga.Minimize(NewVector); err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	if ga.Generations != 10 {
+		t.Errorf("Expected 10, got %d", ga.Generations)
 	}
 }

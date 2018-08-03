@@ -45,11 +45,6 @@ func minInt(a, b int) int {
 	return b
 }
 
-// Find the minimum between two uints.
-func minUint(a, b uint) uint {
-	return uint(minInt(int(a), int(b)))
-}
-
 // Compute the sum of an int slice.
 func sumInts(ints []int) (sum int) {
 	for _, v := range ints {

@@ -623,8 +623,7 @@ Alas you still have to implement the `Genome` interface. You can however provide
 ```go
 type Vector []float64
 
-func (X Vector) Crossover(Y eaopt.Genome, rng *rand.Rand) {
-}
+func (X Vector) Crossover(Y eaopt.Genome, rng *rand.Rand) {}
 ```
 
 

@@ -55,12 +55,24 @@ type ModRuntimeError struct{}
 func (mod ModRuntimeError) Apply(pop *Population) error { return errors.New("") }
 func (mod ModRuntimeError) Validate() error             { return nil }
 
+type ModValidateError struct{}
+
+func (mod ModValidateError) Apply(pop *Population) error { return errors.New("") }
+func (mod ModValidateError) Validate() error             { return errors.New("") }
+
 type SpecRuntimeError struct{}
 
 func (spec SpecRuntimeError) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
-	return []Individuals{indis, indis}, errors.New("")
+	return []Individuals{indis}, errors.New("")
 }
 func (spec SpecRuntimeError) Validate() error { return nil }
+
+type SpecValidateError struct{}
+
+func (spec SpecValidateError) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
+	return []Individuals{indis}, errors.New("")
+}
+func (spec SpecValidateError) Validate() error { return errors.New("") }
 
 type RuntimeErrorGenome struct{ Vector }
 

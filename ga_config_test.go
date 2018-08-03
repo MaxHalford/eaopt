@@ -26,9 +26,10 @@ func TestNewGAErrors(t *testing.T) {
 		{func() GAConfig { c := NewDefaultGAConfig(); c.NGenerations = 0; return c }()},
 		{func() GAConfig { c := NewDefaultGAConfig(); c.HofSize = 0; return c }()},
 		{func() GAConfig { c := NewDefaultGAConfig(); c.Model = nil; return c }()},
-		{func() GAConfig { c := NewDefaultGAConfig(); c.Model = invalidModels[0]; return c }()},
+		{func() GAConfig { c := NewDefaultGAConfig(); c.Model = ModValidateError{}; return c }()},
 		{func() GAConfig { c := NewDefaultGAConfig(); c.Migrator = MigRing{0}; return c }()},
 		{func() GAConfig { c := NewDefaultGAConfig(); c.Migrator = MigRing{1}; c.MigFrequency = 0; return c }()},
+		{func() GAConfig { c := NewDefaultGAConfig(); c.Speciator = SpecValidateError{}; return c }()},
 	}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("TC %d", i), func(t *testing.T) {
