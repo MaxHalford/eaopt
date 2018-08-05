@@ -34,6 +34,15 @@ func NewVector(rng *rand.Rand) Genome {
 	return Vector(InitUnifFloat64(4, -10, 10, rng))
 }
 
+type ErrorGenome struct{}
+
+func (eg ErrorGenome) Evaluate() (float64, error)         { return 0, errors.New("") }
+func (eg ErrorGenome) Mutate(rng *rand.Rand)              {}
+func (eg ErrorGenome) Crossover(Y Genome, rng *rand.Rand) {}
+func (eg ErrorGenome) Clone() Genome                      { return ErrorGenome{} }
+
+func NewErrorGenome(rng *rand.Rand) Genome { return ErrorGenome{} }
+
 func l1Distance(x1, x2 Individual) (d float64) {
 	var (
 		g1 = x1.Genome.(Vector)

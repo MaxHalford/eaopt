@@ -87,7 +87,7 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 
 // NewDefaultDiffEvo calls NewDiffEvo with default values.
 func NewDefaultDiffEvo() (*DiffEvo, error) {
-	return NewDiffEvo(40, 30, -5, 5, 0.5, 0.2, false, newRand())
+	return NewDiffEvo(40, 30, -5, 5, 0.5, 0.2, false, nil)
 }
 
 func (de *DiffEvo) newAgent(rng *rand.Rand) Genome {

@@ -88,6 +88,20 @@ func TestGAInit(t *testing.T) {
 	}
 }
 
+func TestGAInitBadGenome(t *testing.T) {
+	var ga, err = NewDefaultGAConfig().NewGA()
+	if err = ga.init(NewErrorGenome); err == nil {
+		t.Error("Expected error")
+	}
+}
+
+func TestGAMinimizeBadGenome(t *testing.T) {
+	var ga, err = NewDefaultGAConfig().NewGA()
+	if err = ga.Minimize(NewErrorGenome); err == nil {
+		t.Error("Expected error")
+	}
+}
+
 func TestPopRNGs(t *testing.T) {
 	var conf = NewDefaultGAConfig()
 	conf.NPops = 4

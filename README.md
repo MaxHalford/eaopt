@@ -175,8 +175,6 @@ func main() {
 >>> Best fitness at generation 10: -0.999999
 ```
 
-**More examples**
-
 All the examples can be found [in this repository](https://github.com/MaxHalford/eaopt-examples).
 
 ## Background
@@ -306,7 +304,7 @@ type GAConfig struct {
   - `EarlyStop` will be called before each generation to check if the evolution should be stopped early.
   - `RNG` can be set to make results reproducible. If it is not provided then a default `rand.New(rand.NewSource(time.Now().UnixNano()))` will be used. If you want to make your results reproducible use a constant source, e.g. `rand.New(rand.NewSource(42))`.
 
-  Once you have instantiated a `GAConfig` you can call it's `NewGA` method to obtain a `GA`. The `GA` struct has the following definition:
+Once you have instantiated a `GAConfig` you can call it's `NewGA` method to obtain a `GA`. The `GA` struct has the following definition:
 
 ```go
 type GA struct {
@@ -401,15 +399,15 @@ In the ring model, crossovers are applied to neighbours in a one-directional rin
 
 ##### Mutation only
 
-It's possible to run a GA without crossover simply by mutating individuals. Essentially this boils down to doing [hill climbing](https://www.wikiwand.com/en/Hill_climbing) because there is not interaction between individuals. Indeed taking a step in hill climbing is equivalent to mutation for genetic algorithms. What's nice is that by using a population of size n you are essentially running multiple independent hill climbs.
+It's possible to run a GA without crossover simply by mutating individuals. This can be done with the `ModMutationOnly` struct. At each generation each individual is mutated. `ModMutationOnly` has a `strict` field to determine if the mutant should replace the initial individual only if it's fitness is lower.
 
 #### Speciation
 
-Clusters, also called speciation in the literature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists each containing individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the literature, speciation is also called *speciation*.
+Clusters, also called species in the literature, are a partitioning of individuals into smaller groups of similar individuals. Programmatically a cluster is a list of lists that each contain individuals. Individuals inside each species are supposed to be similar. The similarity depends on a metric, for example it could be based on the fitness of the individuals. In the literature, speciation is also called *speciation*.
 
 The purpose of a partitioning individuals is to apply genetic operators to similar individuals. In biological terms this encourages "incest" and maintains isolated species. For example in nature animals usually breed with local mates and don't breed with different animal species.
 
-Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely disappear during selection. Thus speciation was introduced so that neural networks evolved in similar groups so that new neural networks wouldn't disappear immediately. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
+Using speciation/speciation with genetic algorithms became "popular" when they were first applied to the [optimization of neural network topologies](https://www.wikiwand.com/en/Neuroevolution_of_augmenting_topologies). By mixing two neural networks during crossover, the resulting neural networks were often useless because the inherited weights were not optimized for the new topology. This meant that newly generated neural networks were not performing well and would likely disappear during the selection phase. Thus speciation was introduced so that neural networks evolved in similar groups in order for new neural networks wouldn't disappear immediately. Instead the similar neural networks would evolve between each other until they were good enough to mixed with the other neural networks.
 
 With eaopt it's possible to use speciation on top of all the rest. To do so the `Speciator` field of the `GA` struct has to specified.
 
@@ -419,9 +417,9 @@ With eaopt it's possible to use speciation on top of all the rest. To do so the 
 
 #### Multiple populations and migration
 
-Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In eaopt a `GA` struct contains a `Populations` field which contains each population. The number of populations is specified in the `GA`'s `NPops` field.
+Multi-populations GAs run independent populations in parallel. They are not frequently used, however they are very easy to understand and to implement. In eaopt a `GA` struct contains a `Populations` field which stores each population in a slice. The number of populations is specified in the `GAConfig`'s `NPops` field.
 
-If `Migrator` and `MigFrequency` are not provided the populations will be run independently, in parallel. However, if they are provided then at each generation number that is divisible by `MigFrequency` (for example 5 divides generation number 25) individuals will be exchanged between the populations following the `Migrator` protocol.
+If `Migrator` and `MigFrequency` are not provided the populations will be run independently in parallel. However, if they are provided then at each generation number that is divisible by `MigFrequency` (for example 5 divides generation number 25) individuals will be exchanged between the populations following the `Migrator`.
 
 Using multi-populations can be an easy way to gain in diversity. Moreover, not using multi-populations on a multi-core architecture is a waste of resources.
 
@@ -548,9 +546,8 @@ import (
 func Ackley(X []float64) float64 {
     var (
         a, b, c = 20.0, 0.2, 2 * m.Pi
-        s1, s2      float64
-        float64
-        d = float64(len(X))
+        s1, s2  float64
+        d       = float64(len(X))
     )
     for _, x := range X {
         s1 += x * x

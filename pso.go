@@ -137,7 +137,7 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 
 // NewDefaultSPSO calls NewSPSO with default values.
 func NewDefaultSPSO() (*SPSO, error) {
-	return NewSPSO(40, 30, -5, 5, 0.5, false, newRand())
+	return NewSPSO(40, 30, -5, 5, 0.5, false, nil)
 }
 
 // newParticle returns a new Particle that has a pointer to the SPSO.
