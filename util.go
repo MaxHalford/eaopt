@@ -102,6 +102,8 @@ func varianceFloat64s(floats []float64) float64 {
 
 type set map[interface{}]bool
 
+type setInt map[interface{}]int
+
 // union merges two slices and ignores duplicates.
 func union(x, y set) set {
 	var (
