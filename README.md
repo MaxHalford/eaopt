@@ -151,7 +151,7 @@ func main() {
         fmt.Printf("Best fitness at generation %d: %f\n", ga.NGenerations, ga.HallOfFame[0].Fitness)
     }
 
-    // Find an minimum
+    // Find the minimum
     var err = ga.Minimize(VectorFactory)
     if err != nil {
         fmt.Println(err)
