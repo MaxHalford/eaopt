@@ -68,6 +68,7 @@
       - [Logging population statistics](#logging-population-statistics)
     - [Particle swarm optimization](#particle-swarm-optimization)
     - [Differential evolution](#differential-evolution)
+    - [OpenAI evolution strategy](#openai-evolution-strategy)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Dependencies](#dependencies)
@@ -75,6 +76,7 @@
 
 ## Changelog
 
+- **11/11/18**: a simple version of [OpenAI's evolution strategy](https://blog.openai.com/evolution-strategies/) has been implemented, it's called `OES`.
 - **02/08/18**: gago has now become eaopt. You can still everything you could do before but the scope is now larger than genetic algorithms. The goal is to implement many more evolutionary optimization algorithms on top of the existing codebase.
 
 ## Example
@@ -524,7 +526,7 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 
 #### Description
 
-[Differential evolution (DE)](https://www.wikiwand.com/en/Differential_evolution) somewhat ressembles PSO and is also used for optimizing real-valued functions. At each generation, each so-called agent is moved according to the position of 3 randomly sampled agents. If the new position is not better than the current one then it is discarded.
+[Differential evolution (DE)](https://www.wikiwand.com/en/Differential_evolution) somewhat resembles PSO and is also used for optimizing real-valued functions. At each generation, each so-called agent is moved according to the position of 3 randomly sampled agents. If the new position is not better than the current one then it is discarded.
 
 As can be expected there are many variants of PSO. The `SPSO` struct implements the [SPSO-2011 standard](http://clerc.maurice.free.fr/pso/SPSO_descriptions.pdf).
 
@@ -536,22 +538,22 @@ In this example we're going to minimize th [Ackley function](https://www.sfu.ca/
 package main
 
 import (
-  "fmt"
-  m "math"
-  "math/rand"
+    "fmt"
+    m "math"
+    "math/rand"
 
-  "github.com/MaxHalford/eaopt"
+    "github.com/MaxHalford/eaopt"
 )
 
-func Ackley(X []float64) float64 {
+func Ackley(x []float64) float64 {
     var (
         a, b, c = 20.0, 0.2, 2 * m.Pi
         s1, s2  float64
-        d       = float64(len(X))
+        d       = float64(len(x))
     )
-    for _, x := range X {
-        s1 += x * x
-        s2 += m.Cos(c * x)
+    for _, xi := range x {
+        s1 += xi * xi
+        s2 += m.Cos(c * xi)
     }
     return -a*m.Exp(-b*m.Sqrt(s1/d)) - m.Exp(s2/d) + a + m.Exp(1)
 }
@@ -582,7 +584,7 @@ func main() {
 This should produce the following output.
 
 ```sh
->>> Found minimum of 0.00051, the global minimum is 0
+>>> Found minimum of 0.00137, the global minimum is 0
 ```
 
 #### Parameters
@@ -600,6 +602,87 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 - `dWeight` is the differential weight
 - `parallel` determines if the agents are evaluated in parallel or not
 - `rng` is a random number generator, you can set it to `nil` if you want it to be random
+
+
+### OpenAI evolution strategy
+
+#### Description
+
+[OpenAI](https://openai.com/) proposed [a simple evolution strategy](https://blog.openai.com/evolution-strategies/) based on the use of natural gradients. The algorithm is dead simple:
+
+1. Choose a center `mu` at random
+2. Sample points around `mu` using a normal distribution
+3. Evaluate each point and obtain the natural gradient `g`
+4. Move `mu` along the natural gradient `g` using a learning rate
+5. Repeat from step 2 until satisfied
+
+#### Example
+
+In this example we're going to minimize th [Rastrigin function](https://www.sfu.ca/~ssurjano/rastr.html) with three dimensions. The global minimum is 0.
+
+```go
+package main
+
+import (
+    "fmt"
+    m "math"
+    "math/rand"
+
+    "github.com/MaxHalford/eaopt"
+)
+
+func Rastrigin(x []float64) (y float64) {
+    y = 10 * float64(len(x))
+    for _, xi := range x {
+        y += m.Pow(xi, 2) - 10*m.Cos(2*m.Pi*xi)
+    }
+    return y
+}
+
+func main() {
+    // Instantiate DiffEvo
+    var oes, err = eaopt.NewDefaultOES()
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Fix random number generation
+    oes.GA.RNG = rand.New(rand.NewSource(42))
+
+    // Run minimization
+    _, y, err := oes.Minimize(Rastrigin, 2)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    // Output best encountered solution
+    fmt.Printf("Found minimum of %.5f, the global minimum is 0\n", y)
+}
+```
+
+This should produce the following output.
+
+```sh
+>>> Found minimum of 0.02270, the global minimum is 0
+```
+
+#### Parameters
+
+You can (and should) instantiate an `OES` with the `NewOES` method. You can also use the `NewDefaultOES` method as is done in the previous example.
+
+```go
+func NewOES(nPoints, nSteps uint, sigma, lr float64, parallel bool, rng *rand.Rand) (*OES, error)
+```
+
+- `nPoints` is the number of points to use (it has to be at least 3)
+- `nSteps` is the number of steps during which evolution occurs
+- `sigma` determines the shape of the normal distribution used to sample new points
+- `lr` is the learning rate
+- `parallel` determines if the agents are evaluated in parallel or not
+- `rng` is a random number generator, you can set it to `nil` if you want it to be random
+
 
 
 ## A note on parallelism

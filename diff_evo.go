@@ -7,22 +7,22 @@ import (
 
 // An Agent is a candidate solution to a problem.
 type Agent struct {
-	X  []float64
+	x  []float64
 	DE *DiffEvo
 }
 
 // Evaluate the Agent by computing the value of the function at the current
 // position.
 func (a Agent) Evaluate() (float64, error) {
-	return a.DE.F(a.X), nil
+	return a.DE.F(a.x), nil
 }
 
 // Mutate the Agent.
 func (a *Agent) Mutate(rng *rand.Rand) {
 	var agents = a.DE.sampleAgents(3, rng)
-	for i := range a.X {
+	for i := range a.x {
 		if rng.Float64() < a.DE.CRate {
-			a.X[i] = agents[0].X[i] + a.DE.DWeight*(agents[1].X[i]-agents[2].X[i])
+			a.x[i] = agents[0].x[i] + a.DE.DWeight*(agents[1].x[i]-agents[2].x[i])
 		}
 	}
 }
@@ -33,7 +33,7 @@ func (a *Agent) Crossover(q Genome, rng *rand.Rand) {}
 // Clone returns a deep copy of an Agent.
 func (a Agent) Clone() Genome {
 	return &Agent{
-		X:  copyFloat64s(a.X),
+		x:  copyFloat64s(a.x),
 		DE: a.DE,
 	}
 }
@@ -44,7 +44,7 @@ type DiffEvo struct {
 	CRate    float64 // Crossover rate
 	DWeight  float64 // Differential weight
 	NDims    uint
-	F        func(X []float64) float64
+	F        func(x []float64) float64
 	GA       *GA
 }
 
@@ -76,13 +76,16 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 		ParallelEval: parallel,
 		RNG:          rand.New(rand.NewSource(rng.Int63())),
 	}.NewGA()
+	if err != nil {
+		return nil, err
+	}
 	return &DiffEvo{
 		Min:     min,
 		Max:     max,
 		CRate:   cRate,
 		DWeight: dWeight,
 		GA:      ga,
-	}, err
+	}, nil
 }
 
 // NewDefaultDiffEvo calls NewDiffEvo with default values.
@@ -92,7 +95,7 @@ func NewDefaultDiffEvo() (*DiffEvo, error) {
 
 func (de *DiffEvo) newAgent(rng *rand.Rand) Genome {
 	return &Agent{
-		X:  InitUnifFloat64(de.NDims, de.Min, de.Max, rng),
+		x:  InitUnifFloat64(de.NDims, de.Min, de.Max, rng),
 		DE: de,
 	}
 }
@@ -117,5 +120,5 @@ func (de *DiffEvo) Minimize(f func([]float64) float64, nDims uint) ([]float64, f
 	var err = de.GA.Minimize(de.newAgent)
 	// Return the best obtained vector along with the associated function value
 	var best = de.GA.HallOfFame[0]
-	return best.Genome.(*Agent).X, best.Fitness, err
+	return best.Genome.(*Agent).x, best.Fitness, err
 }

@@ -2,6 +2,7 @@ package eaopt
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"reflect"
 	"testing"
@@ -18,23 +19,25 @@ func ExampleSPSO() {
 	// Fix random number generation
 	spso.GA.RNG = rand.New(rand.NewSource(42))
 
-	// Run minimization
-	var bowl = func(X []float64) (y float64) {
-		for _, x := range X {
-			y += x * x
+	// Define function to minimize
+	var styblinskiTang = func(x []float64) (y float64) {
+		for _, xi := range x {
+			y += math.Pow(xi, 4) - 16*math.Pow(xi, 2) + 5*xi
 		}
-		return
+		return 0.5 * y
 	}
-	X, y, err := spso.Minimize(bowl, 2)
+
+	// Run minimization
+	x, y, err := spso.Minimize(styblinskiTang, 2)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Output best encountered solution
-	fmt.Printf("Found minimum of %.5f in %v\n", y, X)
+	fmt.Printf("Found minimum of %.5f in %v\n", y, x)
 	// Output:
-	// Found minimum of 0.00006 in [0.005257773093598095 -0.005956339175848813]
+	// Found minimum of -78.23783 in [-2.8586916496046983 -2.9619895273744623]
 }
 
 func TestParticleCrossover(t *testing.T) {

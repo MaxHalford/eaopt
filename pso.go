@@ -55,15 +55,15 @@ func (p *Particle) Mutate(rng *rand.Rand) {
 		rX = make([]float64, len(p.CurrentX))
 		ss float64
 	)
-	for i, x := range p.CurrentX {
-		G := x + 1.193*(p.BestX[i]+p.SPSO.BestX[i]-2*x)
-		min, max := x-G, G-x
+	for i, xi := range p.CurrentX {
+		G := xi + 1.193*(p.BestX[i]+p.SPSO.BestX[i]-2*xi)
+		min, max := xi-G, G-xi
 		rX[i] = min + rng.Float64()*(max-min)
 		ss += rX[i] * rX[i]
 	}
 	ss = math.Sqrt(ss)
-	for i, x := range p.CurrentX {
-		p.Velocity[i] = p.SPSO.W*p.Velocity[i] + rX[i]/ss - x
+	for i, xi := range p.CurrentX {
+		p.Velocity[i] = p.SPSO.W*p.Velocity[i] + rX[i]/ss - xi
 		p.CurrentX[i] += p.Velocity[i]
 	}
 }
@@ -125,6 +125,9 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 		ParallelEval: parallel,
 		RNG:          rand.New(rand.NewSource(rng.Int63())),
 	}.NewGA()
+	if err != nil {
+		return nil, err
+	}
 	return &SPSO{
 		Min:   min,
 		Max:   max,
@@ -132,7 +135,7 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 		BestY: math.Inf(1),
 		GA:    ga,
 		mutex: &sync.Mutex{},
-	}, err
+	}, nil
 }
 
 // NewDefaultSPSO calls NewSPSO with default values.
@@ -143,16 +146,16 @@ func NewDefaultSPSO() (*SPSO, error) {
 // newParticle returns a new Particle that has a pointer to the SPSO.
 func (pso *SPSO) newParticle(rng *rand.Rand) Genome {
 	var (
-		X        = InitUnifFloat64(pso.NDims, pso.Min, pso.Max, rng)
-		velocity = make([]float64, len(X))
+		x        = InitUnifFloat64(pso.NDims, pso.Min, pso.Max, rng)
+		velocity = make([]float64, len(x))
 	)
-	for i, x := range X {
-		min, max := pso.Min-x, pso.Max-x
+	for i, xi := range x {
+		min, max := pso.Min-xi, pso.Max-xi
 		velocity[i] = min + rng.Float64()*(max-min)
 	}
 	return &Particle{
-		CurrentX: X,
-		BestX:    copyFloat64s(X),
+		CurrentX: x,
+		BestX:    copyFloat64s(x),
 		BestY:    math.Inf(1),
 		SPSO:     pso,
 		Velocity: velocity,

@@ -2,6 +2,7 @@ package eaopt
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"reflect"
 	"testing"
@@ -18,23 +19,31 @@ func ExampleDiffEvo() {
 	// Fix random number generation
 	de.GA.RNG = rand.New(rand.NewSource(42))
 
-	// Run minimization
-	var bowl = func(X []float64) (y float64) {
-		for _, x := range X {
-			y += x * x
+	// Define function to minimize
+	var ackley = func(x []float64) float64 {
+		var (
+			a, b, c = 20.0, 0.2, 2 * math.Pi
+			s1, s2  float64
+			d       = float64(len(x))
+		)
+		for _, xi := range x {
+			s1 += xi * xi
+			s2 += math.Cos(c * xi)
 		}
-		return
+		return -a*math.Exp(-b*math.Sqrt(s1/d)) - math.Exp(s2/d) + a + math.Exp(1)
 	}
-	X, y, err := de.Minimize(bowl, 2)
+
+	// Run minimization
+	x, y, err := de.Minimize(ackley, 2)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Output best encountered solution
-	fmt.Printf("Found minimum of %.5f in %v\n", y, X)
+	fmt.Printf("Found minimum of %.5f in %v\n", y, x)
 	// Output:
-	// Found minimum of 0.00000 in [6.0034503946953274e-05 0.00013615643701126828]
+	// Found minimum of 0.00137 in [0.0004420129693826938 0.000195924625132926]
 }
 
 func TestAgentCrossover(t *testing.T) {
@@ -50,20 +59,20 @@ func TestAgentCrossover(t *testing.T) {
 		p1c = p1.Clone().(*Agent)
 		p2c = p2.Clone().(*Agent)
 	)
-	if reflect.DeepEqual(p1.X, p2.X) {
+	if reflect.DeepEqual(p1.x, p2.x) {
 		t.Errorf("Expected mismatch")
 	}
-	if !reflect.DeepEqual(p1.X, p1c.X) {
+	if !reflect.DeepEqual(p1.x, p1c.x) {
 		t.Errorf("Expected no mismatch")
 	}
-	if !reflect.DeepEqual(p2.X, p2c.X) {
+	if !reflect.DeepEqual(p2.x, p2c.x) {
 		t.Errorf("Expected no mismatch")
 	}
 	p1.Crossover(p2, rng)
-	if !reflect.DeepEqual(p1.X, p1c.X) {
+	if !reflect.DeepEqual(p1.x, p1c.x) {
 		t.Errorf("Expected no mismatch")
 	}
-	if !reflect.DeepEqual(p2.X, p2c.X) {
+	if !reflect.DeepEqual(p2.x, p2c.x) {
 		t.Errorf("Expected no mismatch")
 	}
 }
