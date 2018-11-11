@@ -101,12 +101,6 @@ type SPSO struct {
 // input errors.
 func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *rand.Rand) (*SPSO, error) {
 	// Check inputs
-	if nParticles == 0 {
-		return nil, errors.New("nParticles should be stricly higher than 0")
-	}
-	if nSteps == 0 {
-		return nil, errors.New("nSteps should be stricly higher than 0")
-	}
 	if min >= max {
 		return nil, errors.New("min should be stricly inferior to max")
 	}

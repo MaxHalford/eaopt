@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"reflect"
 	"testing"
 )
 
@@ -38,6 +39,37 @@ func ExampleOES() {
 	fmt.Printf("Found minimum of %.5f in %v\n", y, X)
 	// Output:
 	// Found minimum of 0.02270 in [0.006807861794722094 -0.008251984117745246]
+}
+
+func TestPointCrossover(t *testing.T) {
+	var oes, err = NewDefaultOES()
+	if err != nil {
+		t.Errorf("Expected nil, got %v", err)
+	}
+	oes.Mu = []float64{1, 1}
+	var (
+		rng = newRand()
+		p1  = oes.newPoint(rng).(*oesPoint)
+		p2  = oes.newPoint(rng).(*oesPoint)
+		p1c = p1.Clone().(*oesPoint)
+		p2c = p2.Clone().(*oesPoint)
+	)
+	if reflect.DeepEqual(p1.x, p2.x) {
+		t.Errorf("Expected mismatch")
+	}
+	if !reflect.DeepEqual(p1.x, p1c.x) {
+		t.Errorf("Expected no mismatch")
+	}
+	if !reflect.DeepEqual(p2.x, p2c.x) {
+		t.Errorf("Expected no mismatch")
+	}
+	p1.Crossover(p2, rng)
+	if !reflect.DeepEqual(p1.x, p1c.x) {
+		t.Errorf("Expected no mismatch")
+	}
+	if !reflect.DeepEqual(p2.x, p2c.x) {
+		t.Errorf("Expected no mismatch")
+	}
 }
 
 func TestNewOES(t *testing.T) {

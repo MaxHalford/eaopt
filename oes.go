@@ -63,9 +63,6 @@ func NewOES(nPoints, nSteps uint, sigma, lr float64, parallel bool, rng *rand.Ra
 	if nPoints < 3 {
 		return nil, errors.New("nPoints should be at least 3")
 	}
-	if nSteps == 0 {
-		return nil, errors.New("nSteps should be stricly higher than 0")
-	}
 	if lr <= 0 {
 		return nil, errors.New("lr should be positive")
 	}

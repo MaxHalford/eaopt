@@ -55,9 +55,6 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 	if nAgents < 4 {
 		return nil, errors.New("nAgents should be at least 4")
 	}
-	if nSteps == 0 {
-		return nil, errors.New("nSteps should be stricly higher than 0")
-	}
 	if min >= max {
 		return nil, errors.New("min should be stricly inferior to max")
 	}
