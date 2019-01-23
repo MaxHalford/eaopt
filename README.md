@@ -143,7 +143,7 @@ func VectorFactory(rng *rand.Rand) eaopt.Genome {
 
 func main() {
     // Instantiate a GA with a GAConfig
-    var ga, err = NewDefaultGAConfig().NewGA()
+    var ga, err = eaopt.NewDefaultGAConfig().NewGA()
     if err != nil {
         fmt.Println(err)
         return
@@ -153,7 +153,7 @@ func main() {
     ga.NGenerations = 10
 
     // Add a custom print function to track progress
-    ga.Callback = func(ga *GA) {
+    ga.Callback = func(ga *eaopt.GA) {
         fmt.Printf("Best fitness at generation %d: %f\n", ga.NGenerations, ga.HallOfFame[0].Fitness)
     }
 
