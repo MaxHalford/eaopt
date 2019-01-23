@@ -37,6 +37,10 @@
   <a href="https://codeclimate.com/github/MaxHalford/eaopt">
     <img src="https://codeclimate.com/github/MaxHalford/eaopt/badges/gpa.svg" alt="Code Climate" />
   </a>
+  <!-- Hound -->
+  <a href="https://houndci.com">
+    <img src="https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg" alt="Hound" />
+  </a>
   <!-- License -->
   <a href="https://opensource.org/licenses/MIT">
     <img src="http://img.shields.io/:license-mit-ff69b4.svg?style=flat-square" alt="license"/>
