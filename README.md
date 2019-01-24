@@ -154,11 +154,11 @@ func main() {
 
     // Add a custom print function to track progress
     ga.Callback = func(ga *eaopt.GA) {
-        fmt.Printf("Best fitness at generation %d: %f\n", ga.NGenerations, ga.HallOfFame[0].Fitness)
+        fmt.Printf("Best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
     }
 
     // Find the minimum
-    var err = ga.Minimize(VectorFactory)
+    err = ga.Minimize(VectorFactory)
     if err != nil {
         fmt.Println(err)
         return
@@ -288,6 +288,7 @@ type GAConfig struct {
     Speciator    Speciator
     Logger       *log.Logger
     Callback     func(ga *GA)
+	EarlyStop    func(ga *GA) bool
     RNG          *rand.Rand
 }
 ```
