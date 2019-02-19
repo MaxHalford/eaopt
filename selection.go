@@ -58,7 +58,8 @@ func (sel SelTournament) Apply(n uint, indis Individuals, rng *rand.Rand) (Indiv
 		// Find the best contestant
 		winners[i] = indis[contestants[0]]
 		winners[i].Evaluate()
-		for j, idx := range contestants[1:] {
+		winnerIdx = idxs[0]
+		for j, idx := range contestants {
 			if indis[idx].GetFitness() < winners[i].Fitness {
 				winners[i] = indis[idx]
 				indexes[i] = idx
