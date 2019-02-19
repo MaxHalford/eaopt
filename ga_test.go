@@ -240,7 +240,7 @@ func TestGALog(t *testing.T) {
 	ga.init(NewVector)
 	ga.evolve()
 	var expected = "pop_id=QrZ min=-21.342844 max=16.086140 avg=-2.554992 std=11.673396\n" +
-		"pop_id=QrZ min=-29.052226 max=10.630133 avg=-11.827780 std=8.179576\n"
+		"pop_id=QrZ min=-29.052226 max=10.630133 avg=-11.885364 std=8.266295\n"
 	if s := b.String(); s != expected {
 		t.Errorf("Expected %s, got %s", expected, s)
 	}
