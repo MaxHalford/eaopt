@@ -37,6 +37,41 @@ func TestSelectionSize(t *testing.T) {
 	}
 }
 
+func TestSelectionUniqueness(t *testing.T) {
+	var (
+		rng = newRand()
+		indis = newIndividuals(3, NewVector, rng)
+		selectors = []Selector{
+			SelTournament{
+				NContestants: 2,
+			},
+			SelElitism{},
+		}
+		numIterations = 500
+		anyNotUnique = false
+	)
+	for _, selector := range selectors {
+		for i := 0; i < numIterations; i++ {
+			var selected, _, _= selector.Apply(2, indis, rng)
+			var unique= false
+			var first= selected[0].Genome.(Vector)
+			var second= selected[1].Genome.(Vector)
+			for index := range first {
+				if first[index] != second[index] {
+					unique = true
+					break
+				}
+			}
+			if !unique {
+				anyNotUnique = true
+			}
+		}
+	}
+	if anyNotUnique {
+		t.Error("Selector does not guarantee unique individuals")
+	}
+}
+
 func TestSelElitism(t *testing.T) {
 	var (
 		rng      = newRand()
