@@ -288,7 +288,7 @@ type GAConfig struct {
     Speciator    Speciator
     Logger       *log.Logger
     Callback     func(ga *GA)
-	EarlyStop    func(ga *GA) bool
+    EarlyStop    func(ga *GA) bool
     RNG          *rand.Rand
 }
 ```
