@@ -243,7 +243,7 @@ func (mod ModRing) Apply(pop *Population) error {
 	for i := range pop.Individuals {
 		var (
 			indi      = pop.Individuals[i].Clone(pop.RNG)
-			neighbour = pop.Individuals[i%len(pop.Individuals)]
+			neighbour = pop.Individuals[(i+1)%len(pop.Individuals)]
 		)
 		indi.Crossover(neighbour, pop.RNG)
 		// Apply mutation to the offsprings

@@ -104,7 +104,7 @@ func (sel SelRoulette) Apply(n uint, indis Individuals, rng *rand.Rand) (Individ
 	)
 	for i := range selected {
 		var (
-			index  = sort.SearchFloat64s(wheel, rand.Float64())
+			index  = sort.SearchFloat64s(wheel, rng.Float64())
 			winner = indis[index]
 		)
 		indexes[i] = index

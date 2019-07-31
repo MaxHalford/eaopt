@@ -124,7 +124,7 @@ func (indis Individuals) FitMin() float64 {
 	return minFloat64s(indis.getFitnesses())
 }
 
-// FitMax returns the best fitness of a slice of individuals.
+// FitMax returns the worst fitness of a slice of individuals.
 func (indis Individuals) FitMax() float64 {
 	if indis.IsSortedByFitness() {
 		return indis[len(indis)-1].Fitness
