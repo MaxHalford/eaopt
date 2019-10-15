@@ -15,7 +15,8 @@ var (
 // applied to generate two offsprings. The selection and crossover process is
 // repeated until n offsprings have been generated. If n is uneven then the
 // second offspring of the last crossover is discarded.
-func generateOffsprings(n uint, indis Individuals, sel Selector, crossRate float64, rng *rand.Rand) (Individuals, error) {
+func generateOffsprings(n uint, indis Individuals, sel Selector, crossRate float64,
+	rng *rand.Rand) (Individuals, error) {
 	var (
 		offsprings = make(Individuals, n)
 		i          = 0

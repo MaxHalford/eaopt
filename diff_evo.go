@@ -50,7 +50,8 @@ type DiffEvo struct {
 
 // NewDiffEvo instantiates and returns a DiffEvo instance after having checked
 // for input errors.
-func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel bool, rng *rand.Rand) (*DiffEvo, error) {
+func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64,
+	parallel bool, rng *rand.Rand) (*DiffEvo, error) {
 	// Check inputs
 	if nAgents < 4 {
 		return nil, errors.New("nAgents should be at least 4")
