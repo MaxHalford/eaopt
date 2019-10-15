@@ -275,10 +275,8 @@ func (mod ModRing) Apply(pop *Population) error {
 		}
 		// Select an individual out of the original individual and the
 		// offsprings
-		var (
-			indis            = Individuals{pop.Individuals[i], indi, neighbour}
-			selected, _, err = mod.Selector.Apply(1, indis, pop.RNG)
-		)
+		indis := Individuals{pop.Individuals[i], indi, neighbour}
+		selected, _, err := mod.Selector.Apply(1, indis, pop.RNG)
 		if err != nil {
 			return err
 		}
