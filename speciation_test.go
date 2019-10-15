@@ -3,7 +3,6 @@ package eaopt
 import (
 	"errors"
 	"fmt"
-	"math"
 	"testing"
 )
 
@@ -110,7 +109,7 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {
 			var (
-				m          = minInt(int(math.Ceil(float64(nbi/nbs))), int(nbi))
+				m          = minInt(int(float64(nbi/nbs)), int(nbi))
 				indis      = newIndividuals(nbi, NewVector, rng)
 				spec       = SpecFitnessInterval{K: nbs}
 				species, _ = spec.Apply(indis, rng)

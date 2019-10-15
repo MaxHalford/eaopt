@@ -3,7 +3,6 @@ package eaopt
 import (
 	"errors"
 	"fmt"
-	"math"
 	"math/rand"
 )
 
@@ -120,7 +119,7 @@ func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Indi
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)
-		m       = minInt(int(math.Ceil(float64(n/int(spec.K)))), n)
+		m       = minInt(int(float64(n/int(spec.K))), n)
 	)
 	for i := range species {
 		var a, b = i * m, minInt((i+1)*m, n)
