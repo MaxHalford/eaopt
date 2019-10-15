@@ -86,8 +86,8 @@ func TestSampleInts(t *testing.T) {
 			if (err == nil) != (tc.err == nil) {
 				t.Error("Error")
 			} else if err == nil && (len(ints) != int(tc.k) || len(idxs) != int(tc.k)) {
-					t.Error("Error")
-				}
+				t.Error("Error")
+			}
 		})
 	}
 }
