@@ -131,8 +131,14 @@ func (mod ModSteadyState) Apply(pop *Population) error {
 	}
 	if mod.KeepBest {
 		// Replace the chosen individuals with the best individuals
-		offsprings[0].Evaluate()
-		offsprings[1].Evaluate()
+		err = offsprings[0].Evaluate()
+		if err != nil{
+			return err
+		}
+		err =offsprings[1].Evaluate()
+		if err != nil{
+			return err
+		}
 		var indis = Individuals{selected[0], selected[1], offsprings[0], offsprings[1]}
 		indis.SortByFitness()
 		pop.Individuals[indexes[0]] = indis[0]
@@ -192,7 +198,10 @@ func (mod ModDownToSize) Apply(pop *Population) error {
 	if mod.MutRate > 0 {
 		offsprings.Mutate(mod.MutRate, pop.RNG)
 	}
-	offsprings.Evaluate(false)
+	err = offsprings.Evaluate(false)
+	if err != nil{
+		return err
+	}
 	// Merge the current population with the offsprings
 	offsprings = append(offsprings, pop.Individuals...)
 	// Select down to size
@@ -256,8 +265,14 @@ func (mod ModRing) Apply(pop *Population) error {
 				neighbour.Mutate(pop.RNG)
 			}
 		}
-		indi.Evaluate()
-		neighbour.Evaluate()
+		err := indi.Evaluate()
+		if err != nil{
+			return err
+		}
+		err = neighbour.Evaluate()
+		if err != nil{
+			return err
+		}
 		// Select an individual out of the original individual and the
 		// offsprings
 		var (
@@ -302,7 +317,10 @@ func (mod ModMutationOnly) Apply(pop *Population) error {
 	for i, indi := range pop.Individuals {
 		var mutant = indi.Clone(pop.RNG)
 		mutant.Mutate(pop.RNG)
-		mutant.Evaluate()
+		err := mutant.Evaluate()
+		if err != nil{
+			return err
+		}
 		if !mod.Strict || (mod.Strict && mutant.Fitness < indi.Fitness) {
 			pop.Individuals[i] = mutant
 		}
