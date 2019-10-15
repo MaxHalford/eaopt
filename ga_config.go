@@ -48,7 +48,7 @@ func (conf GAConfig) NewGA() (*GA, error) {
 		return nil, errors.New("HofSize has to be strictly higher than 0")
 	}
 	if conf.Model == nil {
-		return nil, errors.New("Model has to be provided")
+		return nil, errors.New("model has to be provided")
 	}
 	if modelErr := conf.Model.Validate(); modelErr != nil {
 		return nil, modelErr

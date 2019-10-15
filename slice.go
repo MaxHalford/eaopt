@@ -23,7 +23,7 @@ func search(v interface{}, s Slice) (int, error) {
 		}
 	}
 	// Element not in slice
-	return 0, errors.New("Value not contained in slice")
+	return 0, errors.New("value not contained in slice")
 }
 
 // Make a lookup table from a slice, mapping values to indexes.

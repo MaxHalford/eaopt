@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	errNilSelector      = errors.New("Selector cannot be nil")
-	errInvalidMutRate   = errors.New("MutRate should be between 0 and 1")
-	errInvalidCrossRate = errors.New("CrossRate should be between 0 and 1")
+	errNilSelector      = errors.New("selector cannot be nil")
+	errInvalidMutRate   = errors.New("mutRate should be between 0 and 1")
+	errInvalidCrossRate = errors.New("crossRate should be between 0 and 1")
 )
 
 // Two parents are selected from a pool of individuals, crossover is then

@@ -88,13 +88,13 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 // Validate SpecKMedoids fields.
 func (spec SpecKMedoids) Validate() error {
 	if spec.K < 2 {
-		return errors.New("K should be higher than 1")
+		return errors.New("k should be higher than 1")
 	}
 	if spec.Metric == nil {
-		return errors.New("Metric field has to be provided")
+		return errors.New("metric field has to be provided")
 	}
 	if spec.MaxIterations < 1 {
-		return errors.New("K should be higher than 0")
+		return errors.New("k should be higher than 0")
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ type SpecFitnessInterval struct {
 func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
 	// Check there are at least K Individuals
 	if len(indis) < int(spec.K) {
-		return nil, fmt.Errorf("SpecFitnessInterval: have %d individuals and need at least %d",
+		return nil, fmt.Errorf("specFitnessInterval: have %d individuals and need at least %d",
 			len(indis), spec.K)
 	}
 	var (
@@ -131,7 +131,7 @@ func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Indi
 // Validate SpecFitnessInterval fields.
 func (spec SpecFitnessInterval) Validate() error {
 	if spec.K < 2 {
-		return errors.New("K should be higher than 1")
+		return errors.New("k should be higher than 1")
 	}
 	return nil
 }

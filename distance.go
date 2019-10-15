@@ -72,14 +72,14 @@ func rebalanceClusters(clusters []Individuals, dm DistanceMemoizer, minPerCluste
 	for i, cluster := range clusters {
 		// Check that the cluster has at least one Individual
 		if len(cluster) == 0 {
-			return fmt.Errorf("Cluster %d has 0 individuals", i)
+			return fmt.Errorf("cluster %d has 0 individuals", i)
 		}
 		// Calculate the number of missing Individual in the cluster to reach minPerCluster
 		missing[i] = int(minPerCluster) - len(cluster)
 	}
 	// Check if there are enough Individuals to rebalance the clusters.
 	if sumInts(missing) >= 0 {
-		return fmt.Errorf("Missing %d individuals to be able to rebalance the clusters",
+		return fmt.Errorf("missing %d individuals to be able to rebalance the clusters",
 			sumInts(missing))
 	}
 	// Loop through the clusters that are missing Individuals

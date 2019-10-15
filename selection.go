@@ -40,7 +40,7 @@ type SelTournament struct {
 func (sel SelTournament) Apply(n uint, indis Individuals, rng *rand.Rand) (Individuals, []int, error) {
 	// Check that the number of individuals is large enough
 	if uint(len(indis))-n < sel.NContestants-1 || len(indis) < int(n) {
-		return nil, nil, fmt.Errorf("Not enough individuals to select %d "+
+		return nil, nil, fmt.Errorf("not enough individuals to select %d "+
 			"with NContestants = %d, have %d individuals and need at least %d",
 			n, sel.NContestants, len(indis), sel.NContestants+n-1)
 	}
