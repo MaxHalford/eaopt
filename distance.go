@@ -36,11 +36,9 @@ func (dm *DistanceMemoizer) GetDistance(a, b Individual) float64 {
 	// Create maps if the genomes have never been encountered
 	if _, ok := dm.Distances[a.ID]; !ok {
 		dm.Distances[a.ID] = make(map[string]float64)
-	} else {
 		// Check if the distance between the two genomes has been calculated
-		if dist, ok := dm.Distances[a.ID][b.ID]; ok {
-			return dist
-		}
+	} else if dist, ok := dm.Distances[a.ID][b.ID]; ok {
+		return dist
 	}
 	if _, ok := dm.Distances[b.ID]; !ok {
 		dm.Distances[b.ID] = make(map[string]float64)

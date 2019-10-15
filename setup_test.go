@@ -8,25 +8,25 @@ import (
 
 type Vector []float64
 
-func (X Vector) Evaluate() (float64, error) {
+func (x Vector) Evaluate() (float64, error) {
 	var sum float64
-	for _, x := range X {
+	for _, x := range x {
 		sum += x
 	}
 	return sum, nil
 }
 
-func (X Vector) Mutate(rng *rand.Rand) {
-	MutNormalFloat64(X, 0.5, rng)
+func (x Vector) Mutate(rng *rand.Rand) {
+	MutNormalFloat64(x, 0.5, rng)
 }
 
-func (X Vector) Crossover(Y Genome, rng *rand.Rand) {
-	CrossUniformFloat64(X, Y.(Vector), rng)
+func (x Vector) Crossover(y Genome, rng *rand.Rand) {
+	CrossUniformFloat64(x, y.(Vector), rng)
 }
 
-func (X Vector) Clone() Genome {
-	var XX = make(Vector, len(X))
-	copy(XX, X)
+func (x Vector) Clone() Genome {
+	var XX = make(Vector, len(x))
+	copy(XX, x)
 	return XX
 }
 
@@ -38,7 +38,7 @@ type ErrorGenome struct{}
 
 func (eg ErrorGenome) Evaluate() (float64, error)         { return 0, errors.New("") }
 func (eg ErrorGenome) Mutate(rng *rand.Rand)              {}
-func (eg ErrorGenome) Crossover(Y Genome, rng *rand.Rand) {}
+func (eg ErrorGenome) Crossover(y Genome, rng *rand.Rand) {}
 func (eg ErrorGenome) Clone() Genome                      { return ErrorGenome{} }
 
 func NewErrorGenome(rng *rand.Rand) Genome { return ErrorGenome{} }
