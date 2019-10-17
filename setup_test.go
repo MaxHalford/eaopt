@@ -8,9 +8,9 @@ import (
 
 type Vector []float64
 
-func (x Vector) Evaluate() (float64, error) {
+func (xi Vector) Evaluate() (float64, error) {
 	var sum float64
-	for _, x := range x {
+	for _, x := range xi {
 		sum += x
 	}
 	return sum, nil
