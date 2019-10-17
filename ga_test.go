@@ -383,7 +383,6 @@ func TestGADifferentRNGs(t *testing.T) {
 	if ga1.HallOfFame[0].Fitness == ga2.HallOfFame[0].Fitness {
 		t.Errorf("Expected mismatch, got %f == %f", ga1.HallOfFame[0].Fitness, ga2.HallOfFame[0].Fitness)
 	}
-
 }
 
 func TestGASameRNGs(t *testing.T) {

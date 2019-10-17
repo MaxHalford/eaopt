@@ -30,7 +30,7 @@ func randomInts(k uint, min, max int, rng *rand.Rand) []int {
 // Sample k unique integers from a slice of n integers without replacement.
 func sampleInts(ints []int, k uint, rng *rand.Rand) ([]int, []int, error) {
 	if int(k) > len(ints) {
-		return nil, nil, fmt.Errorf("Cannot sample %d elements from array of length %d", k, len(ints))
+		return nil, nil, fmt.Errorf("cannot sample %d elements from array of length %d", k, len(ints))
 	}
 	var (
 		sample = make([]int, k)
