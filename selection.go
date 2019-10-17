@@ -58,7 +58,7 @@ func (sel SelTournament) Apply(n uint, indis Individuals, rng *rand.Rand) (Indiv
 		// Find the best contestant
 		winners[i] = indis[contestants[0]]
 		err := winners[i].Evaluate()
-		if err != nil{
+		if err != nil {
 			return nil, nil, err
 		}
 		winnerIdx = idxs[0]

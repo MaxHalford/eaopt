@@ -70,7 +70,7 @@ func TestSpecKMedoidsApply(t *testing.T) {
 			}
 			// Check error is nil or not
 			if (err == nil) != (tc.err == nil) {
-				if err.Error() != "missing 0 individuals to be able to rebalance the clusters"{
+				if err.Error() != "missing 0 individuals to be able to rebalance the clusters" {
 					t.Error("Wrong error")
 				}
 			}

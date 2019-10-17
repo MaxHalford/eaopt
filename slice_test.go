@@ -60,9 +60,9 @@ func TestGetCycles(t *testing.T) {
 			x: []int{1, 2, 3, 4, 5, 6, 7, 8, 9},
 			y: []int{9, 3, 7, 8, 2, 6, 5, 1, 4},
 			cycles: [][]int{
-				[]int{0, 8, 3, 7},
-				[]int{1, 2, 6, 4},
-				[]int{5},
+				{0, 8, 3, 7},
+				{1, 2, 6, 4},
+				{5},
 			},
 		},
 	}
@@ -88,15 +88,15 @@ func TestGetNeighbours(t *testing.T) {
 		{
 			x: IntSlice{1, 2, 3, 4, 5, 6, 7, 8, 9},
 			neighbours: map[interface{}]set{
-				1: set{9: true, 2: true},
-				2: set{1: true, 3: true},
-				3: set{2: true, 4: true},
-				4: set{3: true, 5: true},
-				5: set{4: true, 6: true},
-				6: set{5: true, 7: true},
-				7: set{6: true, 8: true},
-				8: set{7: true, 9: true},
-				9: set{8: true, 1: true},
+				1: {9: true, 2: true},
+				2: {1: true, 3: true},
+				3: {2: true, 4: true},
+				4: {3: true, 5: true},
+				5: {4: true, 6: true},
+				6: {5: true, 7: true},
+				7: {6: true, 8: true},
+				8: {7: true, 9: true},
+				9: {8: true, 1: true},
 			},
 		},
 	}

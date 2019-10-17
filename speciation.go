@@ -82,7 +82,7 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 	}
 	// Rebalance the species so that their are at least
 	err := rebalanceClusters(species, dm, spec.MinPerCluster)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return species, nil
