@@ -16,17 +16,17 @@ func (xi Vector) Evaluate() (float64, error) {
 	return sum, nil
 }
 
-func (x Vector) Mutate(rng *rand.Rand) {
-	MutNormalFloat64(x, 0.5, rng)
+func (xi Vector) Mutate(rng *rand.Rand) {
+	MutNormalFloat64(xi, 0.5, rng)
 }
 
-func (x Vector) Crossover(y Genome, rng *rand.Rand) {
+func (xi Vector) Crossover(y Genome, rng *rand.Rand) {
 	CrossUniformFloat64(x, y.(Vector), rng)
 }
 
-func (x Vector) Clone() Genome {
-	var XX = make(Vector, len(x))
-	copy(XX, x)
+func (xi Vector) Clone() Genome {
+	var XX = make(Vector, len(xi))
+	copy(XX, xi)
 	return XX
 }
 
