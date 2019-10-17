@@ -21,7 +21,7 @@ func (xi Vector) Mutate(rng *rand.Rand) {
 }
 
 func (xi Vector) Crossover(y Genome, rng *rand.Rand) {
-	CrossUniformFloat64(x, y.(Vector), rng)
+	CrossUniformFloat64(xi, y.(Vector), rng)
 }
 
 func (xi Vector) Clone() Genome {
