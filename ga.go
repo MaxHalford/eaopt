@@ -1,6 +1,10 @@
 package eaopt
 
 import (
+	"bytes"
+	"context"
+	"encoding/gob"
+	"encoding/json"
 	"math"
 	"math/rand"
 	"sort"
@@ -40,16 +44,30 @@ func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 }
 
 func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
+	var err error
+
 	// Reset counters
 	ga.Generations = 0
 	ga.Age = 0
 
 	// Create the initial Populations
-	ga.Populations = make(Populations, ga.NPops)
+	if ga.PopulationsReader != nil {
+		ga.Populations, err = newPopulationsFromReader(ga.NPops, ga.PopulationsReader, ga.RNG, ga.GenomeJSONUnmarshaler)
+		if err != nil {
+			return err
+		}
+		for i := 0; i < len(ga.Populations); i++ {
+			ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
+		}
+	} else {
+		ga.Populations = make(Populations, ga.NPops)
+		for i := range ga.Populations {
+			ga.Populations[i] = newPopulation(ga.PopSize, newGenome, ga.RNG)
+		}
+	}
 	for i := range ga.Populations {
-		ga.Populations[i] = newPopulation(ga.PopSize, newGenome, ga.RNG)
 		// Evaluate and sort
-		err := ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
+		err = ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 		if err != nil {
 			return err
 		}
@@ -58,6 +76,7 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		if ga.Logger != nil {
 			ga.Populations[i].Log(ga.Logger)
 		}
+		ga.Populations[i].JSONUnmarshaler = ga.GenomeJSONUnmarshaler
 	}
 
 	// Initialize the hall of fame
@@ -72,6 +91,17 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 	// Execute the callback if it has been set
 	if ga.Callback != nil {
 		ga.Callback(ga)
+	}
+
+	if ga.Context != nil && ga.PopulationsWriter != nil {
+		go func(ctx context.Context) {
+			// blocks awaiting the context close
+			<-ctx.Done()
+			err := ga.Marshal()
+			if err != nil && ga.Logger != nil {
+				ga.Logger.Println("Error marshaling populations", err)
+			}
+		}(ga.Context)
 	}
 
 	return nil
@@ -156,6 +186,31 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 		}
 		if err := ga.evolve(); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (ga *GA) Marshal() (err error) {
+	if ga.PopulationsWriter != nil {
+		if ga.GenomeJSONUnmarshaler != nil {
+			out, err := json.Marshal(ga.Populations)
+			if err != nil {
+				return err
+			}
+			_, err = ga.PopulationsWriter.Write(out)
+			if err != nil {
+				return err
+			}
+		} else {
+			var buf bytes.Buffer
+			if err := gob.NewEncoder(&buf).Encode(&ga.Populations); err != nil {
+				return err
+			}
+			_, err = ga.PopulationsWriter.Write(buf.Bytes())
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
