@@ -1,6 +1,9 @@
 package eaopt
 
 import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
 	"errors"
 	"math"
 	"math/rand"
@@ -28,6 +31,33 @@ func (X Vector) Clone() Genome {
 	var XX = make(Vector, len(X))
 	copy(XX, X)
 	return XX
+}
+
+func (X Vector) GobEncode() ([]byte, error) {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+	if err := encoder.Encode([]float64(X)); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (X *Vector) GobDecode(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	decoder := gob.NewDecoder(buf)
+	var values []float64
+	if err := decoder.Decode(&values); err != nil {
+		return err
+	}
+	*X = values
+	return nil
+}
+
+// VectorJSONUnmarshaler handles unmarshaling of JSON encoded Vectors.
+func VectorJSONUnmarshaler(data []byte) (Genome, error) {
+	var values []float64
+	err := json.Unmarshal(data, &values)
+	return Vector(values), err
 }
 
 func NewVector(rng *rand.Rand) Genome {
@@ -91,4 +121,8 @@ func (spec RuntimeErrorGenome) Evaluate() (float64, error) {
 
 func NewRuntimeErrorGenome(rng *rand.Rand) Genome {
 	return RuntimeErrorGenome{[]float64{42}}
+}
+
+func init() {
+	gob.Register(Vector{})
 }

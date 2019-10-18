@@ -2,6 +2,7 @@ package eaopt
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"math/rand"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestUpdateHallOfFame(t *testing.T) {
@@ -430,5 +432,133 @@ func TestGAMinimizeEarlyStop(t *testing.T) {
 	}
 	if ga.Generations != 10 {
 		t.Errorf("Expected 10, got %d", ga.Generations)
+	}
+}
+
+func TestGAJSONMarshaling(t *testing.T) {
+	config := NewDefaultGAConfig()
+	config.NPops = 5
+
+	var out bytes.Buffer
+	ga1, err := config.NewGA()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ga1.RNG = rand.New(rand.NewSource(42))
+	ga1.PopulationsWriter = &out
+	ctx, cancel := context.WithCancel(context.Background())
+	ga1.Context = ctx
+
+	if err := ga1.Minimize(NewVector); err != nil {
+		t.Error(err)
+	}
+
+	// forces GA to write the Populations to the buf when the Context is canceled
+	cancel()
+
+	// wait for buf to be written
+	time.Sleep(time.Millisecond * 500)
+
+	ga2, err := config.NewGA()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ga2.RNG = rand.New(rand.NewSource(42))
+	ga2.PopulationsReader = &out
+	err = ga2.init(NewVector)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i := range ga1.Populations {
+		if ga1.Populations[i].String() != ga2.Populations[i].String() {
+			t.Fatal("Populations not equal")
+		}
+	}
+}
+
+func TestGAJSONMarshalingStepper(t *testing.T) {
+	config := NewDefaultGAConfig()
+	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
+
+	var (
+		in      bytes.Buffer
+		rng     *rand.Rand = rand.New(rand.NewSource(42))
+		runs    int        = 3
+		lastHOF *Individual
+	)
+	// then run three separate runs from JSON out/in
+	for i := 0; i < runs; i++ {
+		var out bytes.Buffer
+		ga, err := config.NewGA()
+		if err != nil {
+			t.Fatal(err)
+		}
+		ga.NGenerations = 1
+		ga.RNG = rng
+		ga.PopulationsWriter = &out
+		if in.Len() > 0 {
+			ga.PopulationsReader = &in
+		}
+		ga.Callback = func(ga *GA) {
+			if lastHOF != nil {
+				if lastHOF.Fitness != ga.HallOfFame[0].Fitness {
+					t.Fatal("The last hall of fame fitness should match the new")
+				}
+			}
+			lastHOF = &ga.HallOfFame[0]
+		}
+		err = ga.Minimize(NewVector)
+		err = ga.Marshal()
+		if err != nil {
+			t.Fatal(err)
+		}
+		in = out
+	}
+}
+
+func TestGAGOBMarshalling(t *testing.T) {
+	var out bytes.Buffer
+
+	ga1, err := NewDefaultGAConfig().NewGA()
+	if err != nil {
+		t.Error(err)
+	}
+	ga1.RNG = rand.New(rand.NewSource(42))
+	ga1.PopulationsWriter = &out
+	ctx, cancel := context.WithCancel(context.Background())
+	ga1.Context = ctx
+
+	if err = ga1.Minimize(NewVector); err != nil {
+		t.Error(err)
+	}
+
+	// forces the GA to write the Populations to the buf
+	cancel()
+
+	// wait for buf to be written
+	time.Sleep(time.Millisecond * 500)
+
+	if out.Len() == 0 {
+		t.Fatal("No output to buffer")
+	}
+
+	ga2, err := NewDefaultGAConfig().NewGA()
+	if err != nil {
+		t.Error(err)
+	}
+	ga2.RNG = rand.New(rand.NewSource(42))
+	ga2.PopulationsReader = &out
+	ga2.Callback = func(ga *GA) {
+		// the first callback should contain ga1's last population
+		for i := range ga.Populations {
+			if !reflect.DeepEqual(ga.Populations[i].Individuals, ga1.Populations[i].Individuals) {
+				t.Fatal("Marshaling error")
+			}
+		}
+		ga2.Callback = nil
+	}
+	if err = ga2.Minimize(NewVector); err != nil {
+		t.Error(err)
 	}
 }
