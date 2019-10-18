@@ -1,6 +1,12 @@
 package eaopt
 
 import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"time"
@@ -12,11 +18,12 @@ import (
 // Individuals can migrate from one population to another. Each population has a
 // random number generator to bypass the global rand mutex.
 type Population struct {
-	Individuals Individuals   `json:"indis"`
-	Age         time.Duration `json:"age"`
-	Generations uint          `json:"generations"`
-	ID          string        `json:"id"`
-	RNG         *rand.Rand
+	Individuals     Individuals                  `json:"indis"`
+	Age             time.Duration                `json:"age"`
+	Generations     uint                         `json:"generations"`
+	ID              string                       `json:"id"`
+	RNG             *rand.Rand                   `json:"-"`
+	JSONUnmarshaler func([]byte) (Genome, error) `json:"-"`
 }
 
 // Generate a new population.
@@ -32,16 +39,126 @@ func newPopulation(size uint, newGenome func(rng *rand.Rand) Genome, RNG *rand.R
 	return pop
 }
 
+// Generate a new population from an io.Reader.
+func newPopulationsFromReader(populationCount uint, reader io.Reader, RNG *rand.Rand, unmarshaler func([]byte) (Genome, error)) ([]Population, error) {
+	pops := make([]Population, populationCount)
+	for i := range pops {
+		pops[i].RNG = rand.New(rand.NewSource(RNG.Int63()))
+		pops[i].JSONUnmarshaler = unmarshaler
+	}
+	b, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	switch b[0] {
+	case '[':
+		err = json.Unmarshal(b, &pops)
+	default:
+		decoder := gob.NewDecoder(bytes.NewBuffer(b))
+		err = decoder.Decode(&pops)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return pops, err
+}
+
 // Log a Population's current statistics with a provided log.Logger.
 func (pop Population) Log(logger *log.Logger) {
-	logger.Printf(
-		"pop_id=%s min=%f max=%f avg=%f std=%f",
+	logger.Print(pop.stats())
+}
+
+func (pop Population) String() string {
+	return pop.stats()
+}
+
+func (pop Population) stats() string {
+	return fmt.Sprintf("pop_id=%s min=%f max=%f avg=%f std=%f",
 		pop.ID,
 		pop.Individuals.FitMin(),
 		pop.Individuals.FitMax(),
 		pop.Individuals.FitAvg(),
 		pop.Individuals.FitStd(),
 	)
+}
+
+// UnmarshalJSON implements a JSON unmarshaler for Populations. This override
+// is required because the JSON unmarshaler has no idea how to create your
+// implementation of the Genome interface. See setup_test.go:VectorJSONUnmarshaler
+// for an example JSON unmarshaler function. See ga_test.go:TestMarshalGA for
+// an example of using this custom decoder in a GA instance.
+func (pop *Population) UnmarshalJSON(data []byte) error {
+
+	var decoded struct {
+		Age         time.Duration
+		Generations uint
+		ID          string
+		Indis       []interface{}
+	}
+	err := json.Unmarshal(data, &decoded)
+	if err != nil {
+		return err
+	}
+
+	pop.Age = decoded.Age
+	pop.Generations = decoded.Generations
+	pop.ID = decoded.ID
+	if pop.JSONUnmarshaler != nil {
+		for _, v := range decoded.Indis {
+			val, err := json.Marshal(v.(map[string]interface{})["genome"])
+			if err != nil {
+				return err
+			}
+			genome, err := pop.JSONUnmarshaler(val)
+			if err != nil {
+				return err
+			}
+			pop.Individuals = append(pop.Individuals, Individual{
+				Genome:  genome,
+				Fitness: v.(map[string]interface{})["fitness"].(float64),
+				ID:      v.(map[string]interface{})["id"].(string),
+			})
+		}
+	}
+	return nil
+}
+
+// GobEncode implements a custom binary marshaler for serializing Populations.
+func (pop *Population) GobEncode() ([]byte, error) {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+	if err := encoder.Encode(pop.Age); err != nil {
+		return nil, err
+	}
+	if err := encoder.Encode(pop.Generations); err != nil {
+		return nil, err
+	}
+	if err := encoder.Encode(pop.ID); err != nil {
+		return nil, err
+	}
+	if err := encoder.Encode(pop.Individuals); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// GobDecode implements a custom binary marshaler for serializing Populations.
+func (pop *Population) GobDecode(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	decoder := gob.NewDecoder(buf)
+	if err := decoder.Decode(&pop.Age); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&pop.Generations); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&pop.ID); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&pop.Individuals); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Populations type is necessary for migration and speciation purposes.
