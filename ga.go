@@ -191,6 +191,7 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 	return nil
 }
 
+// Marshal marshals the GA's current populations to the `PopulationsWriter`, if present.
 func (ga *GA) Marshal() (err error) {
 	if ga.PopulationsWriter != nil {
 		if ga.GenomeJSONUnmarshaler != nil {
