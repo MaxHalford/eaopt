@@ -1,7 +1,9 @@
 package eaopt
 
 import (
+	"context"
 	"errors"
+	"io"
 	"log"
 	"math/rand"
 	"time"
@@ -25,6 +27,13 @@ type GAConfig struct {
 	Callback     func(ga *GA)
 	EarlyStop    func(ga *GA) bool
 	RNG          *rand.Rand
+
+	Context context.Context
+
+	// Optional, marshaling fields
+	PopulationsReader     io.Reader
+	PopulationsWriter     io.Writer
+	GenomeJSONUnmarshaler func([]byte) (Genome, error)
 }
 
 // NewGA returns a pointer to a GA instance and checks for configuration
