@@ -9,6 +9,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 )
@@ -437,9 +438,9 @@ func TestGAMinimizeEarlyStop(t *testing.T) {
 
 func TestGAJSONMarshaling(t *testing.T) {
 	config := NewDefaultGAConfig()
-	config.NPops = 5
+	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
 
-	var out bytes.Buffer
+	var out ThreadSafeBuffer
 	ga1, err := config.NewGA()
 	if err != nil {
 		t.Fatal(err)
@@ -471,7 +472,9 @@ func TestGAJSONMarshaling(t *testing.T) {
 	}
 
 	for i := range ga1.Populations {
-		if ga1.Populations[i].String() != ga2.Populations[i].String() {
+		if reflect.DeepEqual(ga1.Populations[i].Individuals, ga2.Populations[i].Individuals) {
+			fmt.Println(ga1.Populations[i].String())
+			fmt.Println(ga2.Populations[i].String())
 			t.Fatal("Populations not equal")
 		}
 	}
@@ -517,8 +520,34 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 	}
 }
 
+type ThreadSafeBuffer struct {
+	b bytes.Buffer
+	m sync.Mutex
+}
+
+func (b *ThreadSafeBuffer) Read(p []byte) (n int, err error) {
+	b.m.Lock()
+	defer b.m.Unlock()
+	return b.b.Read(p)
+}
+func (b *ThreadSafeBuffer) Write(p []byte) (n int, err error) {
+	b.m.Lock()
+	defer b.m.Unlock()
+	return b.b.Write(p)
+}
+func (b *ThreadSafeBuffer) Len() int {
+	b.m.Lock()
+	defer b.m.Unlock()
+	return b.b.Len()
+}
+func (b *ThreadSafeBuffer) Bytes() []byte {
+	b.m.Lock()
+	defer b.m.Unlock()
+	return b.b.Bytes()
+}
+
 func TestGAGOBMarshalling(t *testing.T) {
-	var out bytes.Buffer
+	var out ThreadSafeBuffer
 
 	ga1, err := NewDefaultGAConfig().NewGA()
 	if err != nil {
@@ -548,7 +577,8 @@ func TestGAGOBMarshalling(t *testing.T) {
 		t.Error(err)
 	}
 	ga2.RNG = rand.New(rand.NewSource(42))
-	ga2.PopulationsReader = &out
+	in := bytes.NewBuffer(out.Bytes())
+	ga2.PopulationsReader = in
 	ga2.Callback = func(ga *GA) {
 		// the first callback should contain ga1's last population
 		for i := range ga.Populations {
