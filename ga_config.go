@@ -1,7 +1,6 @@
 package eaopt
 
 import (
-	"context"
 	"errors"
 	"io"
 	"log"
@@ -28,11 +27,8 @@ type GAConfig struct {
 	EarlyStop    func(ga *GA) bool
 	RNG          *rand.Rand
 
-	Context context.Context
-
 	// Optional, marshaling fields
 	PopulationsReader     io.Reader
-	PopulationsWriter     io.Writer
 	GenomeJSONUnmarshaler func([]byte) (Genome, error)
 }
 

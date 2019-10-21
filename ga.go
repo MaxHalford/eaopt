@@ -2,7 +2,6 @@ package eaopt
 
 import (
 	"bytes"
-	"context"
 	"encoding/gob"
 	"encoding/json"
 	"math"
@@ -93,17 +92,6 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		ga.Callback(ga)
 	}
 
-	if ga.Context != nil && ga.PopulationsWriter != nil {
-		go func(ctx context.Context) {
-			// blocks awaiting the context close
-			<-ctx.Done()
-			err := ga.Marshal()
-			if err != nil && ga.Logger != nil {
-				ga.Logger.Println("Error marshaling populations", err)
-			}
-		}(ga.Context)
-	}
-
 	return nil
 }
 
@@ -191,30 +179,18 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 	return nil
 }
 
-// Marshal marshals the GA's current populations to the `PopulationsWriter`, if present.
-func (ga *GA) Marshal() (err error) {
-	if ga.PopulationsWriter != nil {
-		if ga.GenomeJSONUnmarshaler != nil {
-			out, err := json.Marshal(ga.Populations)
-			if err != nil {
-				return err
-			}
-			_, err = ga.PopulationsWriter.Write(out)
-			if err != nil {
-				return err
-			}
-		} else {
-			var buf bytes.Buffer
-			if err := gob.NewEncoder(&buf).Encode(&ga.Populations); err != nil {
-				return err
-			}
-			_, err = ga.PopulationsWriter.Write(buf.Bytes())
-			if err != nil {
-				return err
-			}
-		}
+// MarshalJSON marshals the GA's current populations.
+func (ga *GA) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ga.Populations)
+}
+
+// MarshalGOB marshals the GA's current populations.
+func (ga *GA) MarshalGOB() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := gob.NewEncoder(&buf).Encode(&ga.Populations); err != nil {
+		return nil, err
 	}
-	return nil
+	return buf.Bytes(), nil
 }
 
 func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {

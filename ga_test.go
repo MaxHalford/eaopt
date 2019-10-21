@@ -2,16 +2,13 @@ package eaopt
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"log"
 	"math"
 	"math/rand"
 	"reflect"
-	"sync"
 	"testing"
-	"time"
 )
 
 func TestUpdateHallOfFame(t *testing.T) {
@@ -92,15 +89,15 @@ func TestGAInit(t *testing.T) {
 }
 
 func TestGAInitBadGenome(t *testing.T) {
-	var ga, err = NewDefaultGAConfig().NewGA()
-	if err = ga.init(NewErrorGenome); err == nil {
+	var ga, _ = NewDefaultGAConfig().NewGA()
+	if err := ga.init(NewErrorGenome); err == nil {
 		t.Error("Expected error")
 	}
 }
 
 func TestGAMinimizeBadGenome(t *testing.T) {
-	var ga, err = NewDefaultGAConfig().NewGA()
-	if err = ga.Minimize(NewErrorGenome); err == nil {
+	var ga, _ = NewDefaultGAConfig().NewGA()
+	if err := ga.Minimize(NewErrorGenome); err == nil {
 		t.Error("Expected error")
 	}
 }
@@ -440,32 +437,34 @@ func TestGAJSONMarshaling(t *testing.T) {
 	config := NewDefaultGAConfig()
 	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
 
-	var out ThreadSafeBuffer
 	ga1, err := config.NewGA()
 	if err != nil {
 		t.Fatal(err)
 	}
 	ga1.RNG = rand.New(rand.NewSource(42))
-	ga1.PopulationsWriter = &out
-	ctx, cancel := context.WithCancel(context.Background())
-	ga1.Context = ctx
 
 	if err := ga1.Minimize(NewVector); err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
-	// forces GA to write the Populations to the buf when the Context is canceled
-	cancel()
-
-	// wait for buf to be written
-	time.Sleep(time.Millisecond * 500)
+	out, err := ga1.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	ga2, err := config.NewGA()
 	if err != nil {
 		t.Fatal(err)
 	}
 	ga2.RNG = rand.New(rand.NewSource(42))
-	ga2.PopulationsReader = &out
+
+	ga2.PopulationsReader = bytes.NewBuffer([]byte("[this is not a valid encoding]"))
+	err = ga2.init(NewVector)
+	if err == nil {
+		t.Fatal("Expected init to fail with invalid population encoding")
+	}
+
+	ga2.PopulationsReader = bytes.NewBuffer(out)
 	err = ga2.init(NewVector)
 	if err != nil {
 		t.Fatal(err)
@@ -485,23 +484,21 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
 
 	var (
-		in      bytes.Buffer
+		in      *bytes.Buffer
 		rng     *rand.Rand = rand.New(rand.NewSource(42))
 		runs    int        = 3
 		lastHOF *Individual
 	)
 	// then run three separate runs from JSON out/in
 	for i := 0; i < runs; i++ {
-		var out bytes.Buffer
 		ga, err := config.NewGA()
 		if err != nil {
 			t.Fatal(err)
 		}
 		ga.NGenerations = 1
 		ga.RNG = rng
-		ga.PopulationsWriter = &out
-		if in.Len() > 0 {
-			ga.PopulationsReader = &in
+		if in != nil {
+			ga.PopulationsReader = in
 		}
 		ga.Callback = func(ga *GA) {
 			if lastHOF != nil {
@@ -512,64 +509,32 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 			lastHOF = &ga.HallOfFame[0]
 		}
 		err = ga.Minimize(NewVector)
-		err = ga.Marshal()
 		if err != nil {
 			t.Fatal(err)
 		}
-		in = out
+		data, err := ga.MarshalJSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		in = bytes.NewBuffer(data)
 	}
 }
 
-type ThreadSafeBuffer struct {
-	b bytes.Buffer
-	m sync.Mutex
-}
-
-func (b *ThreadSafeBuffer) Read(p []byte) (n int, err error) {
-	b.m.Lock()
-	defer b.m.Unlock()
-	return b.b.Read(p)
-}
-func (b *ThreadSafeBuffer) Write(p []byte) (n int, err error) {
-	b.m.Lock()
-	defer b.m.Unlock()
-	return b.b.Write(p)
-}
-func (b *ThreadSafeBuffer) Len() int {
-	b.m.Lock()
-	defer b.m.Unlock()
-	return b.b.Len()
-}
-func (b *ThreadSafeBuffer) Bytes() []byte {
-	b.m.Lock()
-	defer b.m.Unlock()
-	return b.b.Bytes()
-}
-
 func TestGAGOBMarshalling(t *testing.T) {
-	var out ThreadSafeBuffer
 
 	ga1, err := NewDefaultGAConfig().NewGA()
 	if err != nil {
 		t.Error(err)
 	}
 	ga1.RNG = rand.New(rand.NewSource(42))
-	ga1.PopulationsWriter = &out
-	ctx, cancel := context.WithCancel(context.Background())
-	ga1.Context = ctx
 
 	if err = ga1.Minimize(NewVector); err != nil {
 		t.Error(err)
 	}
 
-	// forces the GA to write the Populations to the buf
-	cancel()
-
-	// wait for buf to be written
-	time.Sleep(time.Millisecond * 500)
-
-	if out.Len() == 0 {
-		t.Fatal("No output to buffer")
+	data, err := ga1.MarshalGOB()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	ga2, err := NewDefaultGAConfig().NewGA()
@@ -577,8 +542,7 @@ func TestGAGOBMarshalling(t *testing.T) {
 		t.Error(err)
 	}
 	ga2.RNG = rand.New(rand.NewSource(42))
-	in := bytes.NewBuffer(out.Bytes())
-	ga2.PopulationsReader = in
+	ga2.PopulationsReader = bytes.NewBuffer(data)
 	ga2.Callback = func(ga *GA) {
 		// the first callback should contain ga1's last population
 		for i := range ga.Populations {
