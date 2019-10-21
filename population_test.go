@@ -70,9 +70,9 @@ func TestPopGOBMarshal(t *testing.T) {
 
 func TestPopsJSONMarshal(t *testing.T) {
 	pop1 := newPopulation(3, NewVector, rand.New(rand.NewSource(42)))
-	pop1.Individuals.Evaluate(false)
+	_ = pop1.Individuals.Evaluate(false)
 	pop2 := newPopulation(3, NewVector, rand.New(rand.NewSource(201)))
-	pop2.Individuals.Evaluate(false)
+	_ = pop2.Individuals.Evaluate(false)
 
 	pops := Populations{pop1, pop2}
 	encodedPops, err := json.Marshal(pops)
@@ -98,9 +98,9 @@ func TestPopsJSONMarshal(t *testing.T) {
 
 func TestPopsGOBMarshal(t *testing.T) {
 	pop1 := newPopulation(3, NewVector, rand.New(rand.NewSource(42)))
-	pop1.Individuals.Evaluate(false)
+	_ = pop1.Individuals.Evaluate(false)
 	pop2 := newPopulation(3, NewVector, rand.New(rand.NewSource(201)))
-	pop2.Individuals.Evaluate(false)
+	_ = pop2.Individuals.Evaluate(false)
 
 	pops := Populations{pop1, pop2}
 	var buf bytes.Buffer
