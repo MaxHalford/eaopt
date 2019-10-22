@@ -55,9 +55,6 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		if err != nil {
 			return err
 		}
-		for i := 0; i < len(ga.Populations); i++ {
-			ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
-		}
 	} else {
 		ga.Populations = make(Populations, ga.NPops)
 		for i := range ga.Populations {
