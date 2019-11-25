@@ -2,6 +2,7 @@ package eaopt
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -185,13 +186,6 @@ func TestInitResetCounters(t *testing.T) {
 	}
 	if ga.Generations != 1 {
 		t.Errorf("Expected 1, got %d", ga.Generations)
-	}
-	ga.init(NewVector)
-	if ga.Age > 0 {
-		t.Errorf("Expected 0, got %v", ga.Age)
-	}
-	if ga.Generations > 0 {
-		t.Errorf("Expected 0, got %d", ga.Generations)
 	}
 }
 
@@ -447,35 +441,33 @@ func TestGAJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := ga1.MarshalJSON()
+	out, err := json.Marshal(ga1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	ga2, err := config.NewGA()
-	if err != nil {
-		t.Fatal(err)
-	}
 	ga2.RNG = rand.New(rand.NewSource(42))
+	err = ga2.UnmarshalJSON(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ga2.HallOfFame.Evaluate(false)
 
-	ga2.PopulationsReader = bytes.NewBuffer([]byte("[this is not a valid encoding]"))
-	err = ga2.init(NewVector)
-	if err == nil {
-		t.Fatal("Expected init to fail with invalid population encoding")
+	if !reflect.DeepEqual(ga1.HallOfFame, ga2.HallOfFame) {
+		t.Fatal("Expected HAFs to be equal")
 	}
 
-	ga2.PopulationsReader = bytes.NewBuffer(out)
-	err = ga2.init(NewVector)
+	err = ga2.Minimize(NewVector)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for i := range ga1.Populations {
-		if reflect.DeepEqual(ga1.Populations[i].Individuals, ga2.Populations[i].Individuals) {
-			fmt.Println(ga1.Populations[i].String())
-			fmt.Println(ga2.Populations[i].String())
-			t.Fatal("Populations not equal")
-		}
+	if ga2.Generations != 100 {
+		t.Fatal("Expected correct generations count")
+	}
+	if ga2.Age == ga1.Age {
+		t.Fatal("GA Durations should not match")
 	}
 }
 
@@ -484,7 +476,7 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
 
 	var (
-		in      *bytes.Buffer
+		b       []byte
 		rng     *rand.Rand = rand.New(rand.NewSource(42))
 		runs    int        = 3
 		lastHOF *Individual
@@ -495,11 +487,14 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if b != nil {
+			err = ga.UnmarshalJSON(b)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
 		ga.NGenerations = 1
 		ga.RNG = rng
-		if in != nil {
-			ga.PopulationsReader = in
-		}
 		ga.Callback = func(ga *GA) {
 			if lastHOF != nil {
 				if lastHOF.Fitness != ga.HallOfFame[0].Fitness {
@@ -512,47 +507,23 @@ func TestGAJSONMarshalingStepper(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		data, err := ga.MarshalJSON()
+		b, err = json.Marshal(ga)
 		if err != nil {
 			t.Fatal(err)
 		}
-		in = bytes.NewBuffer(data)
 	}
 }
 
-func TestGAGOBMarshalling(t *testing.T) {
+func TestGAJSONErrorHandling(t *testing.T) {
+	ga, _ := NewDefaultGAConfig().NewGA()
 
-	ga1, err := NewDefaultGAConfig().NewGA()
-	if err != nil {
-		t.Error(err)
-	}
-	ga1.RNG = rand.New(rand.NewSource(42))
-
-	if err = ga1.Minimize(NewVector); err != nil {
-		t.Error(err)
+	err := ga.UnmarshalJSON([]byte("[this is not a valid JSON GA]"))
+	if err == nil {
+		t.Fatal("Expected invalid JSON to fail")
 	}
 
-	data, err := ga1.MarshalGOB()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ga2, err := NewDefaultGAConfig().NewGA()
-	if err != nil {
-		t.Error(err)
-	}
-	ga2.RNG = rand.New(rand.NewSource(42))
-	ga2.PopulationsReader = bytes.NewBuffer(data)
-	ga2.Callback = func(ga *GA) {
-		// the first callback should contain ga1's last population
-		for i := range ga.Populations {
-			if !reflect.DeepEqual(ga.Populations[i].Individuals, ga1.Populations[i].Individuals) {
-				t.Fatal("Marshaling error")
-			}
-		}
-		ga2.Callback = nil
-	}
-	if err = ga2.Minimize(NewVector); err != nil {
-		t.Error(err)
+	err = ga.UnmarshalJSON([]byte(`{"populations": "not_valid"}`))
+	if err == nil {
+		t.Fatal("Expected invalid populations JSON to fail")
 	}
 }

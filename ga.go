@@ -1,8 +1,6 @@
 package eaopt
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"math"
 	"math/rand"
@@ -45,17 +43,11 @@ func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 	var err error
 
-	// Reset counters
-	ga.Generations = 0
-	ga.Age = 0
-
-	// Create the initial Populations
-	if ga.PopulationsReader != nil {
-		ga.Populations, err = newPopulationsFromReader(ga.NPops, ga.PopulationsReader, ga.RNG, ga.GenomeJSONUnmarshaler)
-		if err != nil {
-			return err
-		}
-	} else {
+	// Create the initial Populations (if not read from storage).
+	if len(ga.Populations) == 0 {
+		// Reset counters
+		ga.Generations = 0
+		ga.Age = 0
 		ga.Populations = make(Populations, ga.NPops)
 		for i := range ga.Populations {
 			ga.Populations[i] = newPopulation(ga.PopSize, newGenome, ga.RNG)
@@ -76,12 +68,19 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 	}
 
 	// Initialize the hall of fame
-	ga.HallOfFame = make(Individuals, ga.HofSize)
-	for i := range ga.HallOfFame {
-		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
-	}
-	for _, pop := range ga.Populations {
-		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
+	if len(ga.HallOfFame) == 0 {
+		ga.HallOfFame = make(Individuals, ga.HofSize)
+		for i := range ga.HallOfFame {
+			ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
+		}
+		for _, pop := range ga.Populations {
+			updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
+		}
+	} else {
+		err = ga.HallOfFame.Evaluate(ga.ParallelEval)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Execute the callback if it has been set
@@ -176,18 +175,58 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 	return nil
 }
 
-// MarshalJSON marshals the GA's current populations.
-func (ga *GA) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ga.Populations)
-}
+// UnmarshalJSON decodes a GA represented as JSON.
+func (ga *GA) UnmarshalJSON(data []byte) error {
 
-// MarshalGOB marshals the GA's current populations.
-func (ga *GA) MarshalGOB() ([]byte, error) {
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(&ga.Populations); err != nil {
-		return nil, err
+	gaMap := make(map[string]interface{})
+	err := json.Unmarshal(data, &gaMap)
+	if err != nil {
+		return err
 	}
-	return buf.Bytes(), nil
+	age, ok := gaMap["duration"].(float64)
+	if !ok {
+		age = 0
+	}
+	ga.Age = time.Duration(age)
+	generations, ok := gaMap["generations"].(float64)
+	if !ok {
+		generations = 0
+	}
+	ga.Generations = uint(generations)
+
+	populationsJSON, err := json.Marshal(gaMap["populations"])
+	if err != nil {
+		return err
+	}
+	ga.Populations, err = newPopulationsFromBytes(ga.NPops, populationsJSON, ga.RNG, ga.GenomeJSONUnmarshaler)
+	if err != nil {
+		return err
+	}
+
+	var individuals []interface{}
+	hafJSON, err := json.Marshal(gaMap["hall_of_fame"])
+	ga.HallOfFame = make(Individuals, 0)
+	err = json.Unmarshal(hafJSON, &individuals)
+	if err != nil {
+		return err
+	}
+	for _, v := range individuals {
+		val, err := json.Marshal(v.(map[string]interface{})["genome"])
+		if err != nil {
+			return err
+		}
+		genome, err := ga.GenomeJSONUnmarshaler(val)
+		if err != nil {
+			return err
+		}
+		ga.HallOfFame = append(ga.HallOfFame, Individual{
+			Genome:  genome,
+			Fitness: v.(map[string]interface{})["fitness"].(float64),
+			ID:      v.(map[string]interface{})["id"].(string),
+		})
+	}
+
+	return nil
 }
 
 func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
