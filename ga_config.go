@@ -2,7 +2,6 @@ package eaopt
 
 import (
 	"errors"
-	"io"
 	"log"
 	"math/rand"
 	"time"
@@ -27,8 +26,8 @@ type GAConfig struct {
 	EarlyStop    func(ga *GA) bool
 	RNG          *rand.Rand
 
-	// Optional, marshaling fields
-	PopulationsReader     io.Reader
+	// Optional, unmarshal function for your Genome. Needed to support deserializing
+	// a GA and its population(s) from JSON.
 	GenomeJSONUnmarshaler func([]byte) (Genome, error)
 }
 
