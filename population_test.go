@@ -2,7 +2,6 @@ package eaopt
 
 import (
 	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"log"
 	"math/rand"
@@ -47,27 +46,6 @@ func TestPopJSONMarshal(t *testing.T) {
 	}
 }
 
-func TestPopGOBMarshal(t *testing.T) {
-	pop1 := newPopulation(42, NewVector, rand.New(rand.NewSource(42)))
-	pop1.Individuals.Evaluate(false)
-
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(&pop1); err != nil {
-		t.Fatal(err)
-	}
-
-	var pop2 Population
-	decoder := gob.NewDecoder(&buf)
-	err := decoder.Decode(&pop2)
-	if err != nil {
-		t.Fatal(err)
-	}
-	pop2.Individuals.Evaluate(false)
-	if pop1.String() != pop2.String() {
-		t.Errorf("Expected %s, got %s", pop1.String(), pop2.String())
-	}
-}
-
 func TestPopsJSONMarshal(t *testing.T) {
 	pop1 := newPopulation(3, NewVector, rand.New(rand.NewSource(42)))
 	_ = pop1.Individuals.Evaluate(false)
@@ -80,8 +58,7 @@ func TestPopsJSONMarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	buf := bytes.NewBuffer(encodedPops)
-	decodedPops, err := newPopulationsFromReader(uint(len(pops)), buf, rand.New(rand.NewSource(42)), VectorJSONUnmarshaler)
+	decodedPops, err := newPopulationsFromBytes(uint(len(pops)), encodedPops, rand.New(rand.NewSource(42)), VectorJSONUnmarshaler)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,29 +70,5 @@ func TestPopsJSONMarshal(t *testing.T) {
 
 	if !reflect.DeepEqual(encodedPops, encodedDecodedPops) {
 		t.Fatal("Marshaling error")
-	}
-}
-
-func TestPopsGOBMarshal(t *testing.T) {
-	pop1 := newPopulation(3, NewVector, rand.New(rand.NewSource(42)))
-	_ = pop1.Individuals.Evaluate(false)
-	pop2 := newPopulation(3, NewVector, rand.New(rand.NewSource(201)))
-	_ = pop2.Individuals.Evaluate(false)
-
-	pops := Populations{pop1, pop2}
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(&pops); err != nil {
-		t.Fatal(err)
-	}
-
-	decodedPops, err := newPopulationsFromReader(uint(len(pops)), &buf, rand.New(rand.NewSource(42)), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for i := range pops {
-		if !reflect.DeepEqual(pops[i].Individuals, decodedPops[i].Individuals) {
-			t.Fatal("Marshaling error")
-		}
 	}
 }

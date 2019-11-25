@@ -1,10 +1,7 @@
 package eaopt
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
-	"reflect"
 	"testing"
 )
 
@@ -111,32 +108,5 @@ func TestCrossoverIndividual(t *testing.T) {
 	}
 	if &offspring1 == &indi1 || &offspring1 == &indi2 || &offspring2 == &indi1 || &offspring2 == &indi2 {
 		t.Error("Offsprings shouldn't share pointers with parents")
-	}
-}
-
-func TestGOBIndividual(t *testing.T) {
-
-	var (
-		err           error
-		buf           bytes.Buffer
-		newIndividual Individual
-		indi          = Individual{
-			Genome:    Vector{0, 1, 2},
-			Fitness:   42,
-			Evaluated: true,
-			ID:        "bob",
-		}
-	)
-	if err = gob.NewEncoder(&buf).Encode(&indi); err != nil {
-		t.Fatal(err)
-	}
-
-	decoder := gob.NewDecoder(&buf)
-	if err = decoder.Decode(&newIndividual); err != nil {
-		t.Fatal(err)
-	}
-
-	if indi.ID != newIndividual.ID || !reflect.DeepEqual(indi.Genome, newIndividual.Genome) {
-		t.Fatal("Marshaling error")
 	}
 }

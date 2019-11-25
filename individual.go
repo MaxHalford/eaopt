@@ -1,8 +1,6 @@
 package eaopt
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
 	"math"
 	"math/rand"
@@ -97,37 +95,4 @@ func (indi Individual) IdxOfClosest(indis Individuals, dm DistanceMemoizer) (i i
 		}
 	}
 	return i
-}
-
-// GobEncode implements a custom binary marshaler for serializing Individuals.
-func (indi *Individual) GobEncode() ([]byte, error) {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-	if err := encoder.Encode(indi.ID); err != nil {
-		return nil, err
-	}
-	if err := encoder.Encode(indi.Fitness); err != nil {
-		return nil, err
-	}
-	if err := encoder.Encode(&indi.Genome); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-// GobDecode implements a custom binary marshaler for serializing Individuals.
-func (indi *Individual) GobDecode(b []byte) error {
-	buf := bytes.NewBuffer(b)
-	decoder := gob.NewDecoder(buf)
-	if err := decoder.Decode(&indi.ID); err != nil {
-		return err
-	}
-	if err := decoder.Decode(&indi.Fitness); err != nil {
-		return err
-	}
-	indi.Evaluated = true
-	if err := decoder.Decode(&indi.Genome); err != nil {
-		return err
-	}
-	return nil
 }

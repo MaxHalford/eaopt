@@ -1,12 +1,8 @@
 package eaopt
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"time"
@@ -39,27 +35,13 @@ func newPopulation(size uint, newGenome func(rng *rand.Rand) Genome, RNG *rand.R
 	return pop
 }
 
-// Generate a new population from an io.Reader.
-func newPopulationsFromReader(populationCount uint, reader io.Reader, RNG *rand.Rand, unmarshaler func([]byte) (Genome, error)) ([]Population, error) {
+func newPopulationsFromBytes(populationCount uint, b []byte, RNG *rand.Rand, unmarshaler func([]byte) (Genome, error)) ([]Population, error) {
 	pops := make([]Population, populationCount)
 	for i := range pops {
 		pops[i].RNG = rand.New(rand.NewSource(RNG.Int63()))
 		pops[i].JSONUnmarshaler = unmarshaler
 	}
-	b, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-	switch b[0] {
-	case '[':
-		err = json.Unmarshal(b, &pops)
-	default:
-		decoder := gob.NewDecoder(bytes.NewBuffer(b))
-		err = decoder.Decode(&pops)
-	}
-	if err != nil {
-		return nil, err
-	}
+	err := json.Unmarshal(b, &pops)
 	return pops, err
 }
 
@@ -119,44 +101,6 @@ func (pop *Population) UnmarshalJSON(data []byte) error {
 				ID:      v.(map[string]interface{})["id"].(string),
 			})
 		}
-	}
-	return nil
-}
-
-// GobEncode implements a custom binary marshaler for serializing Populations.
-func (pop *Population) GobEncode() ([]byte, error) {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
-	if err := encoder.Encode(pop.Age); err != nil {
-		return nil, err
-	}
-	if err := encoder.Encode(pop.Generations); err != nil {
-		return nil, err
-	}
-	if err := encoder.Encode(pop.ID); err != nil {
-		return nil, err
-	}
-	if err := encoder.Encode(pop.Individuals); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-// GobDecode implements a custom binary marshaler for serializing Populations.
-func (pop *Population) GobDecode(b []byte) error {
-	buf := bytes.NewBuffer(b)
-	decoder := gob.NewDecoder(buf)
-	if err := decoder.Decode(&pop.Age); err != nil {
-		return err
-	}
-	if err := decoder.Decode(&pop.Generations); err != nil {
-		return err
-	}
-	if err := decoder.Decode(&pop.ID); err != nil {
-		return err
-	}
-	if err := decoder.Decode(&pop.Individuals); err != nil {
-		return err
 	}
 	return nil
 }
