@@ -14,7 +14,7 @@ type Migrator interface {
 
 // MigRing migration exchanges individuals between consecutive Populations in a
 // random fashion. One by one, each population exchanges NMigrants individuals
-// at random with the next population. NMigrants should be higher than the
+// at random with the next population. NMigrants should be not higher than the
 // number of individuals in each population, else all the individuals will
 // migrate and it will be as if nothing happened.
 type MigRing struct {
