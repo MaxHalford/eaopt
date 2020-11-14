@@ -15,8 +15,10 @@ import (
 func CrossUniformFloat64(p1 []float64, p2 []float64, rng *rand.Rand) {
 	for i := range p1 {
 		var p = rng.Float64()
-		p1[i] = p*p1[i] + (1-p)*p2[i]
-		p2[i] = (1-p)*p1[i] + p*p2[i]
+		var o1 = p*p1[i] + (1-p)*p2[i]
+		var o2 = (1-p)*p1[i] + p*p2[i]
+		p1[i] = o1
+		p2[i] = o2
 	}
 }
 
