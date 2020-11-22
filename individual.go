@@ -71,13 +71,13 @@ func (indi *Individual) GetFitness() float64 {
 	return indi.Fitness
 }
 
-// Mutate an individual by calling the Mutate method of it's Genome.
+// Mutate an individual by calling the Mutate method of its Genome.
 func (indi *Individual) Mutate(rng *rand.Rand) {
 	indi.Genome.Mutate(rng)
 	indi.Evaluated = false
 }
 
-// Crossover an individual by calling the Crossover method of it's Genome.
+// Crossover an individual by calling the Crossover method of its Genome.
 func (indi *Individual) Crossover(mate Individual, rng *rand.Rand) {
 	indi.Genome.Crossover(mate.Genome, rng)
 	indi.Evaluated = false
