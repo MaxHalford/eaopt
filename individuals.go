@@ -52,8 +52,9 @@ func newIndividuals(n uint, parallel bool, newGenome func(rng *rand.Rand) Genome
 	for a := uint(0); a < n; a += chunkSize {
 		a := a // https://golang.org/doc/faq#closures_and_goroutines
 		var b = minUint(a+chunkSize, n)
+		seed := rng.Int63()
 		g.Go(func() error {
-			indRNG := rand.New(rand.NewSource(rng.Int63()))
+			indRNG := rand.New(rand.NewSource(seed))
 			for i := a; i < b; i++ {
 				indis[i] = NewIndividual(newGenome(indRNG), indRNG)
 			}
