@@ -47,7 +47,7 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 	// Create the initial Populations
 	ga.Populations = make(Populations, ga.NPops)
 	for i := range ga.Populations {
-		ga.Populations[i] = newPopulation(ga.PopSize, newGenome, ga.RNG)
+		ga.Populations[i] = newPopulation(ga.PopSize, ga.ParallelInit, newGenome, ga.RNG)
 		// Evaluate and sort
 		err := ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 		if err != nil {

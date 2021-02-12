@@ -139,7 +139,7 @@ var (
 func TestGenerateOffsprings(t *testing.T) {
 	var (
 		rng   = newRand()
-		indis = newIndividuals(20, NewVector, rng)
+		indis = newIndividuals(20, false, NewVector, rng)
 	)
 	for _, n := range []uint{0, 1, 3, 10} {
 		var offsprings, _ = generateOffsprings(n, indis, SelTournament{1}, 1.0, rng)
@@ -172,7 +172,7 @@ func TestModelsConstantSize(t *testing.T) {
 	var rng = newRand()
 	for _, n := range []uint{1, 2, 3, 42} {
 		for _, model := range validModels {
-			var pop = newPopulation(n, NewVector, rng)
+			var pop = newPopulation(n, false, NewVector, rng)
 			// Check the size of the population doesn't change for a few iterations
 			for i := 0; i < 5; i++ {
 				model.Apply(&pop)

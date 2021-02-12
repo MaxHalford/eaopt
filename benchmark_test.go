@@ -5,7 +5,7 @@ import (
 )
 
 func BenchmarkIndividualsEvaluate(b *testing.B) {
-	var indis = newIndividuals(100, NewVector, newRand())
+	var indis = newIndividuals(100, false, NewVector, newRand())
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		indis.Evaluate(false)
@@ -13,7 +13,7 @@ func BenchmarkIndividualsEvaluate(b *testing.B) {
 }
 
 func BenchmarkIndividualsEvaluateParallel(b *testing.B) {
-	var indis = newIndividuals(100, NewVector, newRand())
+	var indis = newIndividuals(100, false, NewVector, newRand())
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		indis.Evaluate(true)

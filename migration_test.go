@@ -18,7 +18,7 @@ func TestMigSizes(t *testing.T) {
 				// Instantiate populations
 				var pops = make([]Population, nPops)
 				for i := range pops {
-					pops[i] = newPopulation(popSize, NewVector, rng)
+					pops[i] = newPopulation(popSize, false, NewVector, rng)
 					pops[i].Individuals.Evaluate(false)
 					fitnessMeans[i] = pops[i].Individuals.FitAvg()
 				}
