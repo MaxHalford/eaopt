@@ -282,6 +282,7 @@ type GAConfig struct {
     Model        Model
 
     // Optional fields
+	  ParallelInit bool // Whether to initialize Individuals in parallel or not
     ParallelEval bool // Whether to evaluate Individuals in parallel or not
     Migrator     Migrator
     MigFrequency uint // Frequency at which migrations occur
@@ -300,6 +301,7 @@ type GAConfig struct {
   - `HofSize` determines how many of the best individuals should be recorded.
   - `Model` is a struct that determines how to evolve each population of individuals.
 - Optional fields
+  - `ParallelInit` determines if a population is initialized in parallel. The rule of thumb is to set this to `true` if your genome initialization method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
   - `ParallelEval` determines if a population is evaluated in parallel. The rule of thumb is to set this to `true` if your `Evaluate` method is expensive, if not it won't be worth the overhead. Refer to the [section on parallelism](#a-note-on-parallelism) for a more comprehensive explanation.
   - `Migrator` and `MigFrequency` should be provided if you want to exchange individuals between populations in case of a multi-population GA. If not the populations will be run independently. Again this is an advanced concept in the genetic algorithms field that you shouldn't deal with at first.
   - `Speciator` will split each population in distinct species at each generation. Each specie will be evolved separately from the others, after all the species has been evolved they are regrouped.
@@ -696,7 +698,7 @@ Evolutionary algorithms are famous for being [embarrassingly parallel](https://w
 
 The Go language provides nice mechanisms to run stuff in parallel, provided you have more than one core available. However, parallelism is only worth it when the functions you want to run in parallel are heavy. If the functions are cheap then the overhead of spawning routines will be too high and not worth it. It's simply not worth using a routine for each individual because operations at an individual level are often not time consuming enough.
 
-By default eaopt will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population.
+By default eaopt will evolve populations in parallel. This is because evolving one population implies a lot of operations and parallelism is worth it. If your `Evaluate` method is heavy then it might be worth evaluating individuals in parallel, which can done by setting the `GA`'s `ParallelEval` field to `true`. Evaluating individuals in parallel can be done regardless of the fact that you are using more than one population. If your genome initialization method is heavy then it might be worth initializing individuals in parallel, which can done by setting the `GA`'s `ParallelInit` field to `true`. Initializing individuals in parallel can be done regardless of the fact that you are using more than one population.
 
 
 ## FAQ

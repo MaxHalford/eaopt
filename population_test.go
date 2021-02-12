@@ -9,7 +9,7 @@ import (
 
 func TestPopLog(t *testing.T) {
 	var (
-		pop    = newPopulation(42, NewVector, rand.New(rand.NewSource(42)))
+		pop    = newPopulation(42, false, NewVector, rand.New(rand.NewSource(42)))
 		b      bytes.Buffer
 		logger = log.New(&b, "", 0)
 	)

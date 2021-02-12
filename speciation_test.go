@@ -112,7 +112,7 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 		for _, nbs := range nSpecies {
 			var (
 				m          = minInt(int(float64(nbi/nbs)), int(nbi))
-				indis      = newIndividuals(nbi, NewVector, rng)
+				indis      = newIndividuals(nbi, false, NewVector, rng)
 				spec       = SpecFitnessInterval{K: nbs}
 				species, _ = spec.Apply(indis, rng)
 			)

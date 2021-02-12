@@ -17,6 +17,7 @@ type GAConfig struct {
 	Model        Model
 
 	// Optional fields
+	ParallelInit bool // Whether to initialize Populations in parallel or not
 	ParallelEval bool // Whether to evaluate Individuals in parallel or not
 	Migrator     Migrator
 	MigFrequency uint // Frequency at which migrations occur

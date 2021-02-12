@@ -41,7 +41,16 @@ func TestIndividualsString(t *testing.T) {
 func TestNewIndividuals(t *testing.T) {
 	var rng = newRand()
 	for _, n := range []uint{1, 2, 42} {
-		if len(newIndividuals(n, NewVector, rng)) != int(n) {
+		if len(newIndividuals(n, false, NewVector, rng)) != int(n) {
+			t.Error("newIndividuals didn't generate the right number of individuals")
+		}
+	}
+}
+
+func TestNewIndividuals_Parallel(t *testing.T) {
+	var rng = newRand()
+	for _, n := range []uint{1, 2, 42} {
+		if len(newIndividuals(n, true, NewVector, rng)) != int(n) {
 			t.Error("newIndividuals didn't generate the right number of individuals")
 		}
 	}
@@ -50,7 +59,7 @@ func TestNewIndividuals(t *testing.T) {
 func TestCloneIndividuals(t *testing.T) {
 	var (
 		rng    = newRand()
-		indis  = newIndividuals(20, NewVector, rng)
+		indis  = newIndividuals(20, false, NewVector, rng)
 		clones = indis.Clone(rng)
 	)
 	for _, indi := range indis {
@@ -63,7 +72,7 @@ func TestCloneIndividuals(t *testing.T) {
 }
 
 func TestEvaluateIndividuals(t *testing.T) {
-	var indis = newIndividuals(10, NewVector, newRand())
+	var indis = newIndividuals(10, false, NewVector, newRand())
 	for _, indi := range indis {
 		if indi.Evaluated {
 			t.Error("Individual shouldn't have Evaluated set to True")
@@ -78,7 +87,7 @@ func TestEvaluateIndividuals(t *testing.T) {
 }
 
 func TestEvaluateIndividualsWithError(t *testing.T) {
-	var indis = newIndividuals(10, NewRuntimeErrorGenome, newRand())
+	var indis = newIndividuals(10, false, NewRuntimeErrorGenome, newRand())
 	for _, indi := range indis {
 		if indi.Evaluated {
 			t.Error("Individual shouldn't have Evaluated set to true")
@@ -95,7 +104,7 @@ func TestEvaluateIndividualsWithError(t *testing.T) {
 }
 
 func TestEvaluateIndividualsParallel(t *testing.T) {
-	var indis = newIndividuals(10, NewVector, newRand())
+	var indis = newIndividuals(10, false, NewVector, newRand())
 	for _, indi := range indis {
 		if indi.Evaluated {
 			t.Error("Individual shouldn't have Evaluated set to True")
@@ -112,7 +121,7 @@ func TestEvaluateIndividualsParallel(t *testing.T) {
 func TestMutateIndividuals(t *testing.T) {
 	var (
 		rng   = newRand()
-		indis = newIndividuals(10, NewVector, rng)
+		indis = newIndividuals(10, false, NewVector, rng)
 	)
 	indis.Evaluate(false)
 	indis.Mutate(1, rng)
@@ -124,7 +133,7 @@ func TestMutateIndividuals(t *testing.T) {
 }
 
 func TestIndividualsSortByFitness(t *testing.T) {
-	var indis = newIndividuals(10, NewVector, newRand())
+	var indis = newIndividuals(10, false, NewVector, newRand())
 	// Assign a fitness to each individual in decreasing order
 	for i := range indis {
 		indis[i].Fitness = float64(len(indis) - i)
