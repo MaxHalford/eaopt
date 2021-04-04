@@ -73,6 +73,7 @@
     - [Particle swarm optimization](#particle-swarm-optimization)
     - [Differential evolution](#differential-evolution)
     - [OpenAI evolution strategy](#openai-evolution-strategy)
+    - [Hill climbing](#hill-climbing)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Dependencies](#dependencies)
@@ -625,7 +626,7 @@ func NewDiffEvo(nAgents, nSteps uint, min, max, cRate, dWeight float64, parallel
 
 #### Example
 
-In this example we're going to minimize th [Rastrigin function](https://www.sfu.ca/~ssurjano/rastr.html) with three dimensions. The global minimum is 0.
+In this example we're going to minimize the [Rastrigin function](https://www.sfu.ca/~ssurjano/rastr.html) with three dimensions. The global minimum is 0.
 
 ```go
 package main
@@ -690,7 +691,134 @@ func NewOES(nPoints, nSteps uint, sigma, lr float64, parallel bool, rng *rand.Ra
 - `parallel` determines if the agents are evaluated in parallel or not
 - `rng` is a random number generator, you can set it to `nil` if you want it to be random
 
+### Hill climbing
 
+#### Description
+
+[Hill climbing](https://en.wikipedia.org/wiki/Hill_climbing) is a very simple optimization strategy.  It works as follows:
+
+1. Randomly select a point to be the "current" point.  Evaluate it.
+2. Randomly alter one of the coordinates, and evaluate this new point.
+3. If the new point is better than the current point, make the new point the current point.  Otherwise, do nothing.
+4. Repeat from step 2 until satisfied.
+
+One implements hill climbing in eaopt using a genetic algorithm with the `ModMutationOnly` model and `Strict` set to `true`.
+
+#### Example
+
+In this example we minimize a [Bohachevsky function](https://www.sfu.ca/~ssurjano/boha.html).  The global minimum is 0.
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+	"math/rand"
+
+	"github.com/MaxHalford/eaopt"
+)
+
+// A Coord2D is a coordinate in two dimensions.
+type Coord2D struct {
+	X float64
+	Y float64
+}
+
+// Evaluate evalutes a Bohachevsky function at the current coordinates.
+func (c *Coord2D) Evaluate() (float64, error) {
+	z := c.X*c.X + 2*c.Y*c.Y - 0.3*math.Cos(3*math.Pi*c.X) - 0.4*math.Cos(4*math.Pi*c.Y) + 0.7
+	return z, nil
+}
+
+// Mutate replaces one of the current coordinates with a random value in [-100, -100].
+func (c *Coord2D) Mutate(rng *rand.Rand) {
+	if rng.Intn(2) == 0 {
+		c.X = rng.Float64()*200.0 - 100.0
+	} else {
+		c.Y = rng.Float64()*200.0 - 100.0
+	}
+}
+
+// Crossover does nothing.  It is defined only so *Coord2D implements the eaopt.Genome interface.
+func (c *Coord2D) Crossover(other eaopt.Genome, rng *rand.Rand) {}
+
+// Clone returns a copy of a *Coord2D.
+func (c *Coord2D) Clone() eaopt.Genome {
+	return &Coord2D{X: c.X, Y: c.Y}
+}
+
+func main() {
+	// Hill climbing is implemented as a GA using the ModMutationOnly model
+	// with the Strict option.
+	cfg := eaopt.NewDefaultGAConfig()
+	cfg.Model = eaopt.ModMutationOnly{Strict: true}
+	cfg.NGenerations = 9999
+
+	// Add a custom callback function to track progress.
+	minFit := math.MaxFloat64
+	cfg.Callback = func(ga *eaopt.GA) {
+		hof := ga.HallOfFame[0]
+		fit := hof.Fitness
+		if fit == minFit {
+			// Output only when we make an improvement.
+			return
+		}
+		best := hof.Genome.(*Coord2D)
+		fmt.Printf("Best fitness at generation %4d: %10.5f at (%9.5f, %9.5f)\n",
+			ga.Generations, fit, best.X, best.Y)
+		minFit = fit
+	}
+
+	// Run the hill-climbing algorithm.
+	ga, err := cfg.NewGA()
+	if err != nil {
+		panic(err)
+	}
+	err = ga.Minimize(func(rng *rand.Rand) eaopt.Genome {
+		return &Coord2D{
+			X: rng.Float64()*200.0 - 100.0,
+			Y: rng.Float64()*200.0 - 100.0,
+		}
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	// Output the best encountered solution.
+	best := ga.HallOfFame[0].Genome.(*Coord2D)
+	fmt.Printf("Found a minimum at (%.5f, %.5f).\n", best.X, best.Y)
+	fmt.Println("The global minimum is known to lie at (0, 0).")
+}
+```
+
+This should produce output along the following lines:
+
+```sh
+>>> Best fitness at generation    0:  347.29009 at (-17.77572,   3.91475)
+>>> Best fitness at generation    1:   91.64634 at ( -7.79357,  -3.88125)
+>>> Best fitness at generation    7:   84.31780 at (  8.42342,  -2.53296)
+>>> Best fitness at generation    8:   22.81205 at (  3.64011,  -2.09039)
+>>> Best fitness at generation   13:    3.17994 at ( -1.37117,   0.63824)
+>>> Best fitness at generation   25:    2.58142 at ( -1.05701,  -0.29836)
+>>> Best fitness at generation   26:    2.34391 at (  0.96249,  -0.57655)
+>>> Best fitness at generation   70:    1.21768 at (  0.23307,   0.17318)
+>>> Best fitness at generation  117:    0.78975 at (  0.68306,  -0.10444)
+>>> Best fitness at generation  119:    0.71870 at ( -0.10934,  -0.14860)
+>>> Best fitness at generation  130:    0.47829 at (  0.02383,   0.46641)
+>>> Best fitness at generation  277:    0.11108 at (  0.00798,  -0.05851)
+>>> Best fitness at generation  492:    0.07006 at ( -0.07098,   0.00333)
+>>> Best fitness at generation  860:    0.03000 at (  0.01445,  -0.02850)
+>>> Best fitness at generation 1149:    0.02192 at ( -0.03899,   0.00333)
+>>> Best fitness at generation 1270:    0.02055 at ( -0.03333,   0.01191)
+>>> Best fitness at generation 1596:    0.00650 at ( -0.02072,   0.00333)
+>>> Best fitness at generation 2945:    0.00249 at ( -0.00509,   0.00794)
+>>> Best fitness at generation 5551:    0.00134 at (  0.00482,  -0.00548)
+>>> Best fitness at generation 6551:    0.00063 at ( -0.00390,  -0.00350)
+>>> Best fitness at generation 6780:    0.00056 at (  0.00364,   0.00333)
+>>> Found a minimum at (0.00364, 0.00333).
+>>> The global minimum is known to lie at (0, 0).
+```
 
 ## A note on parallelism
 
