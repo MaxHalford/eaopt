@@ -1,4 +1,4 @@
-module github.com/MaxHalford/eaopt
+module github.com/matthewmcneely/eaopt
 
 go 1.15
 
