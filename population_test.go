@@ -24,7 +24,7 @@ func TestPopLog(t *testing.T) {
 }
 
 func TestPopJSONMarshal(t *testing.T) {
-	pop1 := newPopulation(42, NewVector, rand.New(rand.NewSource(42)))
+	pop1 := newPopulation(42, false, NewVector, rand.New(rand.NewSource(42)))
 	pop1.Individuals.Evaluate(false)
 	encodedPop1, err := json.Marshal(pop1)
 	if err != nil {
@@ -47,9 +47,9 @@ func TestPopJSONMarshal(t *testing.T) {
 }
 
 func TestPopsJSONMarshal(t *testing.T) {
-	pop1 := newPopulation(3, NewVector, rand.New(rand.NewSource(42)))
+	pop1 := newPopulation(3, false, NewVector, rand.New(rand.NewSource(42)))
 	_ = pop1.Individuals.Evaluate(false)
-	pop2 := newPopulation(3, NewVector, rand.New(rand.NewSource(201)))
+	pop2 := newPopulation(3, false, NewVector, rand.New(rand.NewSource(201)))
 	_ = pop2.Individuals.Evaluate(false)
 
 	pops := Populations{pop1, pop2}
