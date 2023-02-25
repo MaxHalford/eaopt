@@ -37,6 +37,14 @@ func TestCrossUniformFloat64(t *testing.T) {
 			t.Error("New values are not contained in hyper-rectangle")
 		}
 	}
+	// Check that each parent sum equals the offspring sum
+	for i := 0; i < len(p1); i++ {
+		pSum := p1[i] + p2[i]
+		oSum := o1[i] + o2[i]
+		if math.Abs(pSum-oSum) > 1e-14 {
+			t.Errorf("Total value is not preserved from parents to offsprings (%v vs. %v)", pSum, oSum)
+		}
+	}
 }
 
 func TestGNX(t *testing.T) {

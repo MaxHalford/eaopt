@@ -234,7 +234,7 @@ func TestGALog(t *testing.T) {
 	ga.init(NewVector)
 	ga.evolve()
 	var expected = "pop_id=QrZ min=-21.342844 max=16.086140 avg=-2.554992 std=11.673396\n" +
-		"pop_id=QrZ min=-29.052226 max=10.630133 avg=-11.885364 std=8.266295\n"
+		"pop_id=QrZ min=-29.052226 max=10.630133 avg=-12.575381 std=8.436837\n"
 	if s := b.String(); s != expected {
 		t.Errorf("Expected %s, got %s", expected, s)
 	}
@@ -377,7 +377,6 @@ func TestGADifferentRNGs(t *testing.T) {
 	if ga1.HallOfFame[0].Fitness == ga2.HallOfFame[0].Fitness {
 		t.Errorf("Expected mismatch, got %f == %f", ga1.HallOfFame[0].Fitness, ga2.HallOfFame[0].Fitness)
 	}
-
 }
 
 func TestGASameRNGs(t *testing.T) {

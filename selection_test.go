@@ -19,7 +19,7 @@ var (
 func TestSelectionSize(t *testing.T) {
 	var (
 		rng       = newRand()
-		indis     = newIndividuals(30, NewVector, rng)
+		indis     = newIndividuals(30, false, NewVector, rng)
 		selectors = []Selector{
 			SelTournament{
 				NContestants: 3,
@@ -39,8 +39,8 @@ func TestSelectionSize(t *testing.T) {
 
 func TestSelectionUniqueness(t *testing.T) {
 	var (
-		rng = newRand()
-		indis = newIndividuals(3, NewVector, rng)
+		rng       = newRand()
+		indis     = newIndividuals(3, false, NewVector, rng)
 		selectors = []Selector{
 			SelTournament{
 				NContestants: 2,
@@ -48,14 +48,14 @@ func TestSelectionUniqueness(t *testing.T) {
 			SelElitism{},
 		}
 		numIterations = 500
-		anyNotUnique = false
+		anyNotUnique  = false
 	)
 	for _, selector := range selectors {
 		for i := 0; i < numIterations; i++ {
-			var selected, _, _= selector.Apply(2, indis, rng)
-			var unique= false
-			var first= selected[0].Genome.(Vector)
-			var second= selected[1].Genome.(Vector)
+			var selected, _, _ = selector.Apply(2, indis, rng)
+			var unique = false
+			var first = selected[0].Genome.(Vector)
+			var second = selected[1].Genome.(Vector)
 			for index := range first {
 				if first[index] != second[index] {
 					unique = true
@@ -75,7 +75,7 @@ func TestSelectionUniqueness(t *testing.T) {
 func TestSelElitism(t *testing.T) {
 	var (
 		rng      = newRand()
-		indis    = newIndividuals(30, NewVector, rng)
+		indis    = newIndividuals(30, false, NewVector, rng)
 		selector = SelElitism{}
 	)
 	indis.Evaluate(false)
@@ -92,7 +92,7 @@ func TestSelElitism(t *testing.T) {
 func TestSelTournament(t *testing.T) {
 	var (
 		rng   = newRand()
-		indis = newIndividuals(30, NewVector, rng)
+		indis = newIndividuals(30, false, NewVector, rng)
 	)
 	indis.Evaluate(false)
 	var selected, _, _ = SelTournament{uint(len(indis))}.Apply(1, indis, rng)
@@ -124,7 +124,7 @@ func TestBuildWheel(t *testing.T) {
 func TestSelRoulette(t *testing.T) {
 	var (
 		rng   = newRand()
-		indis = newIndividuals(30, NewVector, rng)
+		indis = newIndividuals(30, false, NewVector, rng)
 		sel   = SelRoulette{}
 	)
 	indis.Evaluate(false)

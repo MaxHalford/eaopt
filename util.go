@@ -37,6 +37,14 @@ func cumsum(floats []float64) []float64 {
 	return summed
 }
 
+// Find the minimum between two uints.
+func minUint(a, b uint) uint {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
 // Find the minimum between two ints.
 func minInt(a, b int) int {
 	if a <= b {

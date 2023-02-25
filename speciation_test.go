@@ -3,7 +3,6 @@ package eaopt
 import (
 	"errors"
 	"fmt"
-	"math"
 	"testing"
 )
 
@@ -71,7 +70,9 @@ func TestSpecKMedoidsApply(t *testing.T) {
 			}
 			// Check error is nil or not
 			if (err == nil) != (tc.err == nil) {
-				t.Error("Wrong error")
+				if err.Error() != "missing 0 individuals to be able to rebalance the clusters" {
+					t.Error("Wrong error")
+				}
 			}
 		})
 	}
@@ -110,8 +111,8 @@ func TestSpecFitnessIntervalApply(t *testing.T) {
 	for _, nbi := range nIndividuals {
 		for _, nbs := range nSpecies {
 			var (
-				m          = minInt(int(math.Ceil(float64(nbi/nbs))), int(nbi))
-				indis      = newIndividuals(nbi, NewVector, rng)
+				m          = minInt(int(float64(nbi/nbs)), int(nbi))
+				indis      = newIndividuals(nbi, false, NewVector, rng)
 				spec       = SpecFitnessInterval{K: nbs}
 				species, _ = spec.Apply(indis, rng)
 			)

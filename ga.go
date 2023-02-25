@@ -50,7 +50,7 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		ga.Age = 0
 		ga.Populations = make(Populations, ga.NPops)
 		for i := range ga.Populations {
-			ga.Populations[i] = newPopulation(ga.PopSize, newGenome, ga.RNG)
+			ga.Populations[i] = newPopulation(ga.PopSize, ga.ParallelInit, newGenome, ga.RNG)
 		}
 	}
 	for i := range ga.Populations {

@@ -3,7 +3,6 @@ package eaopt
 import (
 	"errors"
 	"fmt"
-	"math"
 	"math/rand"
 )
 
@@ -82,20 +81,23 @@ func (spec SpecKMedoids) Apply(indis Individuals, rng *rand.Rand) ([]Individuals
 		total = newTotal
 	}
 	// Rebalance the species so that their are at least
-	rebalanceClusters(species, dm, spec.MinPerCluster)
+	err := rebalanceClusters(species, dm, spec.MinPerCluster)
+	if err != nil {
+		return nil, err
+	}
 	return species, nil
 }
 
 // Validate SpecKMedoids fields.
 func (spec SpecKMedoids) Validate() error {
 	if spec.K < 2 {
-		return errors.New("K should be higher than 1")
+		return errors.New("k should be higher than 1")
 	}
 	if spec.Metric == nil {
-		return errors.New("Metric field has to be provided")
+		return errors.New("metric field has to be provided")
 	}
 	if spec.MaxIterations < 1 {
-		return errors.New("K should be higher than 0")
+		return errors.New("k should be higher than 0")
 	}
 	return nil
 }
@@ -114,13 +116,13 @@ type SpecFitnessInterval struct {
 func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Individuals, error) {
 	// Check there are at least K Individuals
 	if len(indis) < int(spec.K) {
-		return nil, fmt.Errorf("SpecFitnessInterval: have %d individuals and need at least %d",
+		return nil, fmt.Errorf("specFitnessInterval: have %d individuals and need at least %d",
 			len(indis), spec.K)
 	}
 	var (
 		species = make([]Individuals, spec.K)
 		n       = len(indis)
-		m       = minInt(int(math.Ceil(float64(n/int(spec.K)))), n)
+		m       = minInt(int(float64(n/int(spec.K))), n)
 	)
 	for i := range species {
 		var a, b = i * m, minInt((i+1)*m, n)
@@ -132,7 +134,7 @@ func (spec SpecFitnessInterval) Apply(indis Individuals, rng *rand.Rand) ([]Indi
 // Validate SpecFitnessInterval fields.
 func (spec SpecFitnessInterval) Validate() error {
 	if spec.K < 2 {
-		return errors.New("K should be higher than 1")
+		return errors.New("k should be higher than 1")
 	}
 	return nil
 }

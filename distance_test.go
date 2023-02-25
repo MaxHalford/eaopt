@@ -78,17 +78,17 @@ func TestRebalanceClusters(t *testing.T) {
 	}{
 		{
 			clusters: []Individuals{
-				Individuals{
+				{
 					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 					Individual{Genome: Vector{1, 1, 1}, ID: "3"},
 					Individual{Genome: Vector{2, 2, 2}, ID: "4"}, // Second furthest away from the cluster
 					Individual{Genome: Vector{3, 3, 3}, ID: "5"}, // Furthest away from the cluster
 				},
-				Individuals{
+				{
 					Individual{Genome: Vector{2, 2, 2}, ID: "6"},
 				},
-				Individuals{
+				{
 					Individual{Genome: Vector{3, 3, 3}, ID: "7"},
 				},
 			},
@@ -99,11 +99,11 @@ func TestRebalanceClusters(t *testing.T) {
 		},
 		{
 			clusters: []Individuals{
-				Individuals{
+				{
 					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 				},
-				Individuals{},
+				{},
 			},
 			dm:              newDistanceMemoizer(l1Distance),
 			minClusterSize:  1,
@@ -112,11 +112,11 @@ func TestRebalanceClusters(t *testing.T) {
 		},
 		{
 			clusters: []Individuals{
-				Individuals{
+				{
 					Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 					Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 				},
-				Individuals{
+				{
 					Individual{Genome: Vector{1, 1, 1}, ID: "3"},
 				},
 			},
@@ -149,12 +149,12 @@ func TestRebalanceClusters(t *testing.T) {
 func TestRebalanceClustersEmptyCluster(t *testing.T) {
 	var (
 		clusters = []Individuals{
-			Individuals{
+			{
 				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
 			},
-			Individuals{},
+			{},
 		}
 		dm = newDistanceMemoizer(l1Distance)
 	)
@@ -169,15 +169,15 @@ func TestRebalanceClustersEmptyCluster(t *testing.T) {
 func TestRebalanceClustersTooManyMissing(t *testing.T) {
 	var (
 		clusters = []Individuals{
-			Individuals{
+			{
 				Individual{Genome: Vector{1, 1, 1}, ID: "1"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "2"},
 				Individual{Genome: Vector{1, 1, 1}, ID: "3"},
 			},
-			Individuals{
+			{
 				Individual{Genome: Vector{2, 2, 2}, ID: "6"},
 			},
-			Individuals{
+			{
 				Individual{Genome: Vector{3, 3, 3}, ID: "7"},
 			},
 		}

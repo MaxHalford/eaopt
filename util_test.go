@@ -6,9 +6,9 @@ import (
 
 func TestMin(t *testing.T) {
 	var testCases = [][]int{
-		[]int{1, 2},
-		[]int{2, 2},
-		[]int{2, 3},
+		{1, 2},
+		{2, 2},
+		{2, 3},
 	}
 	for _, test := range testCases {
 		if minInt(test[0], test[1]) != test[0] {

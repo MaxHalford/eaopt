@@ -23,11 +23,11 @@ type Population struct {
 }
 
 // Generate a new population.
-func newPopulation(size uint, newGenome func(rng *rand.Rand) Genome, RNG *rand.Rand) Population {
+func newPopulation(size uint, parallel bool, newGenome func(rng *rand.Rand) Genome, rng *rand.Rand) Population {
 	var (
-		popRNG = rand.New(rand.NewSource(RNG.Int63()))
+		popRNG = rand.New(rand.NewSource(rng.Int63()))
 		pop    = Population{
-			Individuals: newIndividuals(size, newGenome, popRNG),
+			Individuals: newIndividuals(size, parallel, newGenome, popRNG),
 			ID:          randString(3, popRNG),
 			RNG:         popRNG,
 		}

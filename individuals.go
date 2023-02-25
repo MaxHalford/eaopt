@@ -34,11 +34,34 @@ func (indis Individuals) Clone(rng *rand.Rand) Individuals {
 }
 
 // Generate a slice of n new individuals.
-func newIndividuals(n uint, newGenome func(rng *rand.Rand) Genome, rng *rand.Rand) Individuals {
+func newIndividuals(n uint, parallel bool, newGenome func(rng *rand.Rand) Genome, rng *rand.Rand) Individuals {
 	var indis = make(Individuals, n)
-	for i := range indis {
-		indis[i] = NewIndividual(newGenome(rng), rng)
+	if !parallel {
+		for i := range indis {
+			indis[i] = NewIndividual(newGenome(rng), rng)
+		}
+		return indis
 	}
+	
+	var (
+		nWorkers  = uint(runtime.GOMAXPROCS(-1))
+		chunkSize = (n + nWorkers - 1) / nWorkers
+		g         errgroup.Group
+	)
+
+	for a := uint(0); a < n; a += chunkSize {
+		a := a // https://golang.org/doc/faq#closures_and_goroutines
+		var b = minUint(a+chunkSize, n)
+		seed := rng.Int63()
+		g.Go(func() error {
+			indRNG := rand.New(rand.NewSource(seed))
+			for i := a; i < b; i++ {
+				indis[i] = NewIndividual(newGenome(indRNG), indRNG)
+			}
+			return nil
+		})
+	}
+	g.Wait()
 	return indis
 }
 
