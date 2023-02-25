@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -41,7 +42,8 @@ func ExampleDiffEvo() {
 	}
 
 	// Output best encountered solution
-	fmt.Printf("Found minimum of %.5f in %v\n", y, x)
+	os.Stderr.WriteString(fmt.Sprintf("Found minimum of %.5f in %v\n", y, x))
+	//fmt.Printf("Found MIN of %.5f in %v\n", y, x)
 	// Output:
 	// Found minimum of 0.00137 in [0.0004420129693826938 0.000195924625132926]
 }
