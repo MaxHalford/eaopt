@@ -1,6 +1,8 @@
 package eaopt
 
 import (
+	crand "crypto/rand"
+	"encoding/binary"
 	"fmt"
 	"math/rand"
 	"time"
@@ -78,4 +80,14 @@ func randString(n int, rng *rand.Rand) string {
 		remain--
 	}
 	return string(b)
+}
+
+// randomInt64 returns a random int64 using crypto/rand.
+func randomInt64() (int64, error) {
+	var b [8]byte
+	_, err := crand.Read(b[:])
+	if err != nil {
+		return 0, err
+	}
+	return int64(binary.LittleEndian.Uint64(b[:])), nil
 }

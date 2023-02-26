@@ -435,6 +435,10 @@ func TestGAJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 	ga1.RNG = rand.New(rand.NewSource(42))
+	err = ga1.Init(NewVector)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if err := ga1.Minimize(NewVector); err != nil {
 		t.Fatal(err)
@@ -446,6 +450,9 @@ func TestGAJSONMarshaling(t *testing.T) {
 	}
 
 	ga2, err := config.NewGA()
+	if err != nil {
+		t.Fatal(err)
+	}
 	ga2.RNG = rand.New(rand.NewSource(42))
 	err = ga2.UnmarshalJSON(out)
 	if err != nil {
