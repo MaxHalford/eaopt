@@ -2,10 +2,14 @@ package eaopt
 
 import (
 	"encoding/json"
+	"log"
 	"math"
 	"math/rand"
 	"sort"
+	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // A GA contains populations which themselves contain individuals.
@@ -14,9 +18,10 @@ type GA struct {
 
 	// Fields generated at runtime
 	Populations Populations   `json:"populations"`
-	HallOfFame  Individuals   `json:"hall_of_fame"` // Sorted best Individuals ever encountered
-	Age         time.Duration `json:"duration"`     // Duration during which the GA has been evolved
-	Generations uint          `json:"generations"`  // Number of generations the GA has been evolved
+	HallOfFame  Individuals   `json:"hall_of_fame"`       // Sorted best Individuals ever encountered
+	Age         time.Duration `json:"duration"`           // Duration during which the GA has been evolved
+	Generations uint          `json:"generations"`        // Number of generations the GA has been evolved
+	RNGSeed     string        `json:"rng_seed,omitempty"` // If evaluation of genomes relies on an initial seed, store for repopulation
 }
 
 // Find the best current Individual in each population and then compare the best
@@ -77,9 +82,20 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 			updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
 		}
 	} else {
+		fitnessPrior := 0.0
+		for _, indi := range ga.HallOfFame {
+			fitnessPrior += indi.Fitness
+		}
 		err = ga.HallOfFame.Evaluate(ga.ParallelEval)
 		if err != nil {
 			return err
+		}
+		fitnessPost := 0.0
+		for _, indi := range ga.HallOfFame {
+			fitnessPost += indi.Fitness
+		}
+		if fitnessPost != fitnessPrior {
+			return errors.Errorf("fitness of hall of fame prior/post mismatch: %v to %v", fitnessPrior, fitnessPost)
 		}
 	}
 
@@ -153,6 +169,31 @@ func (ga *GA) evolve() error {
 	return nil
 }
 
+func (ga *GA) Init(newGenome func(rng *rand.Rand) Genome) error {
+	if ga.RNGSeed == "" {
+		seed, err := randomInt64()
+		if err != nil {
+			return errors.Wrap(err, "could not generate random seed")
+		}
+		ga.RNG = rand.New(rand.NewSource(seed))
+		ga.RNGSeed = strconv.FormatInt(seed, 10)
+	}
+	return ga.init(newGenome)
+}
+
+func (ga *GA) Run() error {
+	for i := uint(0); i < ga.NGenerations; i++ {
+		// Check for early stopping
+		if ga.EarlyStop != nil && ga.EarlyStop(ga) {
+			return nil
+		}
+		if err := ga.evolve(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Minimize evolves the GA's Populations following the given evolutionary
 // method. The GA's hall of fame is updated after each generation.
 func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
@@ -172,60 +213,6 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 			return err
 		}
 	}
-	return nil
-}
-
-// UnmarshalJSON decodes a GA represented as JSON.
-func (ga *GA) UnmarshalJSON(data []byte) error {
-
-	gaMap := make(map[string]interface{})
-	err := json.Unmarshal(data, &gaMap)
-	if err != nil {
-		return err
-	}
-	age, ok := gaMap["duration"].(float64)
-	if !ok {
-		age = 0
-	}
-	ga.Age = time.Duration(age)
-	generations, ok := gaMap["generations"].(float64)
-	if !ok {
-		generations = 0
-	}
-	ga.Generations = uint(generations)
-
-	populationsJSON, err := json.Marshal(gaMap["populations"])
-	if err != nil {
-		return err
-	}
-	ga.Populations, err = newPopulationsFromBytes(ga.NPops, populationsJSON, ga.RNG, ga.GenomeJSONUnmarshaler)
-	if err != nil {
-		return err
-	}
-
-	var individuals []interface{}
-	hafJSON, err := json.Marshal(gaMap["hall_of_fame"])
-	ga.HallOfFame = make(Individuals, 0)
-	err = json.Unmarshal(hafJSON, &individuals)
-	if err != nil {
-		return err
-	}
-	for _, v := range individuals {
-		val, err := json.Marshal(v.(map[string]interface{})["genome"])
-		if err != nil {
-			return err
-		}
-		genome, err := ga.GenomeJSONUnmarshaler(val)
-		if err != nil {
-			return err
-		}
-		ga.HallOfFame = append(ga.HallOfFame, Individual{
-			Genome:  genome,
-			Fitness: v.(map[string]interface{})["fitness"].(float64),
-			ID:      v.(map[string]interface{})["id"].(string),
-		})
-	}
-
 	return nil
 }
 
@@ -258,5 +245,78 @@ func (pop *Population) speciateEvolveMerge(spec Speciator, model Model) error {
 		copy(pop.Individuals[i:i+len(subpop.Individuals)], subpop.Individuals)
 		i += len(subpop.Individuals)
 	}
+	return nil
+}
+
+// UnmarshalJSON decodes a GA represented as JSON.
+func (ga *GA) UnmarshalJSON(data []byte) error {
+
+	gaMap := make(map[string]interface{})
+	err := json.Unmarshal(data, &gaMap)
+	if err != nil {
+		return err
+	}
+	age, ok := gaMap["duration"].(float64)
+	if !ok {
+		age = 0
+	}
+	ga.Age = time.Duration(age)
+	generations, ok := gaMap["generations"].(float64)
+	if !ok {
+		generations = 0
+	}
+	ga.Generations = uint(generations)
+	seed := int64(0)
+	seedString, ok := gaMap["rng_seed"].(string)
+	if !ok {
+		seed, err = randomInt64()
+		if err != nil {
+			return errors.Wrap(err, "processing rng_seed from JSON")
+		}
+		ga.RNGSeed = seedString
+	} else {
+		seed, err = strconv.ParseInt(seedString, 10, 64)
+		if err != nil {
+			return errors.Wrap(err, "parsing seed from seed string")
+		}
+	}
+
+	populationsJSON, err := json.Marshal(gaMap["populations"])
+	if err != nil {
+		return err
+	}
+	ga.Populations, err = newPopulationsFromBytes(ga.NPops, populationsJSON, ga.RNG, ga.GenomeJSONUnmarshaler)
+	if err != nil {
+		return err
+	}
+
+	var individuals []interface{}
+	hafJSON, err := json.Marshal(gaMap["hall_of_fame"])
+	if err != nil {
+		return errors.Wrap(err, "error marshaling hall of fame")
+	}
+	ga.HallOfFame = make(Individuals, 0)
+	err = json.Unmarshal(hafJSON, &individuals)
+	if err != nil {
+		return err
+	}
+	for _, v := range individuals {
+		val, err := json.Marshal(v.(map[string]interface{})["genome"])
+		if err != nil {
+			return err
+		}
+		genome, err := ga.GenomeJSONUnmarshaler(val)
+		if err != nil {
+			return err
+		}
+		ga.HallOfFame = append(ga.HallOfFame, Individual{
+			Genome:  genome,
+			Fitness: v.(map[string]interface{})["fitness"].(float64),
+			ID:      v.(map[string]interface{})["id"].(string),
+		})
+	}
+
+	log.Println("Setting RNG Seed to", seed)
+	ga.RNG = rand.New(rand.NewSource(seed))
 	return nil
 }
