@@ -451,7 +451,7 @@ func TestGAJSONMarshaling(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ga2.HallOfFame.Evaluate(false)
+	ga2.HallOfFame.Evaluate(true)
 
 	if !reflect.DeepEqual(ga1.HallOfFame, ga2.HallOfFame) {
 		t.Fatal("Expected HAFs to be equal")
