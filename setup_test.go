@@ -1,6 +1,7 @@
 package eaopt
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"math/rand"
@@ -28,6 +29,13 @@ func (xi Vector) Clone() Genome {
 	var XX = make(Vector, len(xi))
 	copy(XX, xi)
 	return XX
+}
+
+// VectorJSONUnmarshaler handles unmarshaling of JSON encoded Vectors.
+func VectorJSONUnmarshaler(data []byte) (Genome, error) {
+	var values []float64
+	err := json.Unmarshal(data, &values)
+	return Vector(values), err
 }
 
 func NewVector(rng *rand.Rand) Genome {

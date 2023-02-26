@@ -2,6 +2,7 @@ package eaopt
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -89,15 +90,15 @@ func TestGAInit(t *testing.T) {
 }
 
 func TestGAInitBadGenome(t *testing.T) {
-	var ga, err = NewDefaultGAConfig().NewGA()
-	if err = ga.init(NewErrorGenome); err == nil {
+	var ga, _ = NewDefaultGAConfig().NewGA()
+	if err := ga.init(NewErrorGenome); err == nil {
 		t.Error("Expected error")
 	}
 }
 
 func TestGAMinimizeBadGenome(t *testing.T) {
-	var ga, err = NewDefaultGAConfig().NewGA()
-	if err = ga.Minimize(NewErrorGenome); err == nil {
+	var ga, _ = NewDefaultGAConfig().NewGA()
+	if err := ga.Minimize(NewErrorGenome); err == nil {
 		t.Error("Expected error")
 	}
 }
@@ -185,13 +186,6 @@ func TestInitResetCounters(t *testing.T) {
 	}
 	if ga.Generations != 1 {
 		t.Errorf("Expected 1, got %d", ga.Generations)
-	}
-	ga.init(NewVector)
-	if ga.Age > 0 {
-		t.Errorf("Expected 0, got %v", ga.Age)
-	}
-	if ga.Generations > 0 {
-		t.Errorf("Expected 0, got %d", ga.Generations)
 	}
 }
 
@@ -429,5 +423,106 @@ func TestGAMinimizeEarlyStop(t *testing.T) {
 	}
 	if ga.Generations != 10 {
 		t.Errorf("Expected 10, got %d", ga.Generations)
+	}
+}
+
+func TestGAJSONMarshaling(t *testing.T) {
+	config := NewDefaultGAConfig()
+	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
+
+	ga1, err := config.NewGA()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ga1.RNG = rand.New(rand.NewSource(42))
+
+	if err := ga1.Minimize(NewVector); err != nil {
+		t.Fatal(err)
+	}
+
+	out, err := json.Marshal(ga1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ga2, err := config.NewGA()
+	ga2.RNG = rand.New(rand.NewSource(42))
+	err = ga2.UnmarshalJSON(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ga2.HallOfFame.Evaluate(true)
+
+	if !reflect.DeepEqual(ga1.HallOfFame, ga2.HallOfFame) {
+		t.Fatal("Expected HAFs to be equal")
+	}
+
+	err = ga2.Minimize(NewVector)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ga2.Generations != 100 {
+		t.Fatal("Expected correct generations count")
+	}
+	if ga2.Age == ga1.Age {
+		t.Fatal("GA Durations should not match")
+	}
+}
+
+func TestGAJSONMarshalingStepper(t *testing.T) {
+	config := NewDefaultGAConfig()
+	config.GenomeJSONUnmarshaler = VectorJSONUnmarshaler
+
+	var (
+		b       []byte
+		rng     *rand.Rand = rand.New(rand.NewSource(42))
+		runs    int        = 3
+		lastHOF *Individual
+	)
+	// then run three separate runs from JSON out/in
+	for i := 0; i < runs; i++ {
+		ga, err := config.NewGA()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if b != nil {
+			err = ga.UnmarshalJSON(b)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		ga.NGenerations = 1
+		ga.RNG = rng
+		ga.Callback = func(ga *GA) {
+			if lastHOF != nil {
+				if lastHOF.Fitness != ga.HallOfFame[0].Fitness {
+					t.Fatal("The last hall of fame fitness should match the new")
+				}
+			}
+			lastHOF = &ga.HallOfFame[0]
+		}
+		err = ga.Minimize(NewVector)
+		if err != nil {
+			t.Fatal(err)
+		}
+		b, err = json.Marshal(ga)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestGAJSONErrorHandling(t *testing.T) {
+	ga, _ := NewDefaultGAConfig().NewGA()
+
+	err := ga.UnmarshalJSON([]byte("[this is not a valid JSON GA]"))
+	if err == nil {
+		t.Fatal("Expected invalid JSON to fail")
+	}
+
+	err = ga.UnmarshalJSON([]byte(`{"populations": "not_valid"}`))
+	if err == nil {
+		t.Fatal("Expected invalid populations JSON to fail")
 	}
 }

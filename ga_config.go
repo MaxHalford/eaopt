@@ -26,6 +26,10 @@ type GAConfig struct {
 	Callback     func(ga *GA)
 	EarlyStop    func(ga *GA) bool
 	RNG          *rand.Rand
+
+	// Optional, unmarshal function for your Genome. Needed to support deserializing
+	// a GA and its population(s) from JSON.
+	GenomeJSONUnmarshaler func([]byte) (Genome, error)
 }
 
 // NewGA returns a pointer to a GA instance and checks for configuration

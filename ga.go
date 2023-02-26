@@ -1,6 +1,7 @@
 package eaopt
 
 import (
+	"encoding/json"
 	"math"
 	"math/rand"
 	"sort"
@@ -40,16 +41,21 @@ func updateHallOfFame(hof Individuals, indis Individuals, rng *rand.Rand) {
 }
 
 func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
-	// Reset counters
-	ga.Generations = 0
-	ga.Age = 0
+	var err error
 
-	// Create the initial Populations
-	ga.Populations = make(Populations, ga.NPops)
+	// Create the initial Populations (if not read from storage).
+	if len(ga.Populations) == 0 {
+		// Reset counters
+		ga.Generations = 0
+		ga.Age = 0
+		ga.Populations = make(Populations, ga.NPops)
+		for i := range ga.Populations {
+			ga.Populations[i] = newPopulation(ga.PopSize, ga.ParallelInit, newGenome, ga.RNG)
+		}
+	}
 	for i := range ga.Populations {
-		ga.Populations[i] = newPopulation(ga.PopSize, ga.ParallelInit, newGenome, ga.RNG)
 		// Evaluate and sort
-		err := ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
+		err = ga.Populations[i].Individuals.Evaluate(ga.ParallelEval)
 		if err != nil {
 			return err
 		}
@@ -58,15 +64,23 @@ func (ga *GA) init(newGenome func(rng *rand.Rand) Genome) error {
 		if ga.Logger != nil {
 			ga.Populations[i].Log(ga.Logger)
 		}
+		ga.Populations[i].JSONUnmarshaler = ga.GenomeJSONUnmarshaler
 	}
 
 	// Initialize the hall of fame
-	ga.HallOfFame = make(Individuals, ga.HofSize)
-	for i := range ga.HallOfFame {
-		ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
-	}
-	for _, pop := range ga.Populations {
-		updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
+	if len(ga.HallOfFame) == 0 {
+		ga.HallOfFame = make(Individuals, ga.HofSize)
+		for i := range ga.HallOfFame {
+			ga.HallOfFame[i] = Individual{Fitness: math.Inf(1)}
+		}
+		for _, pop := range ga.Populations {
+			updateHallOfFame(ga.HallOfFame, pop.Individuals, pop.RNG)
+		}
+	} else {
+		err = ga.HallOfFame.Evaluate(ga.ParallelEval)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Execute the callback if it has been set
@@ -158,6 +172,60 @@ func (ga *GA) Minimize(newGenome func(rng *rand.Rand) Genome) error {
 			return err
 		}
 	}
+	return nil
+}
+
+// UnmarshalJSON decodes a GA represented as JSON.
+func (ga *GA) UnmarshalJSON(data []byte) error {
+
+	gaMap := make(map[string]interface{})
+	err := json.Unmarshal(data, &gaMap)
+	if err != nil {
+		return err
+	}
+	age, ok := gaMap["duration"].(float64)
+	if !ok {
+		age = 0
+	}
+	ga.Age = time.Duration(age)
+	generations, ok := gaMap["generations"].(float64)
+	if !ok {
+		generations = 0
+	}
+	ga.Generations = uint(generations)
+
+	populationsJSON, err := json.Marshal(gaMap["populations"])
+	if err != nil {
+		return err
+	}
+	ga.Populations, err = newPopulationsFromBytes(ga.NPops, populationsJSON, ga.RNG, ga.GenomeJSONUnmarshaler)
+	if err != nil {
+		return err
+	}
+
+	var individuals []interface{}
+	hafJSON, err := json.Marshal(gaMap["hall_of_fame"])
+	ga.HallOfFame = make(Individuals, 0)
+	err = json.Unmarshal(hafJSON, &individuals)
+	if err != nil {
+		return err
+	}
+	for _, v := range individuals {
+		val, err := json.Marshal(v.(map[string]interface{})["genome"])
+		if err != nil {
+			return err
+		}
+		genome, err := ga.GenomeJSONUnmarshaler(val)
+		if err != nil {
+			return err
+		}
+		ga.HallOfFame = append(ga.HallOfFame, Individual{
+			Genome:  genome,
+			Fitness: v.(map[string]interface{})["fitness"].(float64),
+			ID:      v.(map[string]interface{})["id"].(string),
+		})
+	}
+
 	return nil
 }
 

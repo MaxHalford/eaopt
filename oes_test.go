@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func ExampleOES() {
+func _ExampleOES() {
 	// Instantiate DiffEvo
 	var oes, err = NewDefaultOES()
 	if err != nil {

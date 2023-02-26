@@ -42,7 +42,7 @@ func newIndividuals(n uint, parallel bool, newGenome func(rng *rand.Rand) Genome
 		}
 		return indis
 	}
-	
+
 	var (
 		nWorkers  = uint(runtime.GOMAXPROCS(-1))
 		chunkSize = (n + nWorkers - 1) / nWorkers
