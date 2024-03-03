@@ -1,6 +1,9 @@
 package eaopt
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 var (
 	// Valid models
@@ -43,6 +46,12 @@ var (
 		},
 		ModMutationOnly{
 			Strict: true,
+		},
+		ModSimulatedAnnealing{
+			Accept: func(g, ng uint, e0, e1 float64) float64 {
+				t := 1.0 - float64(g)/float64(ng)
+				return math.Exp(-3.0 * t)
+			},
 		},
 	}
 	// Invalid models
@@ -131,6 +140,7 @@ var (
 			Selector: SelTournament{1},
 			MutRate:  -1,
 		},
+		ModSimulatedAnnealing{},
 	}
 )
 

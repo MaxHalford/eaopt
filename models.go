@@ -330,3 +330,55 @@ func (mod ModMutationOnly) Apply(pop *Population) error {
 func (mod ModMutationOnly) Validate() error {
 	return nil
 }
+
+// An SAAcceptance function, used by ModSimulatedAnnealing, returns the
+// probability of accepting an energy (badness) increase from e0 to e1 on
+// generation gen of nGen.
+type SAAcceptance func(gen, nGen uint, e0, e1 float64) float64
+
+// ModSimulatedAnnealing is a mutation-only model used to implement simulated
+// annealing.  All individuals are mutated but only conditionally replace their
+// parent.  If the mutation is favorable it always replaces its parent.  If the
+// mutation is unfavorable, it is more likely to replace its parent earlier
+// than later in the evolution.
+type ModSimulatedAnnealing struct {
+	GA     *GA          // Pointer to the encompassing GA, set by NewGA and needed to gauge progress toward completion
+	Accept SAAcceptance // Badness acceptance function
+}
+
+// Apply ModSimulatedAnnealing.
+func (mod ModSimulatedAnnealing) Apply(pop *Population) error {
+	for i, indi := range pop.Individuals {
+		// Mutate the individual.
+		var mutant = indi.Clone(pop.RNG)
+		mutant.Mutate(pop.RNG)
+		err := mutant.Evaluate()
+		if err != nil {
+			return err
+		}
+
+		// Decide whether to keep the original or its mutation
+		prob := 1.0
+		if mutant.Fitness > indi.Fitness && mod.GA != nil {
+			prob = mod.Accept(mod.GA.Generations,
+				mod.GA.GAConfig.NGenerations,
+				indi.Fitness,
+				mutant.Fitness)
+		}
+		if prob > pop.RNG.Float64() {
+			pop.Individuals[i] = mutant
+		}
+	}
+	return nil
+}
+
+// Validate ModSimulatedAnnealing fields.
+func (mod ModSimulatedAnnealing) Validate() error {
+	// Ideally, we would check that GA is not nil.  Unfortunately, Validate
+	// may be called before NewGA has a chance to initialize that field so
+	// all we can check is the Accept field.
+	if mod.Accept == nil {
+		return errors.New("an Accept function must be provided to ModSimulatedAnnealing")
+	}
+	return nil
+}

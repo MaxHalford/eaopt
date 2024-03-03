@@ -68,7 +68,15 @@ func (conf GAConfig) NewGA() (*GA, error) {
 		}
 	}
 	// Initialize the GA
-	return &GA{GAConfig: conf}, nil
+	ga := &GA{GAConfig: conf}
+	// As a special case (and grotesque hack), point ModSimulatedAnnealing
+	// to the GA
+	if msa, ok := conf.Model.(ModSimulatedAnnealing); ok {
+		msa.GA = ga
+		ga.GAConfig.Model = msa
+	}
+	// Return the GA
+	return ga, nil
 }
 
 // NewDefaultGAConfig returns a valid GAConfig with default values.
