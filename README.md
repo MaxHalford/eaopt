@@ -74,6 +74,7 @@
     - [Differential evolution](#differential-evolution)
     - [OpenAI evolution strategy](#openai-evolution-strategy)
     - [Hill climbing](#hill-climbing)
+    - [Simulated annealing](#simulated-annealing)
   - [A note on parallelism](#a-note-on-parallelism)
   - [FAQ](#faq)
   - [Dependencies](#dependencies)
@@ -818,6 +819,175 @@ This should produce output along the following lines:
 >>> Best fitness at generation 6780:    0.00056 at (  0.00364,   0.00333)
 >>> Found a minimum at (0.00364, 0.00333).
 >>> The global minimum is known to lie at (0, 0).
+```
+
+### Simulated Annealing
+
+#### Description
+
+[Simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing) is an optimization strategy inspired by metallurgical annealing.  It works as follows:
+
+1. Randomly select a point to be the current point. Evaluate it.
+2. Select a nearby point (i.e., via a small mutation), and evaluate it.
+3. If the new point is better than the current point, make the new point the current point.
+4. If the new point is worse than the current point, decide randomly—but with decreasing likelihood—whether make the new point the current point.
+5. Repeat from step 2 for a given number of generations.
+
+One implements simulated annealing in eaopt using a genetic algorithm with the `ModSimulatedAnnealing` model.  `ModSimulatedAnnealing` takes a user-defined function `Accept` that returns a probability of moving to a worse point as a function of the current generation number, the total number of generations, the fitness of the current point and the fitness of the mutated point.  It is assumed that `Accept` is non-increasing with the generation number.
+
+An `Accept` function that returns a constant `0` (never accepting a worse move) is equivalent to the `ModMutationOnly` model with `Strict: true`:
+```Go
+func(g, ng uint, e0, e1 float64) float64 { return 0.0 }
+```
+Likewise, an `Accept` function that returns a constant `1` (always accepting a worse move) is equivalent to the `ModMutationOnly` model with `Strict: false`:
+```Go
+func(g, ng uint, e0, e1 float64) float64 { return 1.0 }
+```
+More commonly, `Accept` will return a function of "temperature", which drops from 1 to 0 as `g` increases from 0 to `ng`.  Returning the temperature itself is perfectly legitimate:
+```Go
+func(g, ng uint, e0, e1 float64) float64 {
+	t := 1.0 - float64(g)/float64(ng)
+	return t
+}
+```
+An exponential causes the acceptance probability to drop quickly at first and slowly later, ending a bit above zero:
+```Go
+func(g, ng uint, e0, e1 float64) float64 {
+	t := 1.0 - float64(g)/float64(ng)
+	return math.Exp(-3.0 * t)
+}
+```
+A cosine causes the acceptance probability to drop slowly at the beginning and ending of the evolution and quickly in between:
+```Go
+func(g, ng uint, e0, e1 float64) float64 {
+	t := 1.0 - float64(g)/float64(ng)
+	return (math.Cos(t*math.Pi) + 1.0) / 2.0
+}
+```
+
+The following figure graphs the preceding three `Accept` functions:
+![probability](https://github.com/MaxHalford/eaopt/assets/650041/5a7a0c0f-5c64-40bf-95ca-1db04e58d577)
+<!--
+Gnuplot command for the above:
+
+plot [0:1] 1-x title 'p(t) = 1-t', exp(-3*x) title 'p(t) = exp(-3*t)', (cos(x*pi)+1)/2 title 'p(t) = (cos(t*π)+1)/2'
+-->
+
+The `e0` and `e1` parameters can be used to make the acceptance probability also a function of how much worse the mutation is than its parent.  However, doing so requires *a priori* knowledge of the range of values `e0` and `e1` can take, which is not available in many cases.
+
+#### Example
+
+The following is a complete program that uses simulated annealing to find a minimum of the [Holder table function](https://www.sfu.ca/~ssurjano/holder.html):
+
+```Go
+package main
+
+import (
+	"fmt"
+	"math"
+	"math/rand"
+
+	"github.com/MaxHalford/eaopt"
+)
+
+// A Coord2D is a coordinate in two dimensions.
+type Coord2D struct {
+	X float64
+	Y float64
+}
+
+// Evaluate evaluates the Holder-table function at the current coordinates.
+func (c *Coord2D) Evaluate() (float64, error) {
+	z := -math.Abs(math.Sin(c.X) * math.Cos(c.Y) *
+		math.Exp(math.Abs(1.0-math.Sqrt(c.X*c.X+c.Y*c.Y)/math.Pi)))
+	return z, nil
+}
+
+// Mutate replaces one of the current coordinates with a random value in [-10, 10).
+func (c *Coord2D) Mutate(rng *rand.Rand) {
+	v := rng.Float64()*20.0 - 10.0
+	if rng.Intn(2) == 0 {
+		c.X = v
+	} else {
+		c.Y = v
+	}
+}
+
+// Crossover does nothing.  It is defined only so *Coord2D implements the eaopt.Genome interface.
+func (c *Coord2D) Crossover(other eaopt.Genome, rng *rand.Rand) {}
+
+// Clone returns a copy of a *Coord2D.
+func (c *Coord2D) Clone() eaopt.Genome {
+	cc := *c
+	return &cc
+}
+
+func main() {
+	// Simulated annealing is implemented as a GA using the ModSimulatedAnnealing model.
+	cfg := eaopt.NewDefaultGAConfig()
+	cfg.Model = eaopt.ModSimulatedAnnealing{
+		Accept: func(g, ng uint, e0, e1 float64) float64 {
+			// Accept readily in early generations but reluctantly in later generations.
+			t := 1.0 - float64(g)/float64(ng)
+			return (math.Cos(t*math.Pi) + 1.0) / 2.0
+		},
+	}
+	cfg.NGenerations = 999
+
+	// Add a custom callback function to track progress.
+	minFit := math.MaxFloat64
+	cfg.Callback = func(ga *eaopt.GA) {
+		hof0 := ga.HallOfFame[0]
+		fit := hof0.Fitness
+		if fit == minFit {
+			// Output only when we make an improvement.
+			return
+		}
+		best := hof0.Genome.(*Coord2D)
+		fmt.Printf("Best fitness at generation %3d: %10.5f at (%9.5f, %9.5f)\n",
+			ga.Generations, fit,
+			best.X, best.Y)
+		minFit = fit
+	}
+
+	// Run the simulated-annealing algorithm.
+	ga, err := cfg.NewGA()
+	if err != nil {
+		panic(err)
+	}
+	err = ga.Minimize(func(rng *rand.Rand) eaopt.Genome {
+		var c Coord2D
+		c.X = rng.Float64()
+		c.Y = rng.Float64()
+		return &c
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	// Output the best encountered solution.
+	hof0 := ga.HallOfFame[0]
+	best := hof0.Genome.(*Coord2D)
+	fmt.Printf("Found a minimum at (%.5f, %.5f) --> %.5f.\n",
+		best.X, best.Y, hof0.Fitness)
+	fmt.Println("The global minimum is known to lie at (±8.05502, ±9.66459) and have value -19.20850.")
+}
+```
+This should produce output like the following:
+```
+Best fitness at generation   0:   -1.62856 at (  0.97142,   0.13185)
+Best fitness at generation   1:   -5.70555 at (  0.81465,  -9.68769)
+Best fitness at generation   2:   -8.22368 at ( -8.35803,   6.91242)
+Best fitness at generation   3:  -13.40055 at (  7.36818,  -9.18324)
+Best fitness at generation   6:  -16.45462 at ( -7.49961,  -9.68769)
+Best fitness at generation   7:  -16.53317 at (  8.50224,  -9.39214)
+Best fitness at generation   8:  -19.06737 at ( -7.93491,   9.65411)
+Best fitness at generation  12:  -19.18453 at (  8.02260,  -9.70168)
+Best fitness at generation  44:  -19.18972 at ( -8.04929,   9.70731)
+Best fitness at generation  80:  -19.19616 at ( -8.04283,   9.63179)
+Best fitness at generation  82:  -19.20817 at (  8.05422,   9.65894)
+Found a minimum at (8.05422, 9.65894) --> -19.20817.
+The global minimum is known to lie at (±8.05502, ±9.66459) and have value -19.20850.
 ```
 
 ## A note on parallelism
