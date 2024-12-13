@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/tsenart/kth"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -107,14 +108,7 @@ func (indis Individuals) Mutate(mutRate float64, rng *rand.Rand) {
 
 // SortByFitness ascendingly sorts individuals by fitness.
 func (indis Individuals) SortByFitness() {
-	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
-	sort.Slice(indis, less)
-}
-
-// IsSortedByFitness checks if individuals are ascendingly sorted by fitness.
-func (indis Individuals) IsSortedByFitness() bool {
-	var less = func(i, j int) bool { return indis[i].Fitness < indis[j].Fitness }
-	return sort.SliceIsSorted(indis, less)
+	kth.PDQSelectFunc(indis, 1, func(a, b Individual) bool { return a.Fitness < b.Fitness })
 }
 
 // SortByDistanceToMedoid sorts Individuals according to their distance to the
@@ -141,17 +135,11 @@ func (indis Individuals) getFitnesses() []float64 {
 
 // FitMin returns the best fitness of a slice of individuals.
 func (indis Individuals) FitMin() float64 {
-	if indis.IsSortedByFitness() {
-		return indis[0].Fitness
-	}
 	return minFloat64s(indis.getFitnesses())
 }
 
 // FitMax returns the worst fitness of a slice of individuals.
 func (indis Individuals) FitMax() float64 {
-	if indis.IsSortedByFitness() {
-		return indis[len(indis)-1].Fitness
-	}
 	return maxFloat64s(indis.getFitnesses())
 }
 
