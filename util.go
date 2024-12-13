@@ -2,6 +2,8 @@ package eaopt
 
 import (
 	"math"
+
+	"github.com/tsenart/kth"
 )
 
 func copyFloat64s(fs []float64) []float64 {
@@ -70,25 +72,15 @@ func sumFloat64s(floats []float64) (sum float64) {
 }
 
 // Compute the minimum value of a float64 slice.
-func minFloat64s(floats []float64) (min float64) {
-	min = math.Inf(1)
-	for _, f := range floats {
-		if f < min {
-			min = f
-		}
-	}
-	return
+func minFloat64s(floats []float64) float64 {
+	kth.PDQSelectOrdered(floats, 1)
+	return floats[0]
 }
 
 // Compute the maximum value of a float64 slice.
-func maxFloat64s(floats []float64) (max float64) {
-	max = math.Inf(-1)
-	for _, f := range floats {
-		if f > max {
-			max = f
-		}
-	}
-	return
+func maxFloat64s(floats []float64) float64 {
+	kth.PDQSelectOrdered(floats, len(floats))
+	return floats[len(floats)-1]
 }
 
 // Compute the mean of a float64 slice.
