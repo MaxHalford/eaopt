@@ -1,4 +1,6 @@
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/tsenart/kth v0.0.0-20241130134941-217ea3d4d3dc h1:KjP+ihaE4PeuXwZgnILNxEak3GCMjYQSg4SYZ9HqubA=
+github.com/tsenart/kth v0.0.0-20241130134941-217ea3d4d3dc/go.mod h1:a2gR9UASmmSq39p52ADhRaJmv6WCm/DVTWYS+C45FUM=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9 h1:SQFwaSi55rU7vdNs9Yr0Z324VNlrF+0wMqRXT4St8ck=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
