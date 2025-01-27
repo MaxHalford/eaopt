@@ -20,8 +20,9 @@ func (a Agent) Evaluate() (float64, error) {
 // Mutate the Agent.
 func (a *Agent) Mutate(rng *rand.Rand) {
 	var agents = a.DE.sampleAgents(3, rng)
+	var mustChange = rng.Intn(len(a.x))
 	for i := range a.x {
-		if rng.Float64() < a.DE.CRate {
+		if i == mustChange || rng.Float64() < a.DE.CRate {
 			a.x[i] = agents[0].x[i] + a.DE.DWeight*(agents[1].x[i]-agents[2].x[i])
 		}
 	}

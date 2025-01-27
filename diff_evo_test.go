@@ -43,7 +43,7 @@ func ExampleDiffEvo() {
 	// Output best encountered solution
 	fmt.Printf("Found minimum of %.5f in %v\n", y, x)
 	// Output:
-	// Found minimum of 0.00137 in [0.0004420129693826938 0.000195924625132926]
+	// Found minimum of 0.00001 in [4.732587024307115e-06 1.1630296709345484e-06]
 }
 
 func TestAgentCrossover(t *testing.T) {
