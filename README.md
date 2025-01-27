@@ -537,8 +537,6 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 
 [Differential evolution (DE)](https://www.wikiwand.com/en/Differential_evolution) somewhat resembles PSO and is also used for optimizing real-valued functions. At each generation, each so-called agent is moved according to the position of 3 randomly sampled agents. If the new position is not better than the current one then it is discarded.
 
-As can be expected there are many variants of PSO. The `SPSO` struct implements the [SPSO-2011 standard](http://clerc.maurice.free.fr/pso/SPSO_descriptions.pdf).
-
 #### Example
 
 In this example we're going to minimize th [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is 0.
