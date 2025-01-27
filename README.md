@@ -539,7 +539,7 @@ func NewSPSO(nParticles, nSteps uint, min, max, w float64, parallel bool, rng *r
 
 #### Example
 
-In this example we're going to minimize th [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is 0.
+In this example we're going to minimize the [Ackley function](https://www.sfu.ca/~ssurjano/ackley.html) with two dimensions. The global minimum is 0.
 
 ```go
 package main
@@ -591,7 +591,7 @@ func main() {
 This should produce the following output.
 
 ```sh
->>> Found minimum of 0.00137, the global minimum is 0
+>>> Found minimum of 0.00001, the global minimum is 0
 ```
 
 #### Parameters
